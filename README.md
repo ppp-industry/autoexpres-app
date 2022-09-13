@@ -1,9 +1,11 @@
-Holomidov Vitalii(DevOps), [13 Sep 2022, 13:54:23]:
-Актуальна база в корні
-Щоб залити базу
-Відкрити корінь проекта в терміналі і написати цю команду:
-docker cp ___bk_ticket_09-22__msql.sql db:/root/ && docker exec -it db mysql -u root -p app_db < /root/___bk_ticket_09-22__msql.sql . Ввести потрібно цей пароль: !!!!!!@@@4
-Подивитись/змінити доступи до бази можна в файлі .env в корні проекту
-Логи Nginx пишуться в папку logs/nginx/
+<pre>
+Start project:
+Go to the root of the site
+Change .env.example to .env
+docker-compose up
 
-адмінер localhost:8080
+Project - localhost
+Adminer - localhost:8080
+Adminer accesses - system_bd(MySql), server(db), user(app_usr), password(app_dpassword@), bd(app_db). 
+All accesses are in .env
+</pre>
