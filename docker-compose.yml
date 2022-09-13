@@ -3,6 +3,7 @@ version: '3'
 services:
   db:
     image: mariadb:10.7
+    container_name: db
     restart: always
     environment:
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
@@ -28,7 +29,7 @@ services:
 
   php-fpm:
     container_name: php-fpm
-    image: php:7.4.0-fpm-alpine
+    build: ./php
     restart: always
     volumes:
       - ./site/:/var/www/app/
