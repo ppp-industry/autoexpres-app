@@ -1,0 +1,12 @@
+<?php
+if (!defined("PJ_HOST")) define("PJ_HOST", "localhost");
+if (!defined("PJ_USER")) define("PJ_USER", "busadmin");
+if (!defined("PJ_PASS")) define("PJ_PASS", "mCqKeSxNs7Q8JzVg");
+if (!defined("PJ_DB")) define("PJ_DB", "busadmin");
+if (!defined("PJ_PREFIX")) define("PJ_PREFIX", "");
+if (!defined("PJ_INSTALL_FOLDER")) define("PJ_INSTALL_FOLDER", "/busadmin/");
+if (!defined("PJ_INSTALL_PATH")) define("PJ_INSTALL_PATH", "/usr/www/1qa.ru/html/busadmin/");
+if (!defined("PJ_INSTALL_URL")) define("PJ_INSTALL_URL", "http://1qa.ru/busadmin/");
+if (!defined("PJ_SALT")) define("PJ_SALT", "BO2P703T");
+if (!defined("PJ_INSTALLATION")) define("PJ_INSTALLATION", "1.1111111111111E+28");
+?>
