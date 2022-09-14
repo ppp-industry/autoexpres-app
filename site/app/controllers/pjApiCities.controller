@@ -1,0 +1,17 @@
+<?php
+
+
+/**
+ * Description of pjApiCities
+ *
+ * @author alexp
+ */
+class pjApiCities extends pjAppController {
+    
+    
+    public function pjActionIndex(){
+        echo __LINE__;exit();
+    }
+    
+    
+}

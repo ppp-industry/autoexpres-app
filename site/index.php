@@ -1,6 +1,13 @@
 <?php
-//echo '<pre>';
-//echo var_dump($_SERVER['REQUEST_URI']);exit();
+function vd($var){
+    
+    
+    echo '<pre>';
+    echo var_dump($var);
+    exit();
+
+}
+
 if (!headers_sent()) {
     session_name('BusSchedule');
     @session_start();
@@ -24,16 +31,13 @@ if (!defined("ROOT_PATH")) {
 require_once ROOT_PATH . 'ext/dotenv/install.php';
 require ROOT_PATH . 'app/config/options.inc.php';
 require_once PJ_FRAMEWORK_PATH . 'pjAutoloader.class.php';
+require ROOT_PATH . 'core/Router.php';
+require_once PJ_FRAMEWORK_PATH . 'pjObserver.class.php';
 
 pjAutoloader::register();
-if (!isset($_GET['controller']) || empty($_GET['controller'])) {
-    header("HTTP/1.1 301 Moved Permanently");
-    pjUtil::redirect(PJ_INSTALL_URL . basename($_SERVER['PHP_SELF']) . "?controller=pjAdmin&action=pjActionIndex");
-}
+Router::run(); 
 
-if (isset($_GET['controller'])) {
-    require_once PJ_FRAMEWORK_PATH . 'pjObserver.class.php';
-    $pjObserver = pjObserver::factory();
-    $pjObserver->init();
-}
+$pjObserver = pjObserver::factory();
+$pjObserver->init();
+
 ?>
