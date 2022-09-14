@@ -80,7 +80,6 @@ class pjAppController extends pjController {
 
         
         if ($_GET['controller'] != 'pjInstaller') {
-//            echo __LINE__;exit();
             $this->models['Option'] = pjOptionModel::factory();
             $this->option_arr = $this->models['Option']->getPairs($this->getForeignId());
             $this->set('option_arr', $this->option_arr);
@@ -92,10 +91,8 @@ class pjAppController extends pjController {
                     $this->setLocaleId($locale_arr[0]['id']);
                 }
             }
-//            echo __LINE__;exit();
             $this->loadSetFields();
         }
-//        echo __LINE__;exit();
     }
 
     public static function setFields($locale) {

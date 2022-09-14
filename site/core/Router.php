@@ -12,13 +12,9 @@ class Router {
     private $controller;
     private $params = array();
 
-    private function __construct() {
-        ;
-    }
+    private function __construct() {}
 
-    protected function __clone() {
-        
-    }
+    protected function __clone() {}
 
     public function __wakeup() {
         throw new \Exception("Cannot unserialize a singleton.");
@@ -57,8 +53,24 @@ class Router {
     public function setDataAboutRoute() {
         $url = $_SERVER['REQUEST_URI'];
 
-        if (preg_match('/^\/api/', $url)) {
-            $url = str_replace('/api/', '', $url);
+        if (preg_match('/^(\/(en|uk|ru))?\/api\//', $url)) {
+
+            if(preg_match('/(en|uk|ru)/', $url,$matches)){
+                $lang = $matches[0];
+                
+                $langToId = [
+                    'uk' => 3,
+                    'ru' => 2,
+                    'en' => 1
+                ];
+                
+                if(isset($langToId[$lang])){
+                    $_SESSION['admin_locale_id'] = $langToId[$lang];
+                }
+                
+            }
+            
+            $url = preg_replace('/^(\/(en|uk|ru))?\/api\//', '', $url);
 
             $data = explode('/', $url);
 
