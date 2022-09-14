@@ -61,7 +61,7 @@ class Router {
     public function setDataAboutRoute(){
         $url = $_SERVER['REQUEST_URI'];
         
-        vd($_SERVER);
+//        vd($_SERVER);
         
         if(preg_match('/^\/api/', $url)){
             $url = str_replace('/api/','',$url);
