@@ -5,7 +5,6 @@ if (!defined("ROOT_PATH")) {
     exit;
 }
 
-
 /**
  * Description of pjApiCities
  *
@@ -115,8 +114,6 @@ class pjApiBuses extends pjFront {
     public function pjActionSeats() {
         $_SESSION[$this->defaultStep]['2_passed'] = true;
         $busList = [];
-        
-        
 
         if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
             $bookingPeriod = array();
@@ -155,14 +152,11 @@ class pjApiBuses extends pjFront {
                     function($var) {
                         return !empty($var['ticket_arr'][0]['price']);
                     }
-                );
-                
+                );   
             }
-
-        } 
+        }
         
-        
-         pjAppController::jsonResponse($busList);
+        pjAppController::jsonResponse($busList);
     }
 
 }
