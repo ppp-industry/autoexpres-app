@@ -67,18 +67,17 @@ class Router {
                 if(isset($langToId[$lang])){
                     $_SESSION['admin_locale_id'] = $langToId[$lang];
                 }
-                
             }
             
             $url = preg_replace('/^(\/(en|uk|ru))?\/api\//', '', $url);
-
             $data = explode('/', $url);
 
             if (count($data) === 3 && preg_match('/\w+\/\w+\/\d+/', $url)) {
                 $this->controller = $this->params['controller'] = 'pjApi' . ucfirst($data[0]);
                 $this->action = $this->params['action'] = 'pjAction' . ucfirst($data[1]);
                 $this->params['id'] = $data[2];
-            } elseif (count($data) == 2 && preg_match('/\w+\/\d+/', $url)) {
+            } 
+            elseif (count($data) == 2 && preg_match('/\w+\/\d+/', $url)) {
                 $this->controller = $this->params['controller'] = 'pjApi' . ucfirst($data[0]);
                 $this->params['id'] = $data[1];
 
@@ -93,27 +92,38 @@ class Router {
                         $this->action = $this->params['action'] = 'pjActionDelete';
                         break;
                 }
-            } elseif (count($data) == 1 && preg_match('/\w+/', $url) && $_SERVER['REQUEST_METHOD'] == 'POST') {
+            } 
+            elseif (count($data) == 2) {
+                $this->controller = $this->params['controller'] = 'pjApi' . ucfirst($data[0]);
+                $this->action = $this->params['action'] = 'pjAction' . ucfirst($data[1]);
+            } 
+            elseif (count($data) == 1 && preg_match('/\w+/', $url) && $_SERVER['REQUEST_METHOD'] == 'POST') {
                 $this->controller = $this->params['controller'] = 'pjApi' . ucfirst($data[0]);
                 $this->action = $this->params['action'] = 'pjActionCreate';
-            } elseif (count($data) == 1 && preg_match('/\w+/', $url) && $_SERVER['REQUEST_METHOD'] == 'GET') {
+            } 
+            elseif (count($data) == 1 && preg_match('/\w+/', $url) && $_SERVER['REQUEST_METHOD'] == 'GET') {
                 $this->controller = $this->params['controller'] = 'pjApi' . ucfirst($data[0]);
                 $this->action = $this->params['action'] = 'pjActionIndex';
             }
-        } elseif (strpos($url, 'controller') !== false) {
+                
+            if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
+                $this->params += $_POST;
+            }
+            
+        } 
+        elseif (strpos($url, 'controller') !== false) {
             $queryStr = parse_url($url, PHP_URL_QUERY);
             $queryData = [];
             parse_str($queryStr, $queryData);
-
             $this->controller = $queryData['controller'];
-
 
             if (isset($queryData['action'])) {
                 $this->action = $queryData['action'];
             }
 
             $this->params = $queryData;
-        } else {
+        } 
+        else {
             header("HTTP/1.1 301 Moved Permanently");
             pjUtil::redirect(PJ_INSTALL_URL . basename($_SERVER['PHP_SELF']) . "?controller=pjAdmin&action=pjActionIndex");
         }
