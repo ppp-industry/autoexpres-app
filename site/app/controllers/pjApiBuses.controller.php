@@ -16,12 +16,18 @@ class pjApiBuses extends pjFront {
 	
     
     public function pjActionCheck() {
-
+// переработать метод для работы с пересадками
+  
         $params = Router::getParams();
 
+        $transferIds = null;
         $resp = array();
         $returnBusIdArr = array();
 
+        if($this->_is('with_transfer')){
+            $transferIds = $this->_get('transfer_id_arr');
+        }
+        
         if ($params['pickup_id'] != $params['return_id']) {
             $resp['code'] = 200;
 
@@ -34,8 +40,8 @@ class pjApiBuses extends pjFront {
             if (isset($params['final_check'])) {
                 $date = pjUtil::formatDate($this->_get('date'), $this->option_arr['o_date_format']);
             }
-
-            $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false);
+            
+            $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
 
             if (empty($busIdArr)) {
                 $resp['code'] = 100;
@@ -53,7 +59,7 @@ class pjApiBuses extends pjFront {
 
                 $date = pjUtil::formatDate($params['return_date'], $this->option_arr['o_date_format']);
 
-                $returnBusIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, true);
+                $returnBusIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, true,$transferIds);
 
                 if (empty($returnBusIdArr)) {
                     $resp['code'] = 101;
@@ -116,13 +122,18 @@ class pjApiBuses extends pjFront {
         $busList = [];
 
         if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
-            $bookingPeriod = array();
+            $transferIds = $bookedData = $bookingPeriod = array();
+            
             if ($this->_is('booking_period')) {
                 $bookingPeriod = $this->_get('booking_period');
             }
-            $bookedData = array();
+            
             if ($this->_is('booked_data')) {
                 $bookedData = $this->_get('booked_data');
+            }
+            
+            if($this->_is('with_transfer')){
+                $transferIds = $this->_get('transfer_id_arr');
             }
 
             if ($this->_is('bus_id_arr')) {
@@ -130,8 +141,8 @@ class pjApiBuses extends pjFront {
                 $pickupId = $this->_get('pickup_id');
                 $returnId = $this->_get('return_id');
                 $date = $this->_get('date');
-
-                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F');
+                
+                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F',$transferIds);
                 $busList['bus_arr'] = array_filter(
                     $busList['bus_arr'],
                     function($var) {
@@ -144,8 +155,7 @@ class pjApiBuses extends pjFront {
                 $pickupId = $this->_get('return_id');
                 $returnId = $this->_get('pickup_id');
                 $date = $this->_get('return_date');
-
-                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'T');
+                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'T',$transferIds);
                 
                 $busList['bus_arr'] = array_filter(
                     $busList['bus_arr'],

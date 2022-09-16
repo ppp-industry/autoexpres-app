@@ -466,7 +466,9 @@ class pjAppController extends pjController {
         }
     }
 
-    public function getBusList($pickup_id, $return_id, $bus_id_arr, $booking_period, $booked_data, $date, $is_return) {
+    public function getBusList($pickup_id, $return_id, $bus_id_arr, $booking_period, $booked_data, $date, $is_return,$transfer_id = null) {
+        //vd($bus_id_arr);
+        
         $pjBusLocationModel = pjBusLocationModel::factory();
         $pjPriceModel = pjPriceModel::factory();
         $pjBookingSeatModel = pjBookingSeatModel::factory();

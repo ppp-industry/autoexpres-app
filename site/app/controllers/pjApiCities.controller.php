@@ -5,13 +5,18 @@ if (!defined("ROOT_PATH")) {
     exit;
 }
 
-
+/** 
+ * 
+ * TODO ПЕРЕРАБОТАТЬ МЕХАНИЗМ РАБОТЫ ТАКИМ ОБРАЗОМ, ЧТОБЫ МОЖНО БЫЛО искать маршрутки с пересадками, 
+ * тоесть если города недоступны напрямую, искать маршруты в которых есть точка А или Б 
+ * 
+ * **/
 /**
  * Description of pjApiCities
  *
  * @author alexp
  */
-class pjApiCities extends pjAppController {
+class pjApiCities extends pjFront {
     
     
     public function pjActionIndex(){
@@ -46,20 +51,24 @@ class pjApiCities extends pjAppController {
     }
     
     public function pjActionGetLocations() {
-        $params = Router::getParams();
-        $location_arr = [];
+        $needTransfer = function($cityId,$cities){
+            return !in_array($cityId, $cities);
+        };
         
+        $params = Router::getParams();
         $this->setAjax(true);
 
         $pjCityModel = pjCityModel::factory();
         $pjRouteDetailModel = pjRouteDetailModel::factory();
-
+        $location_arr = $locationArrReturn = $locationArrPickup = null;
+        
         if (isset($params['pickup_id'])) {
             $where = '';
             if (!empty($params['pickup_id'])) {
                 $where = "WHERE TRD.from_location_id=" . $params['pickup_id'];
             }
-            $location_arr = $pjCityModel
+            
+            $locationArrPickup = $pjCityModel
                     ->reset()
                     ->select('t1.*, t2.content as name')
                     ->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
@@ -69,13 +78,12 @@ class pjApiCities extends pjAppController {
                     ->getData();
         }
         
-        
         if (isset($params['return_id'])) {
             $where = '';
             if (!empty($params['return_id'])) {
                 $where = "WHERE TRD.to_location_id=" . $params['return_id'];
             }
-            $location_arr = $pjCityModel
+            $locationArrReturn = $pjCityModel
                     ->reset()
                     ->select('t1.*, t2.content as name')
                     ->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
@@ -85,7 +93,46 @@ class pjApiCities extends pjAppController {
                     ->getData();
         }
 
-        $this->set('location_arr', $location_arr);
+        if(
+                isset($params['pickup_id'],$params['return_id']) 
+                && 
+                (
+                    isset($params['with_transfer']) 
+                    && 
+                    $params['with_transfer'] == '1'
+                )
+                &&
+                $needTransfer(
+                    $params['pickup_id'], 
+                    array_column(
+                        $locationArrPickup, 
+                        'id'
+                    )
+                )
+            ){
+                
+            
+            $citiIdsPickup = array_column($locationArrPickup,'id');
+            $citiIdsReturn = array_column($locationArrReturn,'id');
+            $intersect = array_intersect($citiIdsPickup, $citiIdsReturn);
+            
+            $transferArr = array_filter($locationArrPickup,function($element) use (&$intersect){
+                return in_array($element['id'], $intersect);
+            });
+            
+            $this->_set('transfer_id_arr', $intersect);
+            $this->_set('with_transfer', 1);
+            
+            $location_arr = [
+                'locations' => $locationArrReturn,
+                'transfer' => $transferArr
+            ];   
+        }
+        else{
+            $location_arr = [
+                'locations' => $locationArrPickup ? $locationArrPickup : ($locationArrReturn ? $locationArrReturn : [])
+            ];
+        }
         
         pjAppController::jsonResponse($location_arr);
     }

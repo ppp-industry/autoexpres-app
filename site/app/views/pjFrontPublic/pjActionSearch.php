@@ -16,7 +16,7 @@ $short_days = __('short_days', true);
 	<?php
 	include PJ_VIEWS_PATH . 'pjFrontEnd/elements/header.php';
 	?>
-    <?switch($controller->getLocaleId()){
+    <?php switch($controller->getLocaleId()){
         case '1':
             $baseUrl = $tpl['option_arr']['o_base_url_en'];
             break;
