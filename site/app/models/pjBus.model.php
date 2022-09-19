@@ -82,8 +82,6 @@ SQL;
 
             
             $resFrom = $queryFromTransferCity->findAll()->getDataPair(null, 'id');
-  
-            $resFrom += $resTo;
             
             if(!empty($resTo) && !empty($resFrom)){
                 

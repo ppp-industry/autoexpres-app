@@ -94,23 +94,22 @@ class pjApiCities extends pjFront {
         }
 
         if(
-                isset($params['pickup_id'],$params['return_id']) 
+            isset($params['pickup_id'],$params['return_id']) 
+            && 
+            (
+                isset($params['with_transfer']) 
                 && 
-                (
-                    isset($params['with_transfer']) 
-                    && 
-                    $params['with_transfer'] == '1'
+                $params['with_transfer'] == '1'
+            )
+            &&
+            $needTransfer(
+                $params['pickup_id'], 
+                array_column(
+                    $locationArrPickup, 
+                    'id'
                 )
-                &&
-                $needTransfer(
-                    $params['pickup_id'], 
-                    array_column(
-                        $locationArrPickup, 
-                        'id'
-                    )
-                )
-            ){
-                
+            )
+        ){
             
             $citiIdsPickup = array_column($locationArrPickup,'id');
             $citiIdsReturn = array_column($locationArrReturn,'id');
@@ -120,7 +119,12 @@ class pjApiCities extends pjFront {
                 return in_array($element['id'], $intersect);
             });
             
-            $this->_set('transfer_id_arr', $intersect);
+            $values = array_values($transferArr);
+            $transferArr = array_combine(
+                    range(0, count($values) - 1), 
+                $values
+            );
+            
             $this->_set('with_transfer', 1);
             
             $location_arr = [
