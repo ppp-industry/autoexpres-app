@@ -125,7 +125,7 @@ class pjApiBuses extends pjFront {
     }
     
     public function pjActionSeats() {
-//        echo __LINE__;exit();
+
         ini_set("display_errors", "On");
     error_reporting(E_ALL ^ E_DEPRECATED);
         
@@ -153,18 +153,34 @@ class pjApiBuses extends pjFront {
                 $pickupId = $this->_get('pickup_id');
                 $returnId = $this->_get('return_id');
                 $date = $this->_get('date');
-                
-//                vd($busIdArr);
-                
-                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F',$transferId);
+               
+                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F',$transferId); 
                 
                 
-                $busList['bus_arr'] = array_filter(
-                    $busList['bus_arr'],
-                    function($var) {
-                        return !empty($var['ticket_arr'][0]['price']);
-                    }
-                );
+                if($transferId){
+                    $busList['bus_arr_to'] = array_filter(
+                        $busList['bus_arr_to'],
+                        function($var) {
+                            return !empty($var['ticket_arr'][0]['price']);
+                        }
+                    );
+                     $busList['bus_arr_from'] = array_filter(
+                        $busList['bus_arr_from'],
+                        function($var) {
+                            return !empty($var['ticket_arr'][0]['price']);
+                        }
+                    );
+
+                }
+                else{
+
+                    $busList['bus_arr'] = array_filter(
+                        $busList['bus_arr'],
+                        function($var) {
+                            return !empty($var['ticket_arr'][0]['price']);
+                        }
+                    );
+                }
             }
             if ($this->_is('return_bus_id_arr')) {
                 $busIdArr = $this->_get('return_bus_id_arr');

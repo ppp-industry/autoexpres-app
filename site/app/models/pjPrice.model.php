@@ -21,59 +21,71 @@ class pjPriceModel extends pjAppModel {
         return new pjPriceModel($attr);
     }
 
-    public function getTicketPrice($bus_id, $pickup_id, $return_id, $booked_data, $option_arr, $locale_id, $is_return) {
-        $sub_total = 0;
+    public function getTicketPrice($busId, $pickupId, $returnId, $bookedData, $optionArr, $localeId, $isReturn) {
+        $subTotal = 0;
         $tax = 0;
         $total = 0;
         $deposit = 0;
 
-        $sub_total_format = '';
-        $tax_format = '';
-        $total_format = '';
-        $deposit_format = '';
+        $subTotalFormat = '';
+        $taxFormat = '';
+        $totalFormat = '';
+        $depositFormat = '';
 
-        $ticket_arr = $this
+        $ticketArr = $this
                 ->reset()
                 ->join('pjTicket', 't1.ticket_id = t2.id', 'left')
-                ->join('pjMultiLang', "t3.model='pjTicket' AND t3.foreign_id=t1.ticket_id AND t3.field='title' AND t3.locale='" . $locale_id . "'", 'left outer')
+                ->join('pjMultiLang', "t3.model='pjTicket' AND t3.foreign_id=t1.ticket_id AND t3.field='title' AND t3.locale='" . $localeId . "'", 'left outer')
                 ->join('pjBus', 't1.bus_id = t4.id', 'left')
                 ->select("t1.*, t2.seats_count, t3.content as ticket, t4.discount")
-                ->where('t1.bus_id', $bus_id)
-                ->where('t1.from_location_id', $pickup_id)
-                ->where('t1.to_location_id', $return_id)
+                ->where('t1.bus_id', $busId)
+                ->where('t1.from_location_id', $pickupId)
+                ->where('t1.to_location_id', $returnId)
                 ->where('is_return = "F"')
                 ->index("FORCE KEY (`ticket_id`)")
                 ->orderBy("ticket ASC")
                 ->findAll()
                 ->getData();
 
-        foreach ($ticket_arr as $k => $v) {
-            $return_str = $is_return == 'T' ? 'return_' : '';
+        foreach ($ticketArr as $k => $v) {
+            $returnStr = $isReturn == 'T' ? 'return_' : '';
 
-            if (isset($booked_data[$return_str . 'ticket_cnt_' . $v['ticket_id']]) && (int) $booked_data[$return_str . 'ticket_cnt_' . $v['ticket_id']] > 0) {
+            if (isset($bookedData[$returnStr . 'ticket_cnt_' . $v['ticket_id']]) && (int) $bookedData[$returnStr . 'ticket_cnt_' . $v['ticket_id']] > 0) {
                 $discount = 0;
-                if (isset($v['discount']) && (float) $v['discount'] > 0 && $is_return == 'T') {
+                if (isset($v['discount']) && (float) $v['discount'] > 0 && $isReturn == 'T') {
                     $discount = $v['discount'];
                 }
                 $price = $v['price'] - ($v['price'] * $discount / 100);
-                $sub_total += (int) $booked_data[$return_str . 'ticket_cnt_' . $v['ticket_id']] * $price;
+                $subTotal += (int) $bookedData[$returnStr . 'ticket_cnt_' . $v['ticket_id']] * $price;
             }
         }
 
-        if (!empty($option_arr['o_tax_payment']) && $sub_total > 0) {
-            $tax = ($option_arr['o_tax_payment'] * $sub_total) / 100;
+        if (!empty($optionArr['o_tax_payment']) && $subTotal > 0) {
+            $tax = ($optionArr['o_tax_payment'] * $subTotal) / 100;
         }
-        $total = $sub_total + $tax;
-        if (!empty($option_arr['o_deposit_payment']) && $total > 0) {
-            $deposit = ($option_arr['o_deposit_payment'] * $total) / 100;
+        
+        $total = $subTotal + $tax;
+        if (!empty($optionArr['o_deposit_payment']) && $total > 0) {
+            $deposit = ($optionArr['o_deposit_payment'] * $total) / 100;
         }
 
-        $sub_total_format = pjUtil::formatCurrencySign(number_format($sub_total, 2), $option_arr['o_currency']);
-        $tax_format = pjUtil::formatCurrencySign(number_format($tax, 2), $option_arr['o_currency']);
-        $total_format = pjUtil::formatCurrencySign(number_format($total, 2), $option_arr['o_currency']);
-        $deposit_format = pjUtil::formatCurrencySign(number_format($deposit, 2), $option_arr['o_currency']);
+        $subTotalFormat = pjUtil::formatCurrencySign(number_format($subTotal, 2), $optionArr['o_currency']);
+        $taxFormat = pjUtil::formatCurrencySign(number_format($tax, 2), $optionArr['o_currency']);
+        $totalFormat = pjUtil::formatCurrencySign(number_format($total, 2), $optionArr['o_currency']);
+        $depositFormat = pjUtil::formatCurrencySign(number_format($deposit, 2), $optionArr['o_currency']);
 
-        return compact('ticket_arr', 'sub_total', 'tax', 'total', 'deposit', 'sub_total_format', 'tax_format', 'total_format', 'deposit_format');
+        return [
+            'ticket_arr' => $ticketArr, 
+            'sub_total' => $subTotal, 
+            'tax' => $tax, 
+            'total' => $total, 
+            'deposit' => $deposit,
+            'sub_total_format' => $$subTotalFormat,
+            'tax_format' => $$taxFormat, 
+            'total_format' => $totalFormat, 
+            'deposit_format' => $depositFormat
+        ];
+        
     }
 
 }

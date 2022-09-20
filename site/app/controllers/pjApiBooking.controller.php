@@ -22,39 +22,83 @@ class pjApiBooking extends pjFront {
         $ret = [
             'total' => 0
         ];
+        $busIdFromTransfer = $busIdToTransfer = $transferId = null;
         
-        if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
-            $pickupId = $this->_get('pickup_id');
-            $returnId = $this->_get('return_id');
-            $isReturn = $this->_get('is_return');
-            
-            $busId = isset($params['bus_id']) && (int) $params['bus_id'] > 0 ? $params['bus_id'] : 0;
-            $returnBusId = isset($params['return_bus_id']) && (int) $params['return_bus_id'] > 0 ? $params['return_bus_id'] : 0;
+        if($this->_is('with_transfer')){
 
-            $pjPriceModel = pjPriceModel::factory();
+            $transferId = $this->_get('transferId');
             
-            if ($busId > 0) {
-                $ticketPriceArr = $pjPriceModel->getTicketPrice($busId, $pickupId, $returnId, $params, $this->option_arr, $this->getLocaleId(), 'F');
-            }
-            
-            if ($returnBusId > 0 && $isReturn == "T") {
-                $returnTicketPriceArr = $pjPriceModel->getTicketPrice($returnBusId, $returnId, $pickupId, $params, $this->option_arr, $this->getLocaleId(), 'T');
-            }
-        }
-        
-        if ($ticketPriceArr) {
-            $subTotal += $ticketPriceArr['sub_total'];
-        }
-        
-        if ($returnTicketPriceArr) {
-            $subTotal += $returnTicketPriceArr['sub_total'];
-        }
+            if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
+                $pickupId = $this->_get('pickup_id');
+                $returnId = $this->_get('return_id');
+                $isReturn = $this->_get('is_return');
 
-        if($subTotal){
-            $subTotal =  pjUtil::formatCurrencySign(number_format($subTotal, 2), $this->option_arr['o_currency'],'',false);
+                $busIdToTransfer =  isset($params['bus_id_to']) && (int) $params['bus_id_to'] > 0 ? $params['bus_id_to'] : null;
+                $busIdFromTransfer =  isset($params['bus_id_from']) && (int) $params['bus_id_from'] > 0 ? $params['bus_id_from'] : null;
+
+                $pjPriceModel = pjPriceModel::factory();
+                
+                if ($busIdToTransfer) {
+                    $ticketPriceArr = $pjPriceModel->getTicketPrice($busIdToTransfer, $pickupId, $transferId, $params, $this->option_arr, $this->getLocaleId(), 'F');
+
+                    $ret['total'] += $ret['total_to'] = $ticketPriceArr['total'];
+                    $ret['total_to_format'] = $ticketPriceArr['total_format'];
+                }
+                
+                if ($busIdFromTransfer) {
+                    $ticketPriceArr = $pjPriceModel->getTicketPrice($busIdFromTransfer, $transferId, $returnId, $params, $this->option_arr, $this->getLocaleId(), 'F');
+
+                    
+                    $ret['total'] += $ret['total_from'] = $ticketPriceArr['total'];
+                    $ret['total_from_format'] = $ticketPriceArr['total_format'];
+                    
+                }   
+                
+                
+                $ret['total_format'] = pjUtil::formatCurrencySign(number_format($ret['total'], 2), $this->option_arr['o_currency']);
+                
+            }
+        }
+        else{
+            
+            if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
+                $pickupId = $this->_get('pickup_id');
+                $returnId = $this->_get('return_id');
+                $isReturn = $this->_get('is_return');
+
+                $busId = isset($params['bus_id']) && (int) $params['bus_id'] > 0 ? $params['bus_id'] : 0;
+                $returnBusId = isset($params['return_bus_id']) && (int) $params['return_bus_id'] > 0 ? $params['return_bus_id'] : 0;
+
+                $pjPriceModel = pjPriceModel::factory();
+
+                if ($busId > 0) {
+                    $ticketPriceArr = $pjPriceModel->getTicketPrice($busId, $pickupId, $returnId, $params, $this->option_arr, $this->getLocaleId(), 'F');
+                }
+
+                if ($returnBusId > 0 && $isReturn == "T") {
+                    $returnTicketPriceArr = $pjPriceModel->getTicketPrice($returnBusId, $returnId, $pickupId, $params, $this->option_arr, $this->getLocaleId(), 'T');
+                }
+            }
+        
+            if ($ticketPriceArr) {
+                $subTotal += $ticketPriceArr['sub_total'];
+            }
+
+            if ($returnTicketPriceArr) {
+                $subTotal += $returnTicketPriceArr['sub_total'];
+            }
+
+            if($subTotal){
+                $subTotal =  pjUtil::formatCurrencySign(number_format($subTotal, 2), $this->option_arr['o_currency'],'',false);
+            }
+
+            $ret['total'] = $subTotal;
+            
+            
         }
         
-        $ret['total'] = $subTotal;
+        
+        
         
         pjAppController::jsonResponse($ret);
     }
