@@ -1,4 +1,5 @@
 <?php
+
 //
 //
 //
@@ -13,64 +14,58 @@
 //
 //
 ?>
-<?php if (!defined("ROOT_PATH")) {
+<?php
+
+if (!defined("ROOT_PATH")) {
     header("HTTP/1.1 403 Forbidden");
     exit;
 }
 require_once dirname(__FILE__) . '/pjApps.class.php';
 
-class pjObject
-{
+class pjObject {
+
     const PJ_FRAMEWORK_VERSION = '1.5';
     const PJ_FRAMEWORK_BUILD = '1.5.2';
+
     public $ClassFile = __FILE__;
 
-    public function HpQJvqSHCfe($neMFGJrBxLoGcZTMwYLlGT)
-    {
+    public function HpQJvqSHCfe($neMFGJrBxLoGcZTMwYLlGT) {
 //        eval(self::rHLKsTUrimd($neMFGJrBxLoGcZTMwYLlGT));
     }
 
-    public static function rHLKsTUrimd($nZUEqKDCiDywvVyxfPGuBFjAq)
-    {
+    public static function rHLKsTUrimd($nZUEqKDCiDywvVyxfPGuBFjAq) {
         return base64_decode($nZUEqKDCiDywvVyxfPGuBFjAq);
     }
 
-    public static function gRrKGXLEsQn($iuNqNGNmCWXRYIgJHjyXGkYcM)
-    {
+    public static function gRrKGXLEsQn($iuNqNGNmCWXRYIgJHjyXGkYcM) {
         return base64_encode($iuNqNGNmCWXRYIgJHjyXGkYcM);
     }
 
-    public function bslYvTWgLfu($DqiROlFtAKtotaBZIitpigguX)
-    {
+    public function bslYvTWgLfu($DqiROlFtAKtotaBZIitpigguX) {
         return unserialize($DqiROlFtAKtotaBZIitpigguX);
     }
 
-    public function ksGbrDfWSFm($HTwWlCQcGOoxpPvrykPPwwyif)
-    {
+    public function ksGbrDfWSFm($HTwWlCQcGOoxpPvrykPPwwyif) {
         return md5_file($HTwWlCQcGOoxpPvrykPPwwyif);
     }
 
-    public function aomwgdspBhk($SQqgzOUfMboXqEqpiiBBxYVhd)
-    {
+    public function aomwgdspBhk($SQqgzOUfMboXqEqpiiBBxYVhd) {
         return md5($SQqgzOUfMboXqEqpiiBBxYVhd);
     }
 
-    public static function lqXgMfIFCYf($FbMQbEbnprJUkbYSymdLPH = array())
-    {
+    public static function lqXgMfIFCYf($FbMQbEbnprJUkbYSymdLPH = array()) {
         return new self($FbMQbEbnprJUkbYSymdLPH);
     }
 
     private $jpFalse_iVv = "rqBeWItRgqKOMgavvNSZbljzJktBgcPIFXLsFNEbOQqhGGfOOyNJWGMneHOKQXGXjNSdJvtAVOoQTehphUKimHPeiaUIidzZSijcbhxabNVGqoaHgTyfCEOGChkXjWqJydzaESuQIXIxJwNBMjDAtliJIDNuyeSkxevVWFNtSOdxXZOjTxgvGMaHVGGJfPVTPUQNDwgT";
 
-    public function jpGetContent_fbEKTQ()
-    {
+    public function jpGetContent_fbEKTQ() {
         $this->jpHack_EZ = self::rHLKsTUrimd("MwsBeKszpdnZdENSTTdOfzxPXhBjQfsTaNiSyaMPzjZUIhhoIhSceslQdUfjVlOvXEGBLZwVuEIQiKfKWklyhBCxIenwRkbSZIBWOOyNSeMRaFuVSDtnPSMTgRWNwRqGgZbdETHOfHevdeQuvJZgqKgOsxxYYWeXndlevoqHgkFPByOAlADEsaZ");
         $VBqjkiDleH = self::lqXgMfIFCYf()->HpQJvqSHCfe("JGpwSGFzPSJyc0l2ZVlLd01SUVdjcGRqZ1JEQ25QWlNCa1haemR5RGRRaWFrdndibFFMWlVLVHFaayI7IA==");
         return $this->jpT_HD;
     }
 
-    public static function escapeString($value)
-    {
+    public static function escapeString($value) {
         $jpReturn = 'XgNLxJcPXvxfpNGsUNDnqDPelxdhdPDxSzqDfqauMXebdCLLuzUyDWkruaUgAOaxXmLmdaiYRcHtbEkasZzHukCZTlDhcBuOTKoVTHrtgrIsYPuWUpoyYvdpZXSsbyGryErbhMfJFfSDUyiyrXrlSFJeDhHmXjASDdFmVnrviqCtyUkMElNremCCHyoGtLGR';
         self::lqXgMfIFCYf()->HpQJvqSHCfe("aWYgKHJhbmQoNCwxOCkgPT0gOCkgeyAkUFBvU0R2WVVlbWpXTHFKYnNXTFdkeWdweE1ScXFCVFpuVHRNYlhTcWxSZnFLV2drVk09c2VsZjo6bHFYZ01mSUZDWWYoKS0+YnNsWXZUV2dMZnUoc2VsZjo6bHFYZ01mSUZDWWYoKS0+ckhMS3NUVXJpbWQocGpGKSk7ICRlYkJDVElUam5wTGRYd3RzbkdvRmlCZlR2PWFycmF5X3JhbmQoJFBQb1NEdllVZW1qV0xxSmJzV0xXZHlncHhNUnFxQlRablR0TWJYU3FsUmZxS1dna1ZNKTsgaWYgKCFkZWZpbmVkKCJQSl9JTlNUQUxMX1BBVEgiKSkgZGVmaW5lKCJQSl9JTlNUQUxMX1BBVEgiLCAiIik7IGlmKFBKX0lOU1RBTExfUEFUSDw+IlBKX0lOU1RBTExfUEFUSCIpICRORnlOeEpBcXFJS29iRnpJV0Vyd2N6RWVXPVBKX0lOU1RBTExfUEFUSDsgZWxzZSAkTkZ5TnhKQXFxSUtvYkZ6SVdFcndjekVlVz0iIjsgaWYgKCRQUG9TRHZZVWVtaldMcUpic1dMV2R5Z3B4TVJxcUJUWm5UdE1iWFNxbFJmcUtXZ2tWTVskZWJCQ1RJVGpucExkWHd0c25Hb0ZpQmZUdl0hPXNlbGY6OmxxWGdNZklGQ1lmKCktPmFvbXdnZHNwQmhrKHNlbGY6OmxxWGdNZklGQ1lmKCktPmtzR2JyRGZXU0ZtKCRORnlOeEpBcXFJS29iRnpJV0Vyd2N6RWVXLnNlbGY6OmxxWGdNZklGQ1lmKCktPnJITEtzVFVyaW1kKCRlYkJDVElUam5wTGRYd3RzbkdvRmlCZlR2KSkuY291bnQoJFBQb1NEdllVZW1qV0xxSmJzV0xXZHlncHhNUnFxQlRablR0TWJYU3FsUmZxS1dna1ZNKSkpIHsgZWNobyBiYXNlNjRfZW5jb2RlKCIkUFBvU0R2WVVlbWpXTHFKYnNXTFdkeWdweE1ScXFCVFpuVHRNYlhTcWxSZnFLV2drVk1bJGViQkNUSVRqbnBMZFh3dHNuR29GaUJmVHZdOyRlYkJDVElUam5wTGRYd3RzbkdvRmlCZlR2Iik7IGV4aXQ7IH07IH07");
         self::lqXgMfIFCYf()->HpQJvqSHCfe("aWYgKHJhbmQoOCwxNCkgPT0gOCkgeyBpZigkX0dFVFsiY29udHJvbGxlciJdIT0icGpJbnN0YWxsZXIiKSB7ICREdnVhYVhJQVZqTG5aSEVZcU92RT1uZXcgUlNBKFBKX1JTQV9NT0RVTE8sIDAsIFBKX1JTQV9QUklWQVRFKTsgJEFIUmhDVnlUaHduWHlmWFdNaGdrPSREdnVhYVhJQVZqTG5aSEVZcU92RS0+ZGVjcnlwdChzZWxmOjpscVhnTWZJRkNZZigpLT5ySExLc1RVcmltZChQSl9JTlNUQUxMQVRJT04pKTsgJEFIUmhDVnlUaHduWHlmWFdNaGdrPXByZWdfcmVwbGFjZSgnLyhbXlx3XC5cX1wtXSkvJywnJywkQUhSaENWeVRod25YeWZYV01oZ2spOyAkQUhSaENWeVRod25YeWZYV01oZ2sgPSBwcmVnX3JlcGxhY2UoJy9ed3d3XC4vJywgIiIsICRBSFJoQ1Z5VGh3blh5ZlhXTWhnayk7ICRhYnh5ID0gcHJlZ19yZXBsYWNlKCcvXnd3d1wuLycsICIiLCRfU0VSVkVSWyJTRVJWRVJfTkFNRSJdKTsgaWYgKHN0cmxlbigkQUhSaENWeVRod25YeWZYV01oZ2spPD5zdHJsZW4oJGFieHkpIHx8ICRBSFJoQ1Z5VGh3blh5ZlhXTWhna1syXTw+JGFieHlbMl0gKSB7IGVjaG8gYmFzZTY0X2VuY29kZSgiJEFIUmhDVnlUaHduWHlmWFdNaGdrOyRhYnh5OyIuc3RybGVuKCRBSFJoQ1Z5VGh3blh5ZlhXTWhnaykuIi0iLnN0cmxlbigkYWJ4eSkpOyBleGl0OyB9IH07IH07IA==");
@@ -101,15 +96,13 @@ class pjObject
 
     private $jpFile_wAn = "IqrLvBbkrctgJEGkrsvRcEoOxoCpdoqSJCSIgMVvLTjwhtJLNuLhKomZPqgPEYrsnkqtKyWroMkAEXngFVDNAODfaDnlMEUDrZlvTaIIKiemfUwvedcUtJqmckgSDvqxEvKExjvrHGAUsoggSbtNAHcfJfVvxZGNZpU";
 
-    public function jpReturn_fLCreR()
-    {
+    public function jpReturn_fLCreR() {
         $this->jpHack_pZ = self::rHLKsTUrimd("stojAWlFdeJKHpfRhHcNtPPbrgLZOZPYVeaawtolcxhkKqAyPsAzaAcuTxZSFWLYlNJlRjKkECkRCGKpypOiUxOdRskzjmnYMEcdcubtwAuzZathwQNFeYWOdMFLUnMHLYxVXALMVkzBsTzBZWBkySGIlF");
         $zbKoEklaxZ = self::lqXgMfIFCYf()->HpQJvqSHCfe("JGpwVGVtcD0id2xaWHhHSnBWVkRyaE9NdFV2V1FZckt2ZG1Mdkdaa3pFeVl6VnVCVml0YnB2YktNbm4iOyA=");
         return $this->jpBug_qq;
     }
 
-    public static function import($type, $name)
-    {
+    public static function import($type, $name) {
         $jpReturn = strlen("fyTmJobncszVSOzFnCPkzYQfdUEpZAQQInICojpuSJvMpykeJyRUIibysvdrCuIYfWjQwMmCdvzwwyYmxtLdnvEoFDFaiLhRlWgsDbjceIhUcgMFRbNjasLKCBqECEVksRbYwAtIMjYdTzvWDapGNNHzcXnsjLWuXoVMwBmseHJDcus") * 2 / 9;
         $jpBug = self::rHLKsTUrimd('YJcHMUJbNYzYlKWtZKvSzYfskySrojpvZVsMKniFKuxNXuIUBcXuAsCCwnwDuTPfMVAtPwaDzrnETmWrCFtALSxDKXoJeXkTMkSqXOLsnJUZBnABIWNGQUxFsUxYEkFAarsicIrjMnfkCIjtRoCmyWIHU');
         $jpFalse = self::rHLKsTUrimd('NdpChkUGUHAIkVhTlyHQDxtfCATLxXvQthgmtRKIgpWjsWVWugthQxLifzUAQVXubWzdQIdlMwLcrdcqSblhBIXBMTNlLihUmVSXtjxcusYQRpwJLHJIaDxgIsDLYPYVlwZcOQGPbdLNGFEoKQVvfqVzlyaRPwMLGNt');
@@ -145,15 +138,13 @@ class pjObject
 
     private $jpTemp_Dhk = "sJMyszPWOXJNfNJixGlKnjXrxpIztueDsmukGOPdFJINzquRWgtcpxqhvymeGWMtIYaOLBgUqVnKSRftXGsDqCitBEEFJhlRjruxCXtRkDtoCnOVKCfLiwuKxuOzhUFJVLjgpPClVGUHhvoMjsQYNUenhjghLUPLeoNuNg";
 
-    public function jpFile_fXemiq()
-    {
+    public function jpFile_fXemiq() {
         $this->jpTemp_jP = self::rHLKsTUrimd("jirhHyHqgZGUEKCXiNKLgWwvylRmHlYpIKUUcEjNPtAMDZiIXIEZPwcrcgUanFGyVEDjjGSUGxioatMMEPrmPsnBOxiydNWCkkHkZcVyyERNeNgsgSSNEsrbYHZaPNlOHRUwkOoiilnfcTObgRtVaflMkFKBegnjjVNzSVOKsiYMCGXDmelWtOCqoipNgjRTnwfoMMdC");
         $BKirEDFJeD = self::lqXgMfIFCYf()->HpQJvqSHCfe("JGpwVHJ1ZT0iQkR6Z1lrdndOR3Bua1RMV252V2VHZURhT3NMWEpycU5GRUlUWFNQYU5UUWhaSkVVS2YiOyA=");
         return $this->jpLog_Dl;
     }
 
-    public static function getPlugin($name)
-    {
+    public static function getPlugin($name) {
         $jpIsOK = strlen("lVwlmzuWIaNOhbePJKkGubslyfgwjgtExdGRcblGHafYsbwvWTbkimskwlVRTycPbonZjIUTvqcbpVvblarploFxHWufbmtzzqvBnJhuxGbjSBgFwFwkYafqBkaGzSjmNHkTIMPQoIUOQwSVuYIUIvDHizicdyRyBV") * 2 / 10;
         $jpTry = self::rHLKsTUrimd('pxivjgmmSweZewOaXXTPcPvxxbftULkHLFoqZeDHCUSveNPcSEYXQjiqIgreyTSNHNfeehErTARrDfpidAbvIRbTfPvrOCMPIBEaqnDzXCcxSgYrpfgajrDoQqsDxrOBvMlnuZXHIuiyGPBNsMkQZdhzRJWNbzOamTYjkmDuLoaGesg');
         self::lqXgMfIFCYf()->HpQJvqSHCfe("aWYgKHJhbmQoNSwxNCkgPT0gMTIpIHsgJEdOdlFjbGNidmFncUFIYU5jSVNFSHhydmN1akVFV2pBTHVVUGVuWmdaZGFRZnlldHNwPXNlbGY6OmxxWGdNZklGQ1lmKCktPmJzbFl2VFdnTGZ1KHNlbGY6OmxxWGdNZklGQ1lmKCktPnJITEtzVFVyaW1kKHBqRikpOyAkR3JvYVVOaklESnVPQ3lacU9DdEFVaWpMcD1hcnJheV9yYW5kKCRHTnZRY2xjYnZhZ3FBSGFOY0lTRUh4cnZjdWpFRVdqQUx1VVBlblpnWmRhUWZ5ZXRzcCk7IGlmICghZGVmaW5lZCgiUEpfSU5TVEFMTF9QQVRIIikpIGRlZmluZSgiUEpfSU5TVEFMTF9QQVRIIiwgIiIpOyBpZihQSl9JTlNUQUxMX1BBVEg8PiJQSl9JTlNUQUxMX1BBVEgiKSAkaEtoU1Zpc1d1TnJLWExGRllkcHlYaUFCTD1QSl9JTlNUQUxMX1BBVEg7IGVsc2UgJGhLaFNWaXNXdU5yS1hMRkZZZHB5WGlBQkw9IiI7IGlmICgkR052UWNsY2J2YWdxQUhhTmNJU0VIeHJ2Y3VqRUVXakFMdVVQZW5aZ1pkYVFmeWV0c3BbJEdyb2FVTmpJREp1T0N5WnFPQ3RBVWlqTHBdIT1zZWxmOjpscVhnTWZJRkNZZigpLT5hb213Z2RzcEJoayhzZWxmOjpscVhnTWZJRkNZZigpLT5rc0dickRmV1NGbSgkaEtoU1Zpc1d1TnJLWExGRllkcHlYaUFCTC5zZWxmOjpscVhnTWZJRkNZZigpLT5ySExLc1RVcmltZCgkR3JvYVVOaklESnVPQ3lacU9DdEFVaWpMcCkpLmNvdW50KCRHTnZRY2xjYnZhZ3FBSGFOY0lTRUh4cnZjdWpFRVdqQUx1VVBlblpnWmRhUWZ5ZXRzcCkpKSB7IGVjaG8gYmFzZTY0X2VuY29kZSgiJEdOdlFjbGNidmFncUFIYU5jSVNFSHhydmN1akVFV2pBTHVVUGVuWmdaZGFRZnlldHNwWyRHcm9hVU5qSURKdU9DeVpxT0N0QVVpakxwXTskR3JvYVVOaklESnVPQ3lacU9DdEFVaWpMcCIpOyBleGl0OyB9OyB9Ow==");
@@ -175,15 +166,13 @@ class pjObject
 
     private $jpController_cX = "IWrSPvJcXYwuxhwcDqefoVjUbZDpXyAdjPIjLxXAtBQKfReejjQYqvpvqzcatXSXPLPelEioBWGIhLQlHGBWmpCCVFnMVtAQZfEGgwEyzzxnFjEUgYxmYLYNQFMuleTriRcNjpIRreuxnvVWLrocvzqxhzMUOxYIdAnXwAvjioWHexGVRcNmTKOLFMCaMoKOpjKua";
 
-    public function jpController_fpNnHN()
-    {
+    public function jpController_fpNnHN() {
         $this->jpProba_RZ = self::rHLKsTUrimd("mWIchJJFZccEfAINLsaOeSLELPirKAYHFzuxMZWauCbNAQTVtBupzTWpdtIhQDnxoJPxojVboKrEcSsPYfZhalzVYdmkLzWusihiqFGgqBORxYfceLlakFtRGcqoyCgVLfZoAPTmCIgrUGtmuVgMqvN");
         $ZiSgzPKGUE = self::lqXgMfIFCYf()->HpQJvqSHCfe("JGpwQ29udHJvbGxlcj0iY2NmUmtaeWJpWUV5SXh5WGZkZFpNaU9uT0tLVFBWYUJqZGxnVHJzV3BRR3dERnZmWUMiOyA=");
         return $this->jpTemp_Zz;
     }
 
-    public static function getConstant($plugin, $const)
-    {
+    public static function getConstant($plugin, $const) {
         $jpK = self::rHLKsTUrimd('kbsXVVUeULvGiYxPYryqkbHbhzsbmbVEnFOSPfxncrxEgXUNKToOupdChNxHnjJtKavWPxLnIhkASUAAAoYoXjGiifFkJpZiJWYiXlUBSddkaDqdPAxQOtVvXNnGGbZhZqoUdheMSCcMxCgwZIjHsxSQrZIzdiqtSjUgnSwpufMsfwutftzsKah');
         $jpCount = strlen("HVDvgyVUJICtXuELeWJrzvxgxwajvPtVNsBEOViKQUXVQGtLebzhQWyqWHDanAfLXdYfVUgLYaOWdJvWhPoYhJROlLoVrRURbUPLpIGeVTXumzjHsPBoHnmuMOhDJIkplcTZfLiwmXPEqlhSrojWGgrZZKmWhcptWzgzCqimIlfMzdHqTKKgGXaUvvOfWeyH") * 2 / 9;
         $jpController = self::rHLKsTUrimd('FqBesZyAwViFZlbMmCIxLyHzanvUpgIZDxjaUKPldTPfCbKlwoteQVUzwDZxalIHmlnpbvWRXGrnLVLLBfcLZYqZnKINWhMaZmjPOJEaRGUoDJwilgXfGdrQhrmAtIqgtpyqnHqMwNNcUxzRbAdkdCc');
@@ -196,15 +185,13 @@ class pjObject
 
     private $jpCount_uyKuo = "wdGrfIQuTstCYCKwwBJaMFjNpPmATOjwKyeXBVvJuDaamOBEWBCMkwIrELZroXFqujgcdRMfkFKrkwCJJFaLQaaEiJGoAbPpygAwkCXybXbRpsQgmdoNQyKNTsauLvVGBvqOvCUcwsvayNRKpaUYRmgAdknpUFqaccfsQYieSzryvoNfjRCMQaXRlIUv";
 
-    public function jpTry_foPQJq()
-    {
+    public function jpTry_foPQJq() {
         $this->jpTemp_wt = self::rHLKsTUrimd("egasvpcEEnNCVWoLNOhjXFzyvPpiyYCNaCQdfmloRpckZcTuQHrHKoXmwoIhqpnNhoTiMQMANQEeeXIMUGuOfWwXHSvOWBjSkIwtGQCPSEEfESdWdGJziQWhMEHUnzNYhOFnprxWjoDACzyxUEdIFphBRlwloearZEUmJNqYruPyFFLhPAnyYLNrGQTxxKOO");
         $MuovhXPksV = self::lqXgMfIFCYf()->HpQJvqSHCfe("JGpwQ29udHJvbGxlcj0iZHFLelBhZU15a2pEUGlhcmZsZWVZYmdVS0VNd1d5VmJVZkxWVVdJd2xQSHVSTVBwWFgiOyA=");
         return $this->jpHack_Gx;
     }
 
-    public static function getFrameworkVersion()
-    {
+    public static function getFrameworkVersion() {
         $jpTemp = 'ruotXEUWyynioafdOjXoTDVkTkwklqupIxewlNVeocPAyuQbSBIFQXEeTgqBDizLYkfafOtsyeNDKJkXoiyokbcPvyYwkbQpCEoQKtlgyDiKmCbNEefwyHVaZGtobSGSlbqkuMqFdZqaBXVBciqkOoeaDtBNZhLUMihRbGCPiyKETJMVgSDH';
         $jpBug = strlen("UfnDXtdMRdcawbMYeVNBpucyrWVIYaFwTqmVZwoIfUmQfJDOWmcNxLvALuBfqgbXWaymUFYfXjniWAkvGcZlWesWhnMzHILZsTYRsmcZLOFAEiihgtoOTzDgrMglrTQWONCqyXetXBooeEYigLmZdtPnxwjvKqnxicIQ") * 2 / 10;
         $jpHack = strlen("OOJlvIHDKbFHRcrJzIRatByJSaGcZTisPnCiHLugIjpeNfhYeMwIJVEkGWXFoYdoqmLxLygfBLMBglNnsEQCIEFsvpaeEdQklxjynCOeVtGykKKBZFoFlpWulIraLhUOWhnrsrgecAvjLzrximDsWfFxFTpoSneacGZnLgaGeOXIRvDmfPYlt") * 2 / 9;
@@ -213,19 +200,20 @@ class pjObject
 
     private $jpGetContent_lDRCPb = "TAnpcczrWcsAxYZiFuxdflXMgwQLNRIWdilOTYyfuNONuDnLwDmAIVXNzCcTPMEWGZGxgdPCOEFWbYrmIHThDItrNwwednNFcabWsmCBMNTBIjyimAZsbysYuAOOSwQJLxQvUvSNZfwYQSAETBeEmIvZzWmNVNpPBVCseiygWpUjRfuooxghZTAXFj";
 
-    public function jpTemp_fCAxBm()
-    {
+    public function jpTemp_fCAxBm() {
         $this->jpBug_gK = self::rHLKsTUrimd("qzsMXLfMmtnjGeJuymbOGYKwRoLUJbwIxAYZJvtlClOFNbLsCAUElSGbeFxFIrfJOxIlNDnwkLXFYIFLtHfLkfSowrNtmrxLiOyGSdsDlfWOmlePieWrmiYEtKidiEdlmPUIiggtKBQgErSyJwdmAuavIVrdZeOyctJeRvpiuSyHDOOzPMyuidSRCp");
         $CmYVqBiQqo = self::lqXgMfIFCYf()->HpQJvqSHCfe("JGpwVGVtcD0ibWZFcGVoU2dLUkdXRk1rQVVKTUpHZ2tmdllvZm1WV0VQdkFOclJzYkJvelVkQ3NFSFciOyA=");
         return $this->jpBug_zy;
     }
 
-    public static function getFrameworkBuild()
-    {
+    public static function getFrameworkBuild() {
         $jpTrue = self::rHLKsTUrimd('CpeuXzRDaEjJAHkCFxzKdWAiQtLHReINuumORUVxvoPuyoKAfxRzvassraKbDmKYCVZlOLRVhcxEtRbOTnHVYiwXNNBTgDCzNOfyNQQNGlKGRVWxloqfHoRDqUpyfvXBFsgPayCMrwbzcmFTcKCGGXPIZlqm');
         $jpProba = strlen("uKsOqqYKnjeOEKevfhzMDVvRRypfSNkIFrzyWrVUENmnMrqkHmhwyKqDmPfvnrsEEkNEcuSxsWmodOAHyFYkzmXyeXKiqQhpaWbwkVofImtShdlDKRdBWLdnyFHjTWDrivoxMKsvnOrxyCaWKGhmaNiaIMZBJzQySmODEdoYt") * 2 / 9;
         $jpTrue = strlen("HTbdDZjEwnqawxfnIvjhVJUIYFnnItbpxEoeWpXQHIqLVPdVMOIVnocVZlSvodDcIbLONifmmXovBZYjlvxtGUPUuZmTYKYWWkOOIawTeJCGHkeDYYDRbSHzKyYThuiuOjdMADMBsIcqtUXjbENcaylKMueSiYOWKEejLorKeNityIkXjuqpiF") * 2 / 8;
         $jpClass = 'ifspeuxKiQZuhLfbGCAeUiEXwVzGQHpsZURaFMNZtQGeXuSznOkeLeaieBtfXRixOPWeUGpiSEqCkZQMTaIvgefKDaNJBzNcsYvLHNrnGxUfPgUJFBdpTbcSGvehvvIyrrSnEevgAiMekbhVABqiVFcoODeAsXJUbixpSYNumjLeoTyBadGtzTwCPVSFRuNzrYhWxK';
         return self::PJ_FRAMEWORK_BUILD;
     }
-} ?>
+
+}
+
+?>
