@@ -144,7 +144,7 @@ class pjApiBuses extends pjFront {
             }
             
             if($this->_is('with_transfer')){
-//                echo __LI
+
                 $transferId = $this->_get('transferId');
             }
 
@@ -181,6 +181,9 @@ class pjApiBuses extends pjFront {
                         }
                     );
                 }
+                
+                
+                
             }
             if ($this->_is('return_bus_id_arr')) {
                 $busIdArr = $this->_get('return_bus_id_arr');
