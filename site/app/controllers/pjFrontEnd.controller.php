@@ -349,7 +349,12 @@ class pjFrontEnd extends pjFront {
                         $data ['qty'] = $booked_data ['ticket_cnt_' . $v ['ticket_id']];
                         $data ['amount'] = $data ['qty'] * $v ['price'];
                         $data ['is_return'] = 'F';
+                        
+                        
                         $pjBookingTicketModel->reset()->setAttributes($data)->insert();
+                        
+                        
+                        
                     }
                 }
 

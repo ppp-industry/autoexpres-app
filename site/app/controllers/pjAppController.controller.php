@@ -561,8 +561,12 @@ class pjAppController extends pjController {
                 'selected_seat_arr_to' => $selectedSeatArrTo,
                 'selected_seat_arr_from' => $selectedSeatArrFrom,
                 'ticket_columns' => $ticketColumns,
+              
+              
                 'from_location' => $fromLocation,
                 'to_location' => $toLocation,  
+              
+              
                 'transfer_location' => $transLocation,
             ];
         }
@@ -694,6 +698,8 @@ class pjAppController extends pjController {
             } else {
                 $bus ['depart_arrive'] = '';
             }
+            
+            
             $busArr[$k] = $bus;
 
             $busId = $bus ['id'];

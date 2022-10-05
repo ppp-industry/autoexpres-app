@@ -259,13 +259,24 @@ class pjApiBooking extends pjFront {
                 $pjBookingTicketModel = pjBookingTicketModel::factory();
                 foreach ($ticket_arr as $k => $v) {
                     if (isset($booked_data ['ticket_cnt_' . $v ['ticket_id']]) && $booked_data ['ticket_cnt_' . $v ['ticket_id']] > 0) {
+                        
+                        
+                        
+                        
+                        
                         $data = array();
                         $data ['booking_id'] = $id;
                         $data ['ticket_id'] = $v ['ticket_id'];
                         $data ['qty'] = $booked_data ['ticket_cnt_' . $v ['ticket_id']];
                         $data ['amount'] = $data ['qty'] * $v ['price'];
                         $data ['is_return'] = 'F';
+//                         создаем билет 
                         $pjBookingTicketModel->reset()->setAttributes($data)->insert();
+                        
+                        
+                        
+                        
+                        
                     }
                 }
 
@@ -310,6 +321,13 @@ class pjApiBooking extends pjFront {
                             $location_pair [] = $location_arr [$i] ['city_id'] . '-' . $location_arr [$j] ['city_id'];
                         }
                     }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                     $pjBookingTicketModel = pjBookingTicketModel::factory();
                     foreach ($ticket_arr as $k => $v) {
                         if (isset($booked_data ['return_ticket_cnt_' . $v ['ticket_id']]) && $booked_data ['return_ticket_cnt_' . $v ['ticket_id']] > 0) {
@@ -320,9 +338,24 @@ class pjApiBooking extends pjFront {
                             $data ['qty'] = $booked_data ['return_ticket_cnt_' . $v ['ticket_id']];
                             $data ['amount'] = $data ['qty'] * $price;
                             $data ['is_return'] = 'T';
+                            //                         создаем билет 
                             $pjBookingTicketModel->reset()->setAttributes($data)->insert();
                         }
                     }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
 
                     $seat_id_arr = explode("|", $booked_data ['return_selected_seats']);
                     foreach ($location_pair as $pair) {

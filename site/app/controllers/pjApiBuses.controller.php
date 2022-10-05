@@ -127,7 +127,7 @@ class pjApiBuses extends pjFront {
     public function pjActionSeats() {
 
         ini_set("display_errors", "On");
-    error_reporting(E_ALL ^ E_DEPRECATED);
+        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $_SESSION[$this->defaultStep]['2_passed'] = true;
         $busList = [];
@@ -147,6 +147,10 @@ class pjApiBuses extends pjFront {
 
                 $transferId = $this->_get('transferId');
             }
+            
+            
+            
+            
 
             if ($this->_is('bus_id_arr')) {
                 $busIdArr = $this->_get('bus_id_arr');
