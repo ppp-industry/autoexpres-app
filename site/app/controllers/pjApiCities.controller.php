@@ -104,7 +104,7 @@ class pjApiCities extends pjFront {
                 $withTransferSeparated[$transferCity] = array_values(
                     array_filter($locations, function($item) use (&$inserted){
                         if(!in_array($item['id'], $inserted)){
-                            $inserted[] = $item['id'];
+//                            $inserted[] = $item['id'];
                             return true;
                         }
                         else{

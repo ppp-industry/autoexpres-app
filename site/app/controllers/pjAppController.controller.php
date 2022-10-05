@@ -556,10 +556,12 @@ class pjAppController extends pjController {
                                                                                     $bookedData, 
                                                                                     $isReturn
                                                                                 );
+//            vd($busArrFrom);
+//            $busArrTo = array_filter($busArrTo,$filterFunction);
+//            $busArrFrom = array_filter($busArrFrom,$filterFunction);
             
-            $busArrTo = array_filter($busArrTo,$filterFunction);
-            $busArrFrom = array_filter($busArrFrom,$filterFunction);
             
+//            $cnt = 
             $lastFromBus = $busArrFrom[count($busArrFrom) - 1];
             $lastFromBusDepartureTimeTimestamp = $bookingPeriod[$lastFromBus['id']]['departure_time_timestamp'];
             

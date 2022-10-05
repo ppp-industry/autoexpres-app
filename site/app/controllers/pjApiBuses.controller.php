@@ -27,8 +27,9 @@ class pjApiBuses extends pjFront {
         $returnBusIdArr = array();
 
         if(isset($params['transfer_id'])){
+//            echo __LINE__;exit();
             $transferId = $params['transfer_id'];
-            
+//            vd($transferId);
         }
         
         if ($params['pickup_id'] != $params['return_id']) {
@@ -93,6 +94,8 @@ class pjApiBuses extends pjFront {
                 $this->_set('date', $params['date']);
                 
                 if($transferId){
+                    
+//                    vd($transferId);
                      $this->_set('transferId', $transferId);
                 }
 
@@ -148,6 +151,8 @@ class pjApiBuses extends pjFront {
             if($this->_is('transferId')){
 
                 $transferId = $this->_get('transferId');
+                
+//                vd($transferId);
             }
             
             
