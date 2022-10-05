@@ -80,8 +80,8 @@ class pjPriceModel extends pjAppModel {
             'tax' => $tax, 
             'total' => $total, 
             'deposit' => $deposit,
-            'sub_total_format' => $$subTotalFormat,
-            'tax_format' => $$taxFormat, 
+            'sub_total_format' => $subTotalFormat,
+            'tax_format' => $taxFormat, 
             'total_format' => $totalFormat, 
             'deposit_format' => $depositFormat
         ];

@@ -489,6 +489,15 @@ class pjAppController extends pjController {
         
         $busArrFrom = $busArrTo = $busArr = null;
         
+        $filterFunction  = function($var) use(&$bookingPeriod) {
+            if (empty($var['ticket_arr'][0]['price'])) {
+                unset($bookingPeriod[$var['id']]);
+                return false;
+            } else {
+                return true;
+            }
+        };
+        
         if($transferId){
             $busIdArrFrom = &$busIdArr['from'];
             $busIdArrTo = &$busIdArr['to'];
@@ -548,10 +557,96 @@ class pjAppController extends pjController {
                                                                                     $isReturn
                                                                                 );
             
-          return [
+            $busArrTo = array_filter($busArrTo,$filterFunction);
+            $busArrFrom = array_filter($busArrFrom,$filterFunction);
+            
+            $lastFromBus = $busArrFrom[count($busArrFrom) - 1];
+            $lastFromBusDepartureTimeTimestamp = $bookingPeriod[$lastFromBus['id']]['departure_time_timestamp'];
+            
+            $busArrToIds = array_column($busArrTo,'id');
+            $busArr = [];
+            $busArrTo = array_combine($busArrToIds, $busArrTo);
+            
+            foreach($busArrToIds as $key => &$toID){
+                if($bookingPeriod[$toID]['arrival_time_timestamp'] > $lastFromBusDepartureTimeTimestamp){
+                    unset($bookingPeriod[$toID],$busArrTo[$toID],$busArrToIds[$key]);   
+                }
+            }
+            
+            foreach($busArrFrom as &$itemFrom){
+                
+                $timeDiffBetweenArrivalAndDeparture = 10000000;
+                $id = null;
+                
+                foreach($busArrToIds as &$toID){
+                    $tmpDiff = $bookingPeriod[$itemFrom['id']]['departure_time_timestamp'] - $bookingPeriod[$toID]['arrival_time_timestamp'];
+                    if($tmpDiff < $timeDiffBetweenArrivalAndDeparture){
+                        $timeDiffBetweenArrivalAndDeparture = $tmpDiff;
+                        $id = $toID;
+                    }
+                }
+                
+                $durationInSeconds = $bookingPeriod[$itemFrom['id']]['arrival_time_timestamp'] - $bookingPeriod[$id]['departure_time_timestamp'];
+                $days = floor($durationInSeconds / 86400);
+                $hoursMod = $durationInSeconds - ($days * 86400);
+                $hours = floor($hoursMod / 3600);
+                $minutsMod = $hoursMod % 3600;
+                $minuts = floor($minutsMod / 60);
+                $duration = '';
+                
+                $localeId =  $this->getLocaleId();
+                switch ($localeId){
+                    case 1:
+                        $duration = $days . 'D ' . $hours . 'H ' . $minuts .'M';
+                        break;
+                    case 2:
+                        $duration = $days . 'Д ' . $hours . 'Ч ' . $minuts .'М';
+                        break;
+                    case 3:
+                        $duration = $days . 'Д ' . $hours . 'Г ' . $minuts .'Хв';
+                        break;
+                }
+                
+                $busArr[$id . '_' . $itemFrom['id']] = [
+                    
+                    'departure_time_to_transfer_city' => $bookingPeriod[$id]['departure_time'],
+                    'arrival_time_to_transfer_city' => $bookingPeriod[$id]['arrival_time'],
+                    
+                    'departure_time_from_transfer_city' => $bookingPeriod[$itemFrom['id']]['departure_time'],
+                    'arrival_time_from_transfer_city' => $bookingPeriod[$itemFrom['id']]['arrival_time'],
+                    
+                    'route_id_to_transfer' => $busArrTo[$id]['route_id'],
+                    'route_id_from_transfer' => $itemFrom['route_id'],
+                    
+                    'route_to_transfer' => $busArrTo[$id]['route'],
+                    'route_from_transfer' => $itemFrom['route'],
+                    
+                    'recurring_to_transfer' => $busArrTo[$id]['recurring'],
+                    'recurring_from_transfer' => $itemFrom['recurring'],
+                    
+                    'seats_available_to_transfer' => $busArrTo[$id]['seats_available'],
+                    'seats_available_from_transfer' => $itemFrom['seats_available'],
+                    
+                    'ticket_arr_to_transfer' => $busArrTo[$id]['ticket_arr'],
+                    'ticket_arr_from_transfer' => $itemFrom['ticket_arr'],
+                    
+                    'seat_avail_arr_to_transfer' => $busArrTo[$id]['seat_avail_arr'],
+                    'seat_avail_arr_from_transfer' => $itemFrom['seat_avail_arr'],
+                    
+                    'locations_to_transfer' => $busArrTo[$id]['locations'],
+                    'locations_from_transfer' => $itemFrom['locations'],
+                    
+                    'seats_map_to_transfer' => $busArrTo[$id]['seats_map'],
+                    'seats_map_from_transfer' => $itemFrom['seats_map'],
+                    
+                    'duration_in_seconds' => $durationInSeconds,
+                    'duration' => $duration,
+                ];
+            }
+
+            return [
                 'booking_period' => $bookingPeriod,
-                'bus_arr_to' => $busArrTo,
-                'bus_arr_from' => $busArrFrom,
+                'busArr' => $busArr,
                 'bus_type_arr_to' => $busTypeArrTo,
                 'bus_type_arr_from' => $busTypeArrFrom,
                 'booked_seat_arr_to' => $bookedSeatArrTo,
@@ -561,18 +656,15 @@ class pjAppController extends pjController {
                 'selected_seat_arr_to' => $selectedSeatArrTo,
                 'selected_seat_arr_from' => $selectedSeatArrFrom,
                 'ticket_columns' => $ticketColumns,
-              
-              
                 'from_location' => $fromLocation,
-                'to_location' => $toLocation,  
-              
-              
+                'to_location' => $toLocation,
                 'transfer_location' => $transLocation,
             ];
         }
         else{
         
             $locationIdArr = array();
+            
 
             list($busTypeArr,$bookedSeatArr,$seatArr,$selectedSeatArr) = $this->hundleBusData(
                                                                                     $busArr,
@@ -592,6 +684,10 @@ class pjAppController extends pjController {
                                                                                     $bookedData, 
                                                                                     $isReturn
                                                                                 );
+            
+            
+            $busArrFrom = array_filter($busArr,$filterFunction);
+            
             return [
                 'booking_period' => $bookingPeriod,
                 'bus_arr' => $busArr,
@@ -716,6 +812,8 @@ class pjAppController extends pjController {
             if (!empty($pickupArr)) {
                 $departureTime = pjUtil::formatTime($pickupArr [0] ['departure_time'], 'H:i:s', $this->option_arr ['o_time_format']);
                 $bookingPeriod [$busId] ['departure_time'] = $bookingDate . ' ' . $pickupArr [0] ['departure_time'];
+                $bookingPeriod [$busId] ['departure_time_timestamp'] = strtotime($bookingPeriod [$busId] ['departure_time']);
+                
             }
             if (!empty($returnArr)) {
                 $arrivalTime = pjUtil::formatTime($returnArr [0] ['arrival_time'], 'H:i:s', $this->option_arr ['o_time_format']);
@@ -753,7 +851,10 @@ class pjAppController extends pjController {
                 $duration = $hourStr . $minuteStr;
 
                 if (isset($bookingPeriod [$busId] ['departure_time'])) {
-                    $bookingPeriod [$busId] ['arrival_time'] = date('Y-m-d H:i:s', strtotime($bookingPeriod [$busId] ['departure_time']) + $seconds);
+                    
+                    $timestamp = strtotime($bookingPeriod [$busId] ['departure_time']) + $seconds;
+                    $bookingPeriod [$busId] ['arrival_time'] = date('Y-m-d H:i:s', $timestamp);
+                    $bookingPeriod [$busId] ['arrival_time_timestamp'] = $timestamp;
                 }
             }
 

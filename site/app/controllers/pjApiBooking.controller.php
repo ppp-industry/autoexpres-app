@@ -26,7 +26,7 @@ class pjApiBooking extends pjFront {
         ];
         $busIdFromTransfer = $busIdToTransfer = $transferId = null;
 
-        if ($this->_is('with_transfer')) {
+        if ($this->_is('transferId')) {
 
             $transferId = $this->_get('transferId');
 
