@@ -1,39 +1,33 @@
 <?php
-if (isset($tpl['status']))
-{
-	$status = __('status', true);
-	switch ($tpl['status'])
-	{
-		case 2:
-			pjUtil::printNotice(NULL, $status[2]);
-			break;
-	}
+if (isset($tpl['status'])) {
+    $status = __('status', true);
+    switch ($tpl['status']) {
+        case 2:
+            pjUtil::printNotice(NULL, $status[2]);
+            break;
+    }
 } else {
-	if (isset($_GET['err']))
-	{
-		$titles = __('error_titles', true);
-		$bodies = __('error_bodies', true);
-		pjUtil::printNotice(@$titles[$_GET['err']], @$bodies[$_GET['err']]);
-	}
-	$week_start = isset($tpl['option_arr']['o_week_start']) && in_array((int) $tpl['option_arr']['o_week_start'], range(0,6)) ? (int) $tpl['option_arr']['o_week_start'] : 0;
-	$jqDateFormat = pjUtil::jqDateFormat($tpl['option_arr']['o_date_format']);
-	
-	$show_period = 'false';
-	if((strpos($tpl['option_arr']['o_time_format'], 'a') > -1 || strpos($tpl['option_arr']['o_time_format'], 'A') > -1))
-	{
-		$show_period = 'true';
-	}
-	
-	$route_name = NULL;
-	foreach ($tpl['route_arr'] as $v)
-	{
-		if($tpl['arr']['route_id'] == $v['id'])
-		{
-			$route_name = pjSanitize::clean($v['title']);
-			break;
-		}
-	}
-	?>
+    if (isset($_GET['err'])) {
+        $titles = __('error_titles', true);
+        $bodies = __('error_bodies', true);
+        pjUtil::printNotice(@$titles[$_GET['err']], @$bodies[$_GET['err']]);
+    }
+    $week_start = isset($tpl['option_arr']['o_week_start']) && in_array((int) $tpl['option_arr']['o_week_start'], range(0, 6)) ? (int) $tpl['option_arr']['o_week_start'] : 0;
+    $jqDateFormat = pjUtil::jqDateFormat($tpl['option_arr']['o_date_format']);
+
+    $show_period = 'false';
+    if ((strpos($tpl['option_arr']['o_time_format'], 'a') > -1 || strpos($tpl['option_arr']['o_time_format'], 'A') > -1)) {
+        $show_period = 'true';
+    }
+
+    $route_name = NULL;
+    foreach ($tpl['route_arr'] as $v) {
+        if ($tpl['arr']['route_id'] == $v['id']) {
+            $route_name = pjSanitize::clean($v['title']);
+            break;
+        }
+    }
+?>
 	<div class="bold b10 fs14"><?php __('lblRoute'); ?>: <?php echo $route_name;?></div>
 	<?php
 	

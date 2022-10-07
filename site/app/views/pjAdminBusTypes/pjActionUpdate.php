@@ -1,24 +1,22 @@
 <?php
-if (isset($tpl['status']))
-{
-	$status = __('status', true);
-	switch ($tpl['status'])
-	{
-		case 2:
-			pjUtil::printNotice(NULL, $status[2]);
-			break;
-	}
+
+if (isset($tpl['status'])) {
+    $status = __('status', true);
+    switch ($tpl['status']) {
+        case 2:
+            pjUtil::printNotice(NULL, $status[2]);
+            break;
+    }
 } else {
-	if (isset($_GET['err']))
-	{
-		$titles = __('error_titles', true, false);
-		$bodies = __('error_bodies', true, false);
-		
-		pjUtil::printNotice(@$titles[$_GET['err']], @$bodies[$_GET['err']]);
-	}
-	
-	pjUtil::printNotice(__('infoUpdateBusTypeTitle', true, false), __('infoUpdateBusTypeDesc', true, false)); 
-	?>
+    if (isset($_GET['err'])) {
+        $titles = __('error_titles', true, false);
+        $bodies = __('error_bodies', true, false);
+
+        pjUtil::printNotice(@$titles[$_GET['err']], @$bodies[$_GET['err']]);
+    }
+
+    pjUtil::printNotice(__('infoUpdateBusTypeTitle', true, false), __('infoUpdateBusTypeDesc', true, false));
+?>
 	<form action="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusTypes&amp;action=pjActionUpdate" method="post" id="frmUpdateBusType" class="pj-form form" enctype="multipart/form-data">
 		<input type="hidden" name="bus_type_update" value="1" />
 		<input type="hidden" name="id" value="<?php echo $tpl['arr']['id']?>" />
@@ -92,6 +90,65 @@ if (isset($tpl['status']))
 				<?php
 			} 
 			?>
+                                
+                                
+                                
+                                
+                                
+			<?php
+			$photo = $tpl['arr']['photo']; 
+			if (is_file($photo))
+			{
+				$size = getimagesize($photo);
+				?>
+				<div id="boxMap">
+					<p>
+						<label class="title">Фото</label>
+						<span class="inline_block">
+							<input type="button" value="<?php __('btnDeleteMap'); ?>" class="pj-button pj-delete-map" lang="<?php echo $tpl['arr']['id']?>"/>
+						</span>
+					</p>
+					<div class="bsMapHolder">
+						<div id="mapHolder" style="position: relative; overflow: hidden; width: <?php echo $size[0]; ?>px; height: <?php echo $size[1]; ?>px; margin: 0 auto;">
+							<img id="photo" src="<?php echo $photo; ?>" alt="" style="margin: 0; border: none; position: absolute; top: 0; left: 0; z-index: 500" />
+						</div>
+					</div>
+					
+					<div id="dialogDelete" title="<?php __('btnDeleteMap'); ?>" style="display:none">
+						<p><?php __('lblDeleteMapConfirm'); ?></p>
+					</div>
+				</div>
+				<?php
+			}else{
+				?>
+                                
+                                 <p>
+                                        <label class="title">Фото</label>
+                                        <span class="inline_block">
+                                            <input type="file" name="photo" id="photo" class="pj-form-field" />
+                                        </span>
+                                    </p>
+                                
+				<?php
+			} 
+			?>
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                               
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
 			<p style="display:<?php echo (is_file($map)) ? 'none' : 'block';?>">
 				<label class="title"><?php __('lblSeatsCount'); ?></label>
 				<span class="inline_block">
@@ -104,6 +161,24 @@ if (isset($tpl['status']))
 					<label class="content"><?php __('lblDefineSeats');?></label>
 				</span>
 			</p>
+                         <p>
+                            <label class="title">Додаткові опції:</label>
+                            <span class="inline_block">
+                                
+                                <?php foreach ($tpl['busOptions'] as &$optionItem):?>
+                                <span class="block b5">
+                                    <input type="checkbox" id="options_<?=$optionItem['id']?>" <?php if(in_array($optionItem['id'], $tpl['currentOptions'])): ?>checked=""<?php endif?> name="options[]" value="<?=$optionItem['id']?>" class="r5" >
+                                    <label for="options_<?=$optionItem['id']?>"><?=$optionItem['name']?></label>
+                                </span>
+                                <?php endforeach?>
+                                
+                                
+                                
+                                
+                            </span>
+                        </p>
+                        
+                        
 			<div style="clear:both;"></div>
 			<p>
 				<label class="title">&nbsp;</label>
@@ -113,6 +188,12 @@ if (isset($tpl['status']))
 					<input type="button" id="pj_delete_seat" value="" class="pj-button float_left" style="display: none;"/>
 				</span>
 			</p>
+                        
+                        
+
+                       
+
+                        
 		</div>
 	</form>
 	

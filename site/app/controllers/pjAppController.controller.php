@@ -466,7 +466,7 @@ class pjAppController extends pjController {
         }
     }
 
-    public function getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, $isReturn,$transferId = null) {
+    public function getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, $isReturn) {
       
         $pjBusLocationModel = pjBusLocationModel::factory();
         $pjPriceModel = pjPriceModel::factory();
@@ -476,13 +476,17 @@ class pjAppController extends pjController {
         $pjRouteCityModel = pjRouteCityModel::factory();
         $pjSeatModel = pjSeatModel::factory();
         $pjCityModel = pjCityModel::factory();
+        $pjBusTypeOption = pjBusTypeOptionModel::factory();
+        
+        $transferIds = isset($busIdArr['transferIds']) ? $busIdArr['transferIds'] : null;
+        
 
         $cityPreparedQuery = "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'";
 
         $pickupLocation = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', $cityPreparedQuery, 'left outer')->find($pickupId)->getData();
         $returnLocation = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', $cityPreparedQuery, 'left outer')->find($returnId)->getData();
         
-        $transferLocation = $transferId ? $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', $cityPreparedQuery, 'left outer')->find($transferId)->getData() : null;
+        $transferLocation = $transferIds ? $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', $cityPreparedQuery, 'left outer')->find($transferIds)->getData() : null;
         
         $ticketColumns = 0;
         $bookingDate = pjUtil::formatDate($date, $this->option_arr ['o_date_format']);
@@ -498,7 +502,9 @@ class pjAppController extends pjController {
             }
         };
         
-        if($transferId){
+        
+//        bus_id_arr
+        if($transferIds){
             $busIdArrFrom = &$busIdArr['from'];
             $busIdArrTo = &$busIdArr['to'];
             
@@ -511,7 +517,7 @@ class pjAppController extends pjController {
         $fromLocation = $pickupLocation ['name'];
         $toLocation = $returnLocation ['name'];
         
-        if($transferId){
+        if($transferIds){
             
             $transLocation = $transferLocation['name'];
             $locationIdArrFrom = $locationIdArrTo = array();
@@ -527,7 +533,8 @@ class pjAppController extends pjController {
                                                                                     $pjPriceModel,
                                                                                     $pjBookingSeatModel,
                                                                                     $pjBookingModel,
-                                                                                    $transferId,
+                                                                                    $pjBusTypeOption,
+                                                                                    $transferIds,
                                                                                     $returnId,
                                                                                     $bookingDate,
                                                                                     $ticketColumns,
@@ -550,7 +557,7 @@ class pjAppController extends pjController {
                                                                                     $pjBookingSeatModel,
                                                                                     $pjBookingModel,
                                                                                     $pickupId,
-                                                                                    $transferId,
+                                                                                    $transferIds,
                                                                                     $bookingDate,
                                                                                     $ticketColumns,
                                                                                     $bookedData, 
@@ -773,6 +780,7 @@ class pjAppController extends pjController {
         &$pjPriceModel,
         &$pjBookingSeatModel,
         &$pjBookingModel,
+        &$pjBusTypeOption,
         &$pickupId,
         &$returnId,
         &$bookingDate,
@@ -894,6 +902,16 @@ class pjAppController extends pjController {
                         $and_where .= " AND ((TB.booking_datetime BETWEEN '$departureTime' AND '$arrivalTime') OR (TB.stop_datetime BETWEEN '$departureTime' AND '$arrivalTime' ) OR ('$departureTime' BETWEEN TB.booking_datetime AND TB.stop_datetime ) OR ('$arrivalTime' BETWEEN TB.booking_datetime AND TB.stop_datetime ))";
                     }
                     $busTypeArr = $pjBusTypeModel->reset()->find($bus ['bus_type_id'])->getData();
+                    
+                    
+                    
+                    $options = $pjBusTypeOption->join('pjBusTypeOptionItem',"t1.option_id=t2.id","inner")
+                                                ->select("t2.name")->where('bus_type_id',$bus['bus_type_id'])
+                                                ->findAll()
+                                                ->getData();
+                    
+                    $bookingPeriod [$busId]['options'] = array_column($options, 'name');
+                    
                     $seatsAvailable = $busTypeArr ['seats_count'];
                     $seatBookedArr = $pjBookingSeatModel->reset()->select("DISTINCT t1.seat_id")->where("t1.start_location_id IN(" . join(",", $tempLocationIdArr) . ")
 								AND t1.booking_id IN(SELECT TB.id
@@ -914,9 +932,9 @@ class pjAppController extends pjController {
             
             
             $seats = $pjSeatModel->reset()->where('t1.bus_type_id', $bus ['bus_type_id'])->findAll()->getData();
-            foreach ($seats as $v) {
-                if (!in_array($v ['id'], $seatBookedArr)) {
-                    $seatAvailArr [] = $v ['id'] . '#' . $v ['name'];
+            foreach ($seats as $seat) {
+                if (!in_array($seat ['id'], $seatBookedArr)) {
+                    $seatAvailArr [] = $seat ['id'] . '#' . $seat ['name'];
                 }
             }
 

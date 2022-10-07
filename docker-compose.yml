@@ -32,6 +32,7 @@ services:
     build: ./php
     restart: always
     volumes:
+      - ./php/config/php.ini:/usr/local/etc/php.ini
       - ./site/:/var/www/app/
     ports:
       - 9000:9000

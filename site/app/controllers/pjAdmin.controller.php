@@ -210,8 +210,7 @@ class pjAdmin extends pjAppController {
     }
 
     public function pjActionLogin() {
-//        echo __LINE__;
-//        exit();
+
         $this->setLayout('pjActionAdminLogin');
 
         if (isset($_POST['login_user'])) {

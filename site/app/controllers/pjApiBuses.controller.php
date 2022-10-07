@@ -22,15 +22,18 @@ class pjApiBuses extends pjFront {
         
         $params = Router::getParams();
 
-        $transferId = null;
-        $resp = array();
+        $transferIds = null;
+        $resp = [
+            'coockie' => $_COOKIE,
+        ];
         $returnBusIdArr = array();
-
-        if(isset($params['transfer_id'])){
-//            echo __LINE__;exit();
-            $transferId = $params['transfer_id'];
-//            vd($transferId);
+        
+        
+        if($this->_is('transferIds')){
+            $transferIds = unserialize($this->_get('transferIds'));            
         }
+        
+        
         
         if ($params['pickup_id'] != $params['return_id']) {
             $resp['code'] = 200;
@@ -45,7 +48,7 @@ class pjApiBuses extends pjFront {
                 $date = pjUtil::formatDate($this->_get('date'), $this->option_arr['o_date_format']);
             }
             
-            $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferId);
+            $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
 
             if (empty($busIdArr)) {
                 $resp['code'] = 100;
@@ -63,7 +66,7 @@ class pjApiBuses extends pjFront {
 
                 $date = pjUtil::formatDate($params['return_date'], $this->option_arr['o_date_format']);
 
-                $returnBusIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, true,$transferId);
+                $returnBusIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, true,$transferIds);
 
                 if (empty($returnBusIdArr)) {
                     
@@ -93,11 +96,9 @@ class pjApiBuses extends pjFront {
                 $this->_set('is_return', $params['is_return']);
                 $this->_set('date', $params['date']);
                 
-                if($transferId){
-                    
-//                    vd($transferId);
-                     $this->_set('transferId', $transferId);
-                }
+//                if(isset($busIdArr['transferIds'])){
+//                     $this->_set('transferIds', serialize($busIdArr['transferIds']));
+//                }
 
                 if (isset($params['is_return']) && $params['is_return'] == 'T') {
                     $this->_set('return_bus_id_arr', $returnBusIdArr);
@@ -125,6 +126,9 @@ class pjApiBuses extends pjFront {
                 }
                 pjAppController::jsonResponse($resp);
             }
+            
+            
+            
         }
         pjAppController::jsonResponse($resp);
     }
@@ -138,7 +142,7 @@ class pjApiBuses extends pjFront {
         $busList = [];
         
         if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
-            $transferId = $bookedData = $bookingPeriod = array();
+            $bookedData = $bookingPeriod = array();
             
             if ($this->_is('booking_period')) {
                 $bookingPeriod = $this->_get('booking_period');
@@ -146,17 +150,7 @@ class pjApiBuses extends pjFront {
             
             if ($this->_is('booked_data')) {
                 $bookedData = $this->_get('booked_data');
-            }
-            
-            if($this->_is('transferId')){
-
-                $transferId = $this->_get('transferId');
-                
-//                vd($transferId);
-            }
-            
-            
-            
+            } 
             
 
             if ($this->_is('bus_id_arr')) {
@@ -165,16 +159,17 @@ class pjApiBuses extends pjFront {
                 $returnId = $this->_get('return_id');
                 $date = $this->_get('date');
                
-                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F',$transferId);
+                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F');
                 
             }
+            
             if ($this->_is('return_bus_id_arr')) {
                 $busIdArr = $this->_get('return_bus_id_arr');
                 $pickupId = $this->_get('return_id');
                 $returnId = $this->_get('pickup_id');
                 $date = $this->_get('return_date');
                 
-                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'T',$transferId);
+                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'T');
                 
                
             }

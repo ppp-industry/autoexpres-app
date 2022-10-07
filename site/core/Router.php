@@ -52,6 +52,13 @@ class Router {
 
     public function setDataAboutRoute() {
         $url = $_SERVER['REQUEST_URI'];
+        
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
+//            echo __LINE__;exit();
+            $this->params += $_POST;
+            
+//            vd($this->params);
+        }
 
         if (preg_match('/^(\/(en|uk|ru))?\/api\//', $url)) {
 
@@ -106,9 +113,7 @@ class Router {
                 $this->action = $this->params['action'] = 'pjActionIndex';
             }
                 
-            if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
-                $this->params += $_POST;
-            }
+            
             
         } 
         elseif (strpos($url, 'controller') !== false) {

@@ -26,7 +26,7 @@ class pjBusModel extends pjAppModel {
         return new pjBusModel($attr);
     }
 
-    public function getBusIds($date, $pickup_id, $return_id, $isReturn, $transferId = null) {
+    public function getBusIds($date, $pickup_id, $return_id, $isReturn, &$transferIds = null) {
         error_reporting(E_ALL ^ E_DEPRECATED);
         $day_of_week = strtolower(date('l', strtotime($date)));
         $currentTime = new \DateTime();
@@ -41,25 +41,28 @@ class pjBusModel extends pjAppModel {
         }
 
         $res = $query->findAll()->getDataPair(null, 'id');
-
-        if (empty($res) && $transferId) {
+        
+//        Вычесляем transferID 
+        
+        if (empty($res) && $transferIds) {
 
             $innerConditionFromTransfer = $innerConditionToTransfer = null;
-
-            if (is_array($transferId)) {
-                $imploded = implode(',', $transferId);
+            
+            $tIds = [];
+            
+            foreach($transferIds as $transferCity => &$cities){
+                if(in_array($return_id, $cities)){
+                    $tIds[] = $transferCity;
+                }
+            }
+  
+            if (count($tIds) > 0) {
+                $imploded = implode(',', $tIds);
                 $innerConditionToTransfer = <<<SQL
                         TRD.from_location_id = $pickup_id AND TRD.to_location_id in ($imploded)
 SQL;
                 $innerConditionFromTransfer = <<<SQL
                         TRD.from_location_id in ($imploded) AND TRD.to_location_id = $return_id
-SQL;
-            } else {
-                $innerConditionToTransfer = <<<SQL
-                        TRD.from_location_id = $pickup_id AND TRD.to_location_id = $transferId
-SQL;
-                $innerConditionFromTransfer = <<<SQL
-                        TRD.from_location_id = $transferId  AND TRD.to_location_id = $return_id
 SQL;
             }
 
@@ -88,7 +91,7 @@ SQL;
                 return [
                     'to' => $resTo,
                     'from' => $resFrom,
-                    'with_transfer' => true
+                    'transferIds' => $tIds
                 ];
             }
         }
