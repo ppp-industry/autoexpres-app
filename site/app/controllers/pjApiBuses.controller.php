@@ -30,10 +30,9 @@ class pjApiBuses extends pjFront {
         
         
         if($this->_is('transferIds')){
+//            echo __LINE__;exit();
             $transferIds = unserialize($this->_get('transferIds'));            
         }
-        
-        
         
         if ($params['pickup_id'] != $params['return_id']) {
             $resp['code'] = 200;
@@ -126,9 +125,6 @@ class pjApiBuses extends pjFront {
                 }
                 pjAppController::jsonResponse($resp);
             }
-            
-            
-            
         }
         pjAppController::jsonResponse($resp);
     }
@@ -162,7 +158,6 @@ class pjApiBuses extends pjFront {
                 $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F');
                 
             }
-            
             if ($this->_is('return_bus_id_arr')) {
                 $busIdArr = $this->_get('return_bus_id_arr');
                 $pickupId = $this->_get('return_id');

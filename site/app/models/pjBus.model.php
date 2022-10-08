@@ -55,7 +55,7 @@ class pjBusModel extends pjAppModel {
                     $tIds[] = $transferCity;
                 }
             }
-  
+            
             if (count($tIds) > 0) {
                 $imploded = implode(',', $tIds);
                 $innerConditionToTransfer = <<<SQL
@@ -74,7 +74,7 @@ SQL;
                 $queryToTransferCity->where("STR_TO_DATE(CONCAT('{$currentTime->format('Y-m-d')}', ' ', t1.departure_time), '%Y-%m-%d %H:%i:%s') >= '$departure_time'");
             }
             $resTo = $queryToTransferCity->findAll()->getDataPair(null, 'id');
-
+            
             $queryFromTransferCity = $this
                     ->reset()
                     ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')")

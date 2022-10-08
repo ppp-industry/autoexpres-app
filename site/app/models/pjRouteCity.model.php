@@ -43,7 +43,7 @@ class pjRouteCityModel extends pjAppModel {
 
         $from_order = $this->getOrder($route_id, $pickup_id);
         $to_order = $this->getOrder($route_id, $return_id);
-
+        
         if ($from_order != null && $to_order != null) {
             $location_arr = $this
                     ->reset()
@@ -56,16 +56,21 @@ class pjRouteCityModel extends pjAppModel {
     }
 
     public function getLocationIdPair($route_id, $pickup_id, $return_id) {
-
+        
         $from_order = $this->getOrder($route_id, $pickup_id);
         $to_order = $this->getOrder($route_id, $return_id);
-        $location_id_arr = $this
+        
+        if ($from_order != null && $to_order != null) {
+            return $this
                 ->reset()
                 ->where('route_id', $route_id)
                 ->where("($from_order <= t1.order AND t1.order <= $to_order)")
                 ->findAll()
                 ->getDataPair("city_id", "city_id");
-        return $location_id_arr;
+        }
+        
+        
+        return [];
     }
 }
 ?>
