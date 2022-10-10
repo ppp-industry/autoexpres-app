@@ -20,10 +20,13 @@ if (isset($tpl['status'])) {
 	<form action="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusTypes&amp;action=pjActionUpdate" method="post" id="frmUpdateBusType" class="pj-form form" enctype="multipart/form-data">
 		<input type="hidden" name="bus_type_update" value="1" />
 		<input type="hidden" name="id" value="<?php echo $tpl['arr']['id']?>" />
+                
 		<?php if ((int) $tpl['option_arr']['o_multi_lang'] === 1 && count($tpl['lp_arr']) > 1) : ?>
 		<div class="multilang b10"></div>
 		<?php endif;?>
-		<div class="clear_both">
+		
+                
+                <div class="clear_both">
 			<?php
 			foreach ($tpl['lp_arr'] as $v)
 			{

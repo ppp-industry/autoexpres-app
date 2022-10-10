@@ -237,6 +237,7 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 
             var $grid = $("#grid").datagrid({
                 buttons: [
+                    {type: "edit", url: "index.php?controller=pjAdminBusTypeOptions&action=pjActionUpdateBusTypeOption&id={:id}"},
                     {type: "delete", url: "index.php?controller=pjAdminBusTypeOptions&action=pjActionDeleteBusTypeOption&id={:id}"}
                 ],
                 columns: [

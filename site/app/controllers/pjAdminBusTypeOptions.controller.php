@@ -8,25 +8,40 @@ if (!defined("ROOT_PATH")) {
 class pjAdminBusTypeOptions extends pjAdmin {
 
     public function pjActionCreate() {
-        
-        
         $this->checkLogin();
 
         if ($this->isAdmin() || $this->isEditor()) {
             
-            
             if (isset($_POST['bus_type_create'])) {
+                
                 $pjBusTypeModel = pjBusTypeOptionItemModel::factory();
+                $localeId = $this->getLocaleId();
+                $id = $pjBusTypeModel->setAttributes(['name' => $_POST['i18n'][$localeId]['name']])->insert()->getInsertId();
                 
+                if ($id !== false && (int) $id > 0) {
+                    if (isset($_POST['i18n'])) {
+                        pjMultiLangModel::factory()->saveMultiLang($_POST['i18n'], $id, 'pjBusTypeOptionItemModel', 'data');
+                    }
+                }
 
-                $id = $pjBusTypeModel->setAttributes($_POST)->insert()->getInsertId();
-                
                 pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionIndex");
                 
             } 
             
             else {
+                
+                $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
+                                ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
+                                ->where('t2.file IS NOT NULL')
+                                ->orderBy('t1.sort ASC')->findAll()->getData();
 
+                $lp_arr = array();
+                foreach ($locale_arr as $item) {
+                    $lp_arr[$item['id'] . "_"] = $item['file'];
+                }
+                
+                $this->set('lp_arr', $locale_arr);
+                $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
 
                 $this->appendJs('jquery.validate.min.js', PJ_THIRD_PARTY_PATH . 'validate/');
                 $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
@@ -36,9 +51,6 @@ class pjAdminBusTypeOptions extends pjAdmin {
                 $this->appendJs('index.php?controller=pjAdmin&action=pjActionMessages', PJ_INSTALL_URL, true);
             }
         }
-        
-        
-        
         
     }
     
@@ -53,11 +65,6 @@ class pjAdminBusTypeOptions extends pjAdmin {
                 $q = pjObject::escapeString($_GET['q']);
                 $pjBusTypeOptionModel->where('name LIKE', "%$q%");
             }
-            
-            
-//            if (isset($_GET['status']) && !empty($_GET['status']) && in_array($_GET['status'], array('T', 'F'))) {
-//                $pjBusTypeOptionModel->where('t1.status', $_GET['status']);
-//            }
             
             $column = 'name';
             $direction = 'ASC';
@@ -84,7 +91,6 @@ class pjAdminBusTypeOptions extends pjAdmin {
     }
 
     public function pjActionIndex() {
-//        echo __LINE__;
         
         $this->checkLogin();
 
@@ -106,23 +112,71 @@ class pjAdminBusTypeOptions extends pjAdmin {
         if ($this->isXHR()) {
             
             $pjBusTypeOptionModel = pjBusTypeOptionItemModel::factory();
-//            echo __LINE__;exit();
-//            if (!in_array($_POST['column'], $pjBusTypeOptionModel->i18n)) {
-                
-//                echo __LINE__;exit();
                 $value = $_POST['value'];
-                
-                
 
                 $pjBusTypeOptionModel->where('id', $_GET['id'])->limit(1)->modifyAll(array($_POST['column'] => $value));
-//            } else {
-//                echo __LINE__;exit();
-//                pjMultiLangModel::factory()->updateMultiLang(array($this->getLocaleId() => array($_POST['column'] => $_POST['value'])), $_GET['id'], 'pjBusType', 'data');
-//            }
         }
         exit;
     }
 
+    
+    public function pjActionUpdateBusTypeOption(){
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
+         $this->checkLogin();
+
+        $params = $_POST;
+        
+       
+        if ($this->isAdmin() || $this->isEditor()) {
+            
+            $pjBusTypeOptionItemModel = pjBusTypeOptionItemModel::factory();
+            $pjMultiLangModel = pjMultiLangModel::factory();
+            
+            $arr = $pjBusTypeOptionItemModel->find(isset($params['id']) ? $params['id'] : $_GET['id'] )->getData();
+            
+            if (empty($arr)) {
+                pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionIndex");
+            }
+            
+            if (isset($params['bus_type_option_update'])) {
+                
+                if (isset($params['i18n'])) {
+                    pjMultiLangModel::factory()->updateMultiLang($params['i18n'], $params['id'], 'pjBusTypeOptionItemModel', 'data');
+                    $localeId = $this->getLocaleId();
+                
+                    $pjBusTypeOptionItemModel->reset()->find($params['id'])->modify(['name' => $_POST['i18n'][$localeId]['name']]);
+                    
+                    pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionIndex");
+                }
+            }
+            
+            $arr['i18n'] = $pjMultiLangModel->getMultiLang($arr['id'], 'pjBusTypeOptionItemModel');
+            $this->set('arr', $arr);
+            
+            $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
+                              ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
+                              ->where('t2.file IS NOT NULL')
+                              ->orderBy('t1.sort ASC')->findAll()->getData();
+
+            $lp_arr = array();
+            foreach ($locale_arr as $item) {
+                $lp_arr[$item['id'] . "_"] = $item['file'];
+            }
+
+            $this->set('lp_arr', $locale_arr);
+            $this->set('locale_str', pjAppController::jsonEncode($lp_arr)); 
+            
+            $this->appendJs('jquery.validate.min.js', PJ_THIRD_PARTY_PATH . 'validate/');
+            $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
+            $this->appendJs('jquery.tipsy.js', PJ_THIRD_PARTY_PATH . 'tipsy/');
+            $this->appendCss('jquery.tipsy.css', PJ_THIRD_PARTY_PATH . 'tipsy/');
+            $this->appendJs('index.php?controller=pjAdmin&action=pjActionMessages', PJ_INSTALL_URL, true);
+            
+        }
+        
+    }
     
     public function pjActionDeleteBusTypeOption(){
          ini_set("display_errors", "On");
@@ -136,7 +190,8 @@ class pjAdminBusTypeOptions extends pjAdmin {
             $arr = $pjBusTypeModel->find($_GET['id'])->getData();
             if ($pjBusTypeModel->reset()->setAttributes(array('id' => $_GET['id']))->erase()->getAffectedRows() == 1) {
               
-//                pjMultiLangModel::factory()->where('model', 'pjBusType')->where('foreign_id', $_GET['id'])->eraseAll();
+                pjMultiLangModel::factory()->where('model', 'pjBusTypeOptionItemModel')->where('foreign_id', $_GET['id'])->eraseAll();
+                
                 pjBusTypeOptionModel::factory()->where('option_id', $_GET['id'])->eraseAll();
 
                 $response['code'] = 200;

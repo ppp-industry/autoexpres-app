@@ -15,7 +15,7 @@ class pjFront extends pjAppController {
 
     public function __construct() {
         $this->setLayout('pjActionFront');
-        self::allowCORS();
+//        self::allowCORS();
     }
 
     public function afterFilter() {

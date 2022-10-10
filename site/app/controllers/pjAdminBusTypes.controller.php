@@ -326,10 +326,6 @@ class pjAdminBusTypes extends pjAdmin {
                                     
                                     
                                 }
-//                            }
-//                            else{
-//                                echo __LINE__;exit();
-//                            }
 
                         } else {
                             
@@ -340,13 +336,9 @@ class pjAdminBusTypes extends pjAdmin {
                         pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypes&action=pjActionUpdate&id=" . $params['id'] . "&err=ABT10");
                     }
                 }
-                
-                
-                
 
                 if (isset($params['options'])) {
                 
-//                    echo __LINE__;exit();
                     $pjBusTypeOptionModel->reset()->where('bus_type_id', isset($_GET['id']) ? $_GET['id'] : $params['id'])->eraseAll();
                     
                     foreach($params['options'] as $optionId){

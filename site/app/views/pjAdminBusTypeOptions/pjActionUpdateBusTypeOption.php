@@ -3,10 +3,11 @@
 
     pjUtil::printNotice(__('infoAddBusTypeTitle', true, false), __('infoAddBusTypeDesc', true, false));
 	?>
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusTypeOptions&amp;action=pjActionCreate" method="post" id="frmCreateBusType" class="pj-form form" enctype="multipart/form-data">
-    <input type="hidden" name="bus_type_create" value="1" />
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusTypeOptions&amp;action=pjActionUpdateBusTypeOption" method="post" id="frmCreateBusType" class="pj-form form" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="<?=$tpl['arr']['id']?>" />
+    <input type="hidden" name="bus_type_option_update" value="1" />
 
-    <?php if ((int) $tpl['option_arr']['o_multi_lang'] === 1 && count($tpl['lp_arr']) > 1) : ?>
+    <?php if ((int) $tpl['option_arr']['o_multi_lang'] === 1 && count($tpl['lp_arr']) > 1) :?>
         <div class="multilang b10"></div>
     <?php endif;?>
     
@@ -15,13 +16,14 @@
         <?php
             foreach ($tpl['lp_arr'] as $v)
             {
+                
             ?>
-                    <p class="pj-multilang-wrap" data-index="<?php echo $v['id']; ?>" style="display: <?php echo (int) $v['is_default'] === 0 ? 'none' : NULL; ?>">
+                    <p class="pj-multilang-wrap"  data-index="<?php echo $v['id']; ?>" style="display: <?php echo (int) $v['is_default'] === 0 ? 'none' : NULL; ?>">
                             <label class="title">Назва:</label>
                             <span class="inline_block">
                                 
                                 
-                                    <input type="text" name="i18n[<?php echo $v['id']; ?>][name]" class="pj-form-field w300 required" required lang="<?php echo $v['id']; ?>" />
+                                    <input type="text" <?php if(isset($tpl['arr']['i18n'][$v['id']]['name'])):?>value="<?=$tpl['arr']['i18n'][$v['id']]['name']?>"<?php endif?>  name="i18n[<?php echo $v['id']; ?>][name]" class="pj-form-field w300 required" required lang="<?php echo $v['id']; ?>" />
                                    
 
                                      <?php if ((int) $tpl['option_arr']['o_multi_lang'] === 1 && count($tpl['lp_arr']) > 1) : ?>

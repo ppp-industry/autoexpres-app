@@ -14,9 +14,13 @@ if (isset($tpl['status']))
 	?>
 	<form action="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusTypes&amp;action=pjActionCreate" method="post" id="frmCreateBusType" class="pj-form form" enctype="multipart/form-data">
 		<input type="hidden" name="bus_type_create" value="1" />
+                
 		<?php if ((int) $tpl['option_arr']['o_multi_lang'] === 1 && count($tpl['lp_arr']) > 1) : ?>
 		<div class="multilangb b10"></div>
 		<?php endif;?>
+                
+                
+                
 		<div class="clear_both">
 			<?php
 			foreach ($tpl['lp_arr'] as $v)
