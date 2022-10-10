@@ -1,22 +1,19 @@
 <?php
-if (isset($tpl['status']))
-{
-	$status = __('status', true);
-	switch ($tpl['status'])
-	{
-		case 2:
-			pjUtil::printNotice(NULL, $status[2]);
-			break;
-	}
+if (isset($tpl['status'])) {
+    $status = __('status', true);
+    switch ($tpl['status']) {
+        case 2:
+            pjUtil::printNotice(NULL, $status[2]);
+            break;
+    }
 } else {
-	if (isset($_GET['err']))
-	{
-		$titles = __('error_titles', true);
-		$bodies = __('error_bodies', true);
-		pjUtil::printNotice(@$titles[$_GET['err']], @$bodies[$_GET['err']]);
-	}
-	
-	pjUtil::printNotice(__('infoBusesTitle', true, false), __('infoBusesDesc', true, false)); 
+    if (isset($_GET['err'])) {
+        $titles = __('error_titles', true);
+        $bodies = __('error_bodies', true);
+        pjUtil::printNotice(@$titles[$_GET['err']], @$bodies[$_GET['err']]);
+    }
+
+    pjUtil::printNotice(__('infoBusesTitle', true, false), __('infoBusesDesc', true, false)); 
 	?>
 	<div class="b10">
 		<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get" class="float_left r5">
