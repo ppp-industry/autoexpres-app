@@ -94,10 +94,10 @@ class pjFront extends pjAppController {
     protected static function allowCORS() {
         $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '*';
         header('P3P: CP="ALL DSP COR CUR ADM TAI OUR IND COM NAV INT"');
-        header("Access-Control-Allow-Origin: $origin");
+        header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Credentials: true");
         header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
     }
 
     protected function _get($key) {
