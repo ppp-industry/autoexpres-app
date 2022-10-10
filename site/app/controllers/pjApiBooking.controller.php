@@ -10,7 +10,7 @@ if (!defined("ROOT_PATH")) {
  *
  * @author alexp
  */
-class pjApiBooking extends pjFront {
+class pjApiBooking extends pjApi {
 
     public function afterFilter() {
         

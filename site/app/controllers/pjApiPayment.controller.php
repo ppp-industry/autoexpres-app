@@ -5,7 +5,7 @@
  *
  * @author alexp
  */
-class pjApiPayment extends pjFront {
+class pjApiPayment extends pjApi {
 
     public function afterFilter() {
         

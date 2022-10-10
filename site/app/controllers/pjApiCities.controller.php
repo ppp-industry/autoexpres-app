@@ -16,7 +16,7 @@ if (!defined("ROOT_PATH")) {
  *
  * @author alexp
  */
-class pjApiCities extends pjFront {
+class pjApiCities extends pjApi {
     
     
     public function pjActionIndex(){
