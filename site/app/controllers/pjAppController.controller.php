@@ -777,8 +777,10 @@ class pjAppController extends pjController {
             
     ){
         
+        $localeId = $this->getLocaleId();
+        
         foreach ($busArr as $k => $bus) {
-            $locations = $pjRouteCityModel->reset()->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.city_id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjBusLocation', "(t3.bus_id='" . $bus ['id'] . "' AND t3.location_id=t1.city_id", 'inner')->select("t1.*, t2.content, t3.departure_time, t3.arrival_time")->where('t1.route_id', $bus ['route_id'])->orderBy("`order` ASC")->findAll()->getData();
+            $locations = $pjRouteCityModel->reset()->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.city_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left outer')->join('pjBusLocation', "(t3.bus_id='" . $bus ['id'] . "' AND t3.location_id=t1.city_id", 'inner')->select("t1.*, t2.content, t3.departure_time, t3.arrival_time")->where('t1.route_id', $bus ['route_id'])->orderBy("`order` ASC")->findAll()->getData();
             $bus ['locations'] = $locations;
 
             if (!empty($bus ['start_date']) && !empty($bus ['end_date'])) {
@@ -865,7 +867,7 @@ class pjAppController extends pjController {
             }
             
             if (!empty($tempLocationIdArr)) {
-                $ticketPriceArr = $pjPriceModel->getTicketPrice($busId, $pickupId, $returnId, $bookedData, $this->option_arr, $this->getLocaleId(), $isReturn);
+                $ticketPriceArr = $pjPriceModel->getTicketPrice($busId, $pickupId, $returnId, $bookedData, $this->option_arr, $localeId, $isReturn);
                 $ticketArr = $ticketPriceArr ['ticket_arr'];
 
                 if ($bus ['set_seats_count'] == 'F') {
@@ -889,14 +891,16 @@ class pjAppController extends pjController {
                         
                         
                         $busTypeArr[$bus['bus_type_id']] = $pjBusTypeModel->reset()->find($bus ['bus_type_id'])->getData();
-                    
-                    
+
                         
                         $options = $pjBusTypeOption->reset()
-                                    ->join('pjBusTypeOptionItem',"t1.option_id=t2.id","inner")
-                                                ->select("t2.name")->where('bus_type_id',$bus['bus_type_id'])
+                                    ->join('pjMultiLang', "t2.model='pjBusTypeOptionItemModel' AND t2.foreign_id=t1.option_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left')
+                                                ->select("t2.content as name")
+                                                ->where('bus_type_id',$bus['bus_type_id'])
                                                 ->findAll()
                                                 ->getData();
+                        
+                     
                         
                         
                         $busTypeArr[$bus['bus_type_id']]['options'] = $options;
