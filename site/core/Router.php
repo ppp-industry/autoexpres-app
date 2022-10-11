@@ -34,6 +34,10 @@ class Router {
         return self::getInstance()->getProperty('controller');
     }
 
+    public static function getAction() {
+        return self::getInstance()->getProperty('action');
+    }
+
     public static function getParams() {
         return self::getInstance()->getProperty('params');
     }
@@ -53,11 +57,12 @@ class Router {
     public function setDataAboutRoute() {
         $url = $_SERVER['REQUEST_URI'];
         
+        $query = parse_url($url, PHP_URL_QUERY);
+        
+        $url = str_replace($query,'', $url);
+        
         if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
-//            echo __LINE__;exit();
             $this->params += $_POST;
-            
-//            vd($this->params);
         }
 
         if (preg_match('/^(\/(en|uk|ru))?\/api\//', $url)) {

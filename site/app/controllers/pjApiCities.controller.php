@@ -129,6 +129,8 @@ class pjApiCities extends pjApi {
             $location_arr['locations'] = $locationArrPickup;
             $location_arr['transfer'] = $withTransferSeparated;
             
+            $location_arr['key'] = $this->generate_string();
+            
             
             $this->_set('transferIds', serialize($withTransferIds));
             

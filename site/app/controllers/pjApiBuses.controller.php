@@ -24,13 +24,12 @@ class pjApiBuses extends pjApi {
 
         $transferIds = null;
         $resp = [
-            'coockie' => $_COOKIE,
+          
         ];
         $returnBusIdArr = array();
         
         
         if($this->_is('transferIds')){
-//            echo __LINE__;exit();
             $transferIds = unserialize($this->_get('transferIds'));            
         }
         
