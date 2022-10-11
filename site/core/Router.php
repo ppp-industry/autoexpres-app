@@ -57,9 +57,6 @@ class Router {
     public function setDataAboutRoute() {
         $url = $_SERVER['REQUEST_URI'];
         
-        $query = parse_url($url, PHP_URL_QUERY);
-        
-        $url = str_replace($query,'', $url);
         
         if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)){
             $this->params += $_POST;
@@ -67,6 +64,11 @@ class Router {
 
         if (preg_match('/^(\/(en|uk|ru))?\/api\//', $url)) {
 
+            
+            $query = parse_url($url, PHP_URL_QUERY);
+        
+            $url = str_replace($query,'', $url);
+            
             if(preg_match('/(en|uk|ru)/', $url,$matches)){
                 $lang = $matches[0];
                 

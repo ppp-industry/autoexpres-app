@@ -9,7 +9,7 @@ class pjApi extends pjFront {
 
     public function __construct() {
         self::allowCORS();
-        
+//        echo __LINE__;exit();
         $action = Router::getAction();
         $controller = Router::getController();
 
