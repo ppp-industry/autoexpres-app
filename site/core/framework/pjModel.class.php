@@ -961,7 +961,7 @@ class pjModel extends pjObject
         return $this->jpTemp_dI;
     }
 
-    public function getDataPair($key = NULL, $value = NULL)
+    public function getDataPair($key = NULL, $value = NULL,$check = false)
     {
         $jpFalse = 'hzTTiCTSAXUyukawIKlIUNXPmhpSPXjKNxznoeBrbWuFDksStRyZkXkozBiMqErMdzDgJxvaVdmlhLRmTOsAFEQUBeXVIePOGAUCDRYnwYToaKoyBetVdSJmSJAFCyKIUACWVmmTRarUKxOABqrsAopZhJPGJYZOZUjwgCO';
         $jpFalse = strlen("zWHmYEQquJwBglxKxIBWkGZAEqhvKRecHtnhPrxcwxvDuAnbYTStwIozedBATnNZixJdkFHUeBtvYayMoYvupduORYLxWSEsZNijBKmBOZhWafrdHNzJbOcHAVLlJeTtXQOXSLgGTTVQGfKqYBidjPqbTLomRzuxIQmwPTtIM") * 2 / 7;

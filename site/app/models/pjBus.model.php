@@ -51,7 +51,7 @@ class pjBusModel extends pjAppModel {
             $tIds = [];
             
             foreach($transferIds as $transferCity => &$cities){
-                if(in_array($return_id, $cities)){
+                if(in_array($pickup_id, $cities) || in_array($return_id, $cities)){
                     $tIds[] = $transferCity;
                 }
             }

@@ -69,7 +69,7 @@ class pjApi extends pjFront {
             return isset($storage['data'][$key]) ? $storage['data'][$key] : false;            
         }
     }
-
+    
     protected function _is($key) {
         
         $model = pjDbSessionDataModel::factory();
@@ -114,6 +114,39 @@ class pjApi extends pjFront {
             $model->reset()->setAttributes(['id' => $storage['id']])->modify($storage);
         }
     }
+    protected function _getStore(){
+        $model = pjDbSessionDataModel::factory();
+        $model->where('storage_key', $this->defaultStore)->limit(1);
+
+        $res = $model->findAll()->getData();
+        
+        if(!empty($res)){
+            return $res[0];
+        } 
+        return null;
+    }
+    
+    protected function _remove($key) {
+        $model = pjDbSessionDataModel::factory();
+        $model->where('storage_key', $this->defaultStore)->limit(1);
+
+        $res = $model->findAll()->getData();
+        
+        if(!empty($res)){
+             $storage = $res[0];
+            $storage['data'] = unserialize($storage['data']);
+            
+            if(isset($storage['data'][$key])){
+                unset($storage['data'][$key]);
+            }
+            
+            $storage['data'] = serialize($storage['data']);
+            
+            $model->reset()->setAttributes(['id' => $storage['id']])->modify($storage);
+                    
+        } 
+    }
+    
     
     
 }
