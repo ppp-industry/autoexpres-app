@@ -3,8 +3,9 @@
 
     pjUtil::printNotice(__('infoAddBusTypeTitle', true, false), __('infoAddBusTypeDesc', true, false));
 	?>
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusStop&amp;action=pjActionCreate" method="post" id="frmCreateBusType" class="pj-form form" enctype="multipart/form-data">
-    <input type="hidden" name="bus_stop_create" value="1" />
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusStop&amp;action=pjActionUpdate" method="post" id="frmCreateBusType" class="pj-form form" enctype="multipart/form-data">
+    <input type="hidden" name="bus_stop_update" value="1" />
+    <input type="hidden" name="id" value="<?=$tpl['arr']['id']?>" />
 
     <?php if ((int) $tpl['option_arr']['o_multi_lang'] === 1 && count($tpl['lp_arr']) > 1) : ?>
         <div class="multilang b10"></div>
@@ -58,7 +59,7 @@
                             <span class="inline_block">
                                 
                                 
-                                    <input type="text" name="i18n[<?php echo $v['id']; ?>][address]" class="pj-form-field w300 required" required lang="<?php echo $v['id']; ?>" />
+                                    <input type="text"  <?php  if(isset($tpl['arr']['i18n'][$v['id']]['address'])):?>value="<?=$tpl['arr']['i18n'][$v['id']]['address']?>"<?php endif?> name="i18n[<?php echo $v['id']; ?>][address]" class="pj-form-field w300 required" required lang="<?php echo $v['id']; ?>" />
                                    
 
                                      <?php if ((int) $tpl['option_arr']['o_multi_lang'] === 1 && count($tpl['lp_arr']) > 1) : ?>

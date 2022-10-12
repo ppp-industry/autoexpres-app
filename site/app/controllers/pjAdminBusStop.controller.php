@@ -37,18 +37,23 @@ class pjAdminBusStop extends pjAdmin {
             $arr = $pjBusStopModel->find(isset($params['id']) ? $params['id'] : $_GET['id'] )->getData();
             
             if (empty($arr)) {
-                pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionIndex");
+                pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusStop&action=pjActionIndex");
             }
             
-            if (isset($params['bus_type_option_update'])) {
+            if (isset($params['bus_stop_update'])) {
                 
                 if (isset($params['i18n'])) {
-                    pjMultiLangModel::factory()->updateMultiLang($params['i18n'], $params['id'], 'pjBusTypeOptionItemModel', 'data');
+                    
+                    pjMultiLangModel::factory()->updateMultiLang($params['i18n'], $params['id'], 'pjBusStopModel', 'data');
                     $localeId = $this->getLocaleId();
                 
-                    $pjBusStopModel->reset()->find($params['id'])->modify(['name' => $_POST['i18n'][$localeId]['name']]);
+                    $pjBusStopModel->reset()->find($params['id'])->modify([
+                        'location_id' => $_POST['location_id'],
+                        'name' => $_POST['i18n'][$localeId]['name'],
+                        'address' => $_POST['i18n'][$localeId]['address'],
+                    ]);
                     
-                    pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionIndex");
+                    pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusStop&action=pjActionIndex");
                 }
             }
             

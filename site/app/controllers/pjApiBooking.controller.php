@@ -30,7 +30,7 @@ class pjApiBooking extends pjApi {
 
             $transferId = $this->_get('transferId');
 
-            if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
+            if ($this->checkStore() && $this->isBusReady() == true) {
                 $pickupId = $this->_get('pickup_id');
                 $returnId = $this->_get('return_id');
                 $isReturn = $this->_get('is_return');
@@ -58,7 +58,7 @@ class pjApiBooking extends pjApi {
             }
         } else {
 
-            if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
+            if ($this->checkStore() && $this->isBusReady() == true) {
                 $pickupId = $this->_get('pickup_id');
                 $returnId = $this->_get('return_id');
                 $isReturn = $this->_get('is_return');
@@ -438,7 +438,7 @@ class pjApiBooking extends pjApi {
 
             $_SESSION[$this->defaultStep]['3_passed'] = true;
 
-            if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
+            if ($this->checkStore() && $this->isBusReady() == true) {
                 $bookedData = $this->_get('booked_data');
 
                 $pickupId = $this->_get('pickup_id');
