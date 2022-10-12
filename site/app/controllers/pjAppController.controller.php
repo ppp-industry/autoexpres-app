@@ -670,9 +670,10 @@ class pjAppController extends pjController {
             $busTypeArr = $bookedSeatArr = $seatArr = $selectedSeatArr = array();
             $locationIdArr = array();
             $this->hundleBusData(
-                $busArr,$bookingPeriod,$locationIdArr,$pjRouteCityModel,$pjBusTypeModel,$pjBusLocationModel,$pjSeatModel,
-                $pjPriceModel,$pjBookingSeatModel,$pjBookingModel,$pickupId,$returnId,$bookingDate,$ticketColumns,$bookedData,
-                $isReturn,$busTypeArr,$bookedSeatArr,$seatArr,$selectedSeatArr
+                $busArr,$bookingPeriod,$locationIdArr,$pjRouteCityModel,$pjBusTypeModel,
+                $pjBusLocationModel,$pjSeatModel,$pjPriceModel,$pjBookingSeatModel,
+                $pjBookingModel,$pjBusTypeOption,$pickupId,$returnId,$bookingDate,$ticketColumns,$bookedData,$isReturn,
+                $busTypeArr,$bookedSeatArr,$seatArr,$selectedSeatArr
             );
             
             
@@ -950,7 +951,7 @@ class pjAppController extends pjController {
                 $busArr[$k]['transferId'] = $transferId;
                 $busArr[$k]['transfer_location'] = $transferLocation;
 //                $busArr
-        }
+            }
         }
         
 

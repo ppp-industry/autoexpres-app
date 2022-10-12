@@ -297,6 +297,21 @@ class pjAdmin extends pjAppController {
             $this->set('status', 2);
         }
     }
+    
+    protected function setLocales() {
+        $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
+                        ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
+                        ->where('t2.file IS NOT NULL')
+                        ->orderBy('t1.sort ASC')->findAll()->getData();
+
+        $lp_arr = array();
+        foreach ($locale_arr as $item) {
+            $lp_arr[$item['id'] . "_"] = $item['file'];
+        }
+
+        $this->set('lp_arr', $locale_arr);
+        $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+    }
 
 }
 

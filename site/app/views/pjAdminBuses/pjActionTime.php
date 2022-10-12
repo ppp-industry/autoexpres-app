@@ -53,6 +53,7 @@ if (isset($tpl['status'])) {
 				<a href="#" class="pj-form-langbar-tip listing-tip" title="<?php __('lblBusTypeTip'); ?>"></a>
 			</span>
 		</p>
+                
 		<div id="bs_bus_locations">
 			<?php
 			if(isset($tpl['location_arr']))

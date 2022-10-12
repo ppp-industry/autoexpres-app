@@ -47,7 +47,7 @@ class pjApiBuses extends pjApi {
             }
             
             $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
-
+           
             if (empty($busIdArr)) {
                 $resp['code'] = 100;
                 if (!isset($params['final_check'])) {

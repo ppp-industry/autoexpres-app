@@ -14,6 +14,7 @@ if (pjObject::getPlugin('pjOneAdmin') !== NULL) {
         <li><a href="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminRoutes&amp;action=pjActionIndex" class="<?php echo $_GET['controller'] == 'pjAdminRoutes' || $_GET['controller'] == 'pjAdminCities' ? 'menu-focus' : NULL; ?>"><span class="menu-routes">&nbsp;</span><?php __('menuRoutes'); ?></a></li>
         <li><a href="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusTypes&amp;action=pjActionIndex" class="<?php echo $_GET['controller'] == 'pjAdminBusTypes' ? 'menu-focus' : NULL; ?>"><span class="menu-bus-types">&nbsp;</span><?php __('menuBusTypes'); ?></a></li>
         <li><a href="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusTypeOptions&amp;action=pjActionIndex" class="<?php echo $_GET['controller'] == 'pjAdminBusTypeOptions' ? 'menu-focus' : NULL; ?>"><span class="menu-reservations">&nbsp;</span>Опції автобусів</a></li>
+        <li><a href="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminBusStop&amp;action=pjActionIndex" class="<?php echo $_GET['controller'] == 'pjAdminBusStop' ? 'menu-focus' : NULL; ?>"><span style="background: url(/app/web/img/backend/pngwing.png) no-repeat;" >&nbsp;</span>Зупинки</a></li>
         <?php
         if ($controller->isAdmin()) {
             ?>

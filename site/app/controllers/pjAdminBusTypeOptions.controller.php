@@ -100,7 +100,7 @@ class pjAdminBusTypeOptions extends pjAdmin {
             $this->appendJs('index.php?controller=pjAdmin&action=pjActionMessages', PJ_INSTALL_URL, true);
         } else {
             $this->set('status', 2);
-        }
+        } 
     }
 
     public function pjActionSaveBusTypeOption() {
