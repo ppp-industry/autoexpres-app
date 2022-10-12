@@ -155,6 +155,7 @@ class pjAdminBusTypeOptions extends pjAdmin {
             $arr['i18n'] = $pjMultiLangModel->getMultiLang($arr['id'], 'pjBusTypeOptionItemModel');
             $this->set('arr', $arr);
             
+            
             $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
                               ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
                               ->where('t2.file IS NOT NULL')

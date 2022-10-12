@@ -102,12 +102,18 @@ class pjApiBuses extends pjApi {
                     $this->_set('return_bus_id_arr', $returnBusIdArr);
                     $this->_set('return_date', $params['return_date']);
                 }
+                
+                
                 if ($this->_is('booked_data')) {
                     unset($_SESSION[$this->defaultStore]['booked_data']);
                 }
+                
+                
                 if ($this->_is('bus_id')) {
                     unset($_SESSION[$this->defaultStore]['bus_id']);
                 }
+                
+                
                 $resp['code'] = 200;
                 pjAppController::jsonResponse($resp);
             } else {
@@ -134,9 +140,11 @@ class pjApiBuses extends pjApi {
         error_reporting(E_ALL ^ E_DEPRECATED);
         
         $_SESSION[$this->defaultStep]['2_passed'] = true;
+        
+        
         $busList = [];
         
-        if (isset($_SESSION[$this->defaultStore]) && count($_SESSION[$this->defaultStore]) > 0 && $this->isBusReady() == true) {
+        if ($this->checkStore() && $this->isBusReady() == true) {
             $bookedData = $bookingPeriod = array();
             
             if ($this->_is('booking_period')) {
@@ -149,6 +157,7 @@ class pjApiBuses extends pjApi {
             
 
             if ($this->_is('bus_id_arr')) {
+                
                 $busIdArr = $this->_get('bus_id_arr');
                 $pickupId = $this->_get('pickup_id');
                 $returnId = $this->_get('return_id');

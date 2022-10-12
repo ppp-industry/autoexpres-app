@@ -43,7 +43,7 @@
                             <span class="inline_block">
                                 
                                 
-                                    <input type="text"  <?php  if(isset($tpl['i18n'][$v['id']]['name'])):?>value="<?=$tpl['i18n'][$v['id']]['name']?>"<?php endif  ?>  name="i18n[<?php echo $v['id']; ?>][name]" class="pj-form-field w300 required" required lang="<?php echo $v['id']; ?>" />
+                                    <input type="text"  <?php  if(isset($tpl['arr']['i18n'][$v['id']]['name'])):?>value="<?=$tpl['arr']['i18n'][$v['id']]['name']?>"<?php endif  ?>  name="i18n[<?php echo $v['id']; ?>][name]" class="pj-form-field w300 required" required lang="<?php echo $v['id']; ?>" />
                                    
 
                                      <?php if ((int) $tpl['option_arr']['o_multi_lang'] === 1 && count($tpl['lp_arr']) > 1) : ?>

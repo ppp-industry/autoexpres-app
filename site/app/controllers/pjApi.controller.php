@@ -39,6 +39,83 @@ class pjApi extends pjFront {
         
         return $random_string;
     }
+    
+    protected function checkStore(){
+        $model = pjDbSessionDataModel::factory();
+        $model->where('storage_key', $this->defaultStore)->limit(1);
+
+        $res = $model->findAll()->getData();
+        if(empty($res)){
+            return false;
+        }
+        else{
+            $storage = $res[0];
+            $storage['data'] = unserialize($storage['data']);
+            return count($storage['data']) > 0;            
+        }
+    }
+    
+    protected function _get($key) {
+        $model = pjDbSessionDataModel::factory();
+        $model->where('storage_key', $this->defaultStore)->limit(1);
+
+        $res = $model->findAll()->getData();
+        if(empty($res)){
+            return false;
+        }
+        else{
+            $storage = $res[0];
+            $storage['data'] = unserialize($storage['data']);
+            return isset($storage['data'][$key]) ? $storage['data'][$key] : false;            
+        }
+    }
+
+    protected function _is($key) {
+        
+        $model = pjDbSessionDataModel::factory();
+        $model->where('storage_key', $this->defaultStore)->limit(1);
+
+        $res = $model->findAll()->getData();
+        if(empty($res)){
+            
+            return false;
+        }
+        else{
+            $storage = $res[0];
+            $storage['data'] = unserialize($storage['data']);
+            return isset($storage['data'][$key]);
+            
+        }
+        
+    }
+
+    protected function _set($key, $value) {
+        $model = pjDbSessionDataModel::factory();
+        $model->where('storage_key', $this->defaultStore)->limit(1);
+
+        $res = $model->findAll()->getData();
+        
+        if(empty($res)){
+            
+            $model->setAttributes([
+                'storage_key' => $this->defaultStore,
+                'data' => serialize([
+                    $key => $value
+                ])
+            ])->insert();            
+        }   
+        
+        else{
+            $storage = $res[0];
+            $storage['data'] = unserialize($storage['data']);
+            $storage['data'][$key] = $value;
+            $storage['data'] = serialize($storage['data']);
+            
+            $model->reset()->setAttributes(['id' => $storage['id']])->modify($storage);
+        }
+    }
+    
+    
 }
 
 ?>
