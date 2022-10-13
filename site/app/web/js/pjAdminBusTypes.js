@@ -242,6 +242,7 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 				          {type: "delete", url: "index.php?controller=pjAdminBusTypes&action=pjActionDeleteBusType&id={:id}"}
 				          ],
 				columns: [{text: myLabel.name, type: "text", sortable: true, editable: false, width: 280},
+				          {text: myLabel.car_model, type: "text", sortable: false, editable: false,  width: 100},
 				          {text: myLabel.map, type: "text", sortable: false, editable: false, renderer: formatMap, width: 100},
 				          {text: myLabel.seats, type: "text", sortable: true, editable: false, width: 120},
 				          {text: myLabel.status, type: "select", sortable: true, editable: true, width: 90, options: [
@@ -250,7 +251,7 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 				                                                                                     ], applyClass: "pj-status"}],
 				dataUrl: "index.php?controller=pjAdminBusTypes&action=pjActionGetBusType",
 				dataType: "json",
-				fields: ['name', 'seats_map', 'seats_count', 'status'],
+				fields: ['name','car_model', 'seats_map', 'seats_count', 'status'],
 				paginator: {
 					actions: [
 					   {text: myLabel.delete_selected, url: "index.php?controller=pjAdminBusTypes&action=pjActionDeleteBusTypeBulk", render: true, confirmation: myLabel.delete_confirmation},

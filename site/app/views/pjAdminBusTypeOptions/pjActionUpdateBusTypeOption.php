@@ -35,6 +35,14 @@
             }
             ?>
         
+                    
+            <p>
+                <label class="title">Фото</label>
+                <span class="inline_block">
+                    <input type="file" name="photo" id="photo" class="pj-form-field" accept=".svg" />
+                </span>
+            </p>
+                                
 
         <p>
             <label class="title">&nbsp;</label>

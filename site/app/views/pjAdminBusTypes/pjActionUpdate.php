@@ -43,6 +43,15 @@ if (isset($tpl['status'])) {
 				<?php
 			}
 			?>
+                                
+                                              
+			<p style="display:<?php echo (is_file($map)) ? 'none' : 'block';?>">
+				<label class="title">Марка авто</label>
+				<span class="inline_block">
+					<input type="text" name="car_model" id="car_model" class="pj-form-field w300" value="<?php echo $tpl['arr']['car_model'] != '' ? $tpl['arr']['car_model'] : null; ?>"/>
+				</span>
+			</p>
+                        
 			
 			<?php
 			$map = $tpl['arr']['seats_map']; 
@@ -139,11 +148,8 @@ if (isset($tpl['status'])) {
                                 
                                 
                                 
-                                
-                                
-                                
-                               
-                                    
+                        
+                        
                                     
                                     
                                     

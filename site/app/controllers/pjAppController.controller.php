@@ -896,21 +896,20 @@ class pjAppController extends pjController {
                         
                         $options = $pjBusTypeOption->reset()
                                     ->join('pjMultiLang', "t2.model='pjBusTypeOptionItemModel' AND t2.foreign_id=t1.option_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left')
-                                                ->select("t2.content as name")
-                                                ->where('bus_type_id',$bus['bus_type_id'])
-                                                ->findAll()
-                                                ->getData();
+                                    ->join('pjBusTypeOptionItem', "t3.id=t1.option_id ", 'inner')
+                                    ->select("t1.*,t2.content as name,t3.svg_source as file")
+                                    ->where('bus_type_id',$bus['bus_type_id'])
+                                    ->findAll()
+                                    ->getData();
                         
-                     
+                        $keys = array_column($options,'name');
+                        $values = array_column($options,'file');
                         
                         
-                        $busTypeArr[$bus['bus_type_id']]['options'] = $options;
+
+                        $bookingPeriod [$busId]['options'] = $keys;
+                        $busTypeArr[$bus['bus_type_id']]['options'] = array_combine($keys, $values);
                     }
-                    
-                    
-                    $bookingPeriod [$busId]['options'] = array_column($busTypeArr[$bus['bus_type_id']]['options'], 'name');
-                    
-                    
                     
                     $seatsAvailable = $busTypeArr[$bus['bus_type_id']]['seats_count'];
                     

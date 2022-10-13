@@ -31,7 +31,39 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
                             $.get('index.php?controller=pjAdminRoutes&action=pjActionGetBusStopsByCity',{
                                 city : cityId,
                             },(data) => {
-                                console.log(data);
+                                
+
+                                $( "#busStopSelect" ).html(data).find('input[type="checkbox"]').on('change',function(){
+                                    
+                                    var $this = $(this);
+                                    var val = $this.val();
+                                    
+                                    var targetInput = $(`input[type="hidden"][name="bus_stops[${cityId}]"]`);
+                                    var targetVal = targetInput.val();
+                                    
+                                    if(targetVal.length > 0){
+                                        targetVal = targetVal.split(',');   
+                                    }
+                                    else{
+                                        targetVal = [];
+                                    }
+                                    
+                                    if($this.is(':checked')){
+                                        targetVal.push(val);
+                                    }
+                                    else{
+                                        
+                                        targetVal = targetVal.filter(e => e !== val);
+                                    }
+                                    
+                                    
+                                    targetInput.val(targetVal.join(','));
+                                    
+                                    
+                                    
+                                })
+                                
+                                
                             });
                         },
                         buttons: [

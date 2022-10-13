@@ -14,7 +14,8 @@ class pjBusTypeModel extends pjAppModel {
         array('name' => 'seats_map', 'type' => 'varchar', 'default' => ':NULL'),
         array('name' => 'photo', 'type' => 'varchar', 'default' => ':NULL'),
         array('name' => 'seats_count', 'type' => 'int', 'default' => ':NULL'),
-        array('name' => 'status', 'type' => 'enum', 'default' => 'T')
+        array('name' => 'status', 'type' => 'enum', 'default' => 'T'),
+        array('name' => 'car_model', 'type' => 'varchar', 'default' => 'T')
     );
     public $i18n = array('name');
 

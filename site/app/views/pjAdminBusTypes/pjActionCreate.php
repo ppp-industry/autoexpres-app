@@ -38,7 +38,17 @@ if (isset($tpl['status']))
 				<?php
 			}
 			?>
+                                
+                        <p >
+				<label class="title">Марка авто</label>
+				<span class="inline_block">
+					<input type="text" name="car_model" id="car_model" class="pj-form-field w300" />
+				</span>
+			</p>
+                                
+                                
 			<p>
+                            
 				<label class="title"><?php __('lblSeatsMap'); ?></label>
 				<span class="inline_block">
 					<input type="file" name="seats_map" id="seats_map" class="pj-form-field" />

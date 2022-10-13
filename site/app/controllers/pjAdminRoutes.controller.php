@@ -222,6 +222,9 @@ class pjAdminRoutes extends pjAdmin {
     }
 
     public function pjActionUpdate() {
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
         $this->checkLogin();
 
         if ($this->isAdmin() || $this->isEditor()) {
@@ -229,6 +232,8 @@ class pjAdminRoutes extends pjAdmin {
             if (isset($_POST['route_update'])) {
                 $pjMultiLangModel = pjMultiLangModel::factory();
                 $pjRouteModel = pjRouteModel::factory();
+                $pjRouteCityBusStopModel = pjRouteCityBusStopModel::factory();
+                
                 $arr = $pjRouteModel->find($_POST['id'])->getData();
                 if (empty($arr)) {
                     pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminRoutes&action=pjActionIndex&err=AR08");
@@ -240,6 +245,18 @@ class pjAdminRoutes extends pjAdmin {
                 }
 
                 if (!isset($_POST['has_bookings'])) {
+                    
+                    if (isset($_POST['bus_stops'])){
+                        
+                        
+                        foreach($_POST['bus_stops'] as $cityId => $busIds){
+                            
+                            
+                        }
+
+                    }
+                    
+                    
                     $pjRouteCityModel = pjRouteCityModel::factory();
                     $pjRouteCityModel->where('route_id', $_POST['id'])->eraseAll();
                     if (isset($_POST['index_arr']) && $_POST['index_arr'] != '') {
@@ -326,6 +343,7 @@ class pjAdminRoutes extends pjAdmin {
     
     public function pjActionGetBusStopsByCity(){
         $city = $_GET['city'];
+        $this->setAjax(true);
         
         ini_set("display_errors", "On");
         error_reporting(E_ALL ^ E_DEPRECATED);
@@ -338,11 +356,7 @@ class pjAdminRoutes extends pjAdmin {
         $data = $pjBusStopModel->findAll()->getData();
         
         $this->set('busStops',$data);
-        
-        
-//        GetBusStopsByCity
-        echo pjAppController::jsonResponse($data);
-        exit();
+
     }
 
 }

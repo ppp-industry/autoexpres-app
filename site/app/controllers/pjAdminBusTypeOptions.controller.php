@@ -14,13 +14,40 @@ class pjAdminBusTypeOptions extends pjAdmin {
             
             if (isset($_POST['bus_type_create'])) {
                 
-                $pjBusTypeModel = pjBusTypeOptionItemModel::factory();
+                $pjBusTypeOptionItemModel = pjBusTypeOptionItemModel::factory();
                 $localeId = $this->getLocaleId();
-                $id = $pjBusTypeModel->setAttributes(['name' => $_POST['i18n'][$localeId]['name']])->insert()->getInsertId();
+                $data = ['name' => $_POST['i18n'][$localeId]['name']];
+                
+                $id = $pjBusTypeOptionItemModel->setAttributes($data)->insert()->getInsertId();
                 
                 if ($id !== false && (int) $id > 0) {
                     if (isset($_POST['i18n'])) {
                         pjMultiLangModel::factory()->saveMultiLang($_POST['i18n'], $id, 'pjBusTypeOptionItemModel', 'data');
+                    }
+                    
+                    if (isset($_FILES['photo'])) {
+                        $data = [];
+                        if ($_FILES['photo']['error'] == 0) {
+                            if (is_writable('app/web/upload/buy_types_options')) {
+
+                                $hash = md5(uniqid(rand(), true));
+                                $imagePath = PJ_UPLOAD_PATH . 'buy_types_options/photo_' . $id . '_'  . $hash . '.svg';
+
+                                if(move_uploaded_file($_FILES['photo']['tmp_name'], $imagePath)){
+                                    $data['svg_source'] = $imagePath; 
+                                }
+
+                            } else {
+                                pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionCreate&err=ABT11");
+                            }
+                        } else if ($_FILES['photo']['error'] != 4) {
+
+                            pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionCreate&err=ABT10");
+                        }
+                        
+                        if(!empty($data) && $pjBusTypeOptionItemModel->reset()->find($id)->modify($data)->getAffectedRows() > 0){
+                            pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionIndex");
+                        }   
                     }
                 }
 
@@ -141,13 +168,41 @@ class pjAdminBusTypeOptions extends pjAdmin {
             }
             
             if (isset($params['bus_type_option_update'])) {
+                $data = [];
+                
+                if (isset($_FILES['photo'])) {
+//                    echo __LINE__;exit();
+                    
+//                    vd($_FILES['photo']);
+                    if ($_FILES['photo']['error'] == 0) {
+                        if (is_writable('app/web/upload/buy_types_options')) {
+                    
+                            $hash = md5(uniqid(rand(), true));
+                            $imagePath = PJ_UPLOAD_PATH . 'buy_types_options/photo_' . $params['id'] . '_' . $hash . '.svg';
+                            
+                            if(move_uploaded_file($_FILES['photo']['tmp_name'], $imagePath)){
+                                $data['svg_source'] = $imagePath; 
+                            }
+
+                        } else {
+                            
+                            pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionUpdateBusTypeOption&id=" . $params['id'] . "&err=ABT11");
+                        }
+                    } else if ($_FILES['photo']['error'] != 4) {
+                      
+                        pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionUpdateBusTypeOption&id=" . $params['id'] . "&err=ABT10");
+                    }
+                }
                 
                 if (isset($params['i18n'])) {
                     pjMultiLangModel::factory()->updateMultiLang($params['i18n'], $params['id'], 'pjBusTypeOptionItemModel', 'data');
-                    $localeId = $this->getLocaleId();
-                
-                    $pjBusTypeOptionItemModel->reset()->find($params['id'])->modify(['name' => $_POST['i18n'][$localeId]['name']]);
                     
+                    $localeId = $this->getLocaleId();
+                    $data['name'] = $_POST['i18n'][$localeId]['name'];    
+                    
+                }
+                
+                if($pjBusTypeOptionItemModel->reset()->find($params['id'])->modify($data)->getAffectedRows() > 0){
                     pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionIndex");
                 }
             }
