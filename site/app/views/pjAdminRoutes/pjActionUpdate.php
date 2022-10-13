@@ -1,27 +1,31 @@
-<?php
-if (isset($tpl['status']))
-{
-	$status = __('status', true);
-	switch ($tpl['status'])
-	{
-		case 2:
-			pjUtil::printNotice(NULL, $status[2]);
-			break;
-	}
+<?php //vd($tpl['arr']['city']);
+
+if (isset($tpl['status'])) {
+    $status = __('status', true);
+    switch ($tpl['status']) {
+        case 2:
+            pjUtil::printNotice(NULL, $status[2]);
+            break;
+    }
 } else {
-	if (isset($_GET['err']))
-	{
-		$titles = __('error_titles', true);
-		$bodies = __('error_bodies', true);
-		pjUtil::printNotice(@$titles[$_GET['err']], @$bodies[$_GET['err']]);
-	}
-	?>
-	<div class="ui-tabs ui-widget ui-widget-content ui-corner-all b10">
-		<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-			<li class="ui-state-default ui-corner-top"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminRoutes&amp;action=pjActionIndex"><?php __('menuRoutes'); ?></a></li>
-			<li class="ui-state-default ui-corner-top"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminCities&amp;action=pjActionIndex"><?php __('lblCities'); ?></a></li>
-		</ul>
-	</div>
+    if (isset($_GET['err'])) {
+        $titles = __('error_titles', true);
+        $bodies = __('error_bodies', true);
+        pjUtil::printNotice(@$titles[$_GET['err']], @$bodies[$_GET['err']]);
+    }
+?>
+
+<div id="busStopSelect" title="<?php __('lblSelectSeats'); ?>" style="display:none">
+    <img src="<?php echo PJ_IMG_PATH . 'backend/pj-preloader.gif'?>" />
+</div>
+
+
+    <div class="ui-tabs ui-widget ui-widget-content ui-corner-all b10">
+        <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+            <li class="ui-state-default ui-corner-top"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminRoutes&amp;action=pjActionIndex"><?php __('menuRoutes'); ?></a></li>
+            <li class="ui-state-default ui-corner-top"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?controller=pjAdminCities&amp;action=pjActionIndex"><?php __('lblCities'); ?></a></li>
+        </ul>
+    </div>
 	<?php
 	pjUtil::printNotice(__('infoUpdateRouteTitle', true, false), __('infoUpdateRouteDesc', true, false)); 
 	?>
@@ -72,6 +76,9 @@ if (isset($tpl['status']))
 				if(isset($tpl['arr']['city']) && count($tpl['arr']['city']) > 0)
 				{
 					$city_id_arr = $tpl['arr']['city'];
+                                        
+                                        
+                                        
 					foreach($city_id_arr as $k => $city_id)
 					{
 						$index = 'bs_' . rand(1, 999999);
@@ -92,6 +99,9 @@ if (isset($tpl['status']))
 								</span>
 							</p>
 							<div class="location-icons">
+                                                            <button type="button" data-city="<?=$city_id?>" class="bus-stop" style="">
+                                                                    <img src="/app/web/img/backend/bus_stop.png" style="height: 24px;">
+                                                        </button>
 								<a href="javascript:void(0);" class="location-delete-icon"></a>
 								<a href="javascript:void(0);" class="location-move-icon"></a>
 							</div>
@@ -116,7 +126,12 @@ if (isset($tpl['status']))
 								</select>
 							</span>
 						</p>
+                                                
 						<div class="location-icons">
+                                                    
+                                                    <button type="button" class="bus-stop" style="">
+                                                                    <img src="/app/web/img/backend/bus_stop.png" style="height: 24px;">
+                                                        </button>
 							<a href="javascript:void(0);" class="location-delete-icon"></a>
 							<a href="javascript:void(0);" class="location-move-icon"></a>
 						</div>
@@ -161,6 +176,9 @@ if (isset($tpl['status']))
 				</span>
 			</p>
 			<div class="location-icons">
+                                                                             <button type="button" class="bus-stop" style="">
+                                                                    <img src="/app/web/img/backend/bus_stop.png" style="height: 24px;">
+                                                        </button>
 				<a href="javascript:void(0);" class="location-delete-icon"></a>
 				<a href="javascript:void(0);" class="location-move-icon"></a>
 			</div>

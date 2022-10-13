@@ -129,8 +129,8 @@ class pjApiBuses extends pjApi {
     
     public function pjActionSeats() {
 
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $this->_set('2_passed', true);
         
@@ -148,24 +148,23 @@ class pjApiBuses extends pjApi {
                 $bookedData = $this->_get('booked_data');
             } 
             
+            $pickupId = $this->_get('pickup_id');
+            $returnId = $this->_get('return_id');
 
             if ($this->_is('bus_id_arr')) {
                 
                 $busIdArr = $this->_get('bus_id_arr');
-                $pickupId = $this->_get('pickup_id');
-                $returnId = $this->_get('return_id');
                 $date = $this->_get('date');
                
                 $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F');
                 
             }
             if ($this->_is('return_bus_id_arr')) {
+                
                 $busIdArr = $this->_get('return_bus_id_arr');
-                $pickupId = $this->_get('return_id');
-                $returnId = $this->_get('pickup_id');
                 $date = $this->_get('return_date');
                 
-                $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'T');
+                $busList['return'] = $this->getBusList($returnId,$pickupId, $busIdArr, $bookingPeriod, $bookedData, $date, 'T');
                 
                
             }

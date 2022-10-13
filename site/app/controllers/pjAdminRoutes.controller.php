@@ -322,6 +322,28 @@ class pjAdminRoutes extends pjAdmin {
             $this->set('status', 2);
         }
     }
+    
+    
+    public function pjActionGetBusStopsByCity(){
+        $city = $_GET['city'];
+        
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
+        $pjBusStopModel = pjBusStopModel::factory();
+        $pjBusStopModel->where('location_id',$city);
+        $pjBusStopModel->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.location_id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer');
+        $pjBusStopModel->select('t1.*,t2.content as city');
+            
+        $data = $pjBusStopModel->findAll()->getData();
+        
+        $this->set('busStops',$data);
+        
+        
+//        GetBusStopsByCity
+        echo pjAppController::jsonResponse($data);
+        exit();
+    }
 
 }
 

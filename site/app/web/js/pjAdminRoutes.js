@@ -17,6 +17,44 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 			$('#index_arr').val(index_arr.join("|"));
 		}
 		
+                
+                
+		if($(".bus-stop").length > 0){
+                    
+                   $(".bus-stop").on('click',function(){
+                       
+                       var cityId = $(this).data('city');
+                        $( "#busStopSelect" ).dialog({
+                        dialogClass: "no-close",
+                        width: 610,
+                        open: function (){
+                            $.get('index.php?controller=pjAdminRoutes&action=pjActionGetBusStopsByCity',{
+                                city : cityId,
+                            },(data) => {
+                                console.log(data);
+                            });
+                        },
+                        buttons: [
+                          {
+                            text: "OK",
+                            click: function() {
+                              $( this ).dialog( "close" );
+                            }
+                          }
+                        ]
+                      });
+                       
+                       
+                   });
+                    
+                    
+                   
+                      
+                      
+                      
+                }
+                
+                
 		if($(".pj-location-grid").length > 0)
 		{
 			var head_height = $('.content-head-row').height();
