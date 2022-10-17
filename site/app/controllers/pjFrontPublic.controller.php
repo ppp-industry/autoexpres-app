@@ -150,8 +150,6 @@ class pjFrontPublic extends pjFront {
                 $pickup_id = $this->_get('pickup_id');
                 $return_id = $this->_get('return_id');
                 $is_return = $this->_get('is_return');
-                
-                
                 $bus_id = $booked_data['bus_id'];
                 $departure_time = NULL;
                 $_departure_time = NULL;

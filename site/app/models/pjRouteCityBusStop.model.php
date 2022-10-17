@@ -1,4 +1,8 @@
 <?php
+if (!defined("ROOT_PATH")) {
+    header("HTTP/1.1 403 Forbidden");
+    exit;
+}
 
 /**
  * Description of pjRouteCityBusStop
@@ -12,8 +16,8 @@ class pjRouteCityBusStopModel extends pjAppModel {
     
     protected $schema = array(
         array('name' => 'id', 'type' => 'int', 'default' => ':NULL'),
-        array('name' => 'route_id', 'type' => 'int', 'default' => ':NULL')
-        array('name' => 'city_id', 'type' => 'int', 'default' => ':NULL')
+        array('name' => 'route_id', 'type' => 'int', 'default' => ':NULL'),
+        array('name' => 'city_id', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'bus_stop_id', 'type' => 'int', 'default' => ':NULL')
     );
     

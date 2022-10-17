@@ -644,6 +644,10 @@ class pjAppController extends pjController {
                     'transferId' => $busArrTo[$id]['transferId'],
                     'transfer_location' => $busArrTo[$id]['transfer_location'],
                     
+                    
+                    'bus_type_id_to' => $busArrTo[$id]['bus_type_id'],
+                    'bus_type_id_from' => $itemFrom['bus_type_id'],
+                    
                 ];
             }
 
@@ -779,10 +783,44 @@ class pjAppController extends pjController {
     ){
         
         $localeId = $this->getLocaleId();
+//        $bookingDate
+        
         
         foreach ($busArr as $k => $bus) {
             $locations = $pjRouteCityModel->reset()->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.city_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left outer')->join('pjBusLocation', "(t3.bus_id='" . $bus ['id'] . "' AND t3.location_id=t1.city_id", 'inner')->select("t1.*, t2.content, t3.departure_time, t3.arrival_time")->where('t1.route_id', $bus ['route_id'])->orderBy("`order` ASC")->findAll()->getData();
-            $bus ['locations'] = $locations;
+            
+            
+            
+            $bookingDateTmp = $bookingDate;
+            
+            $hour = (int) explode(':', $locations[0]['departure_time'])[0];
+            $day = (int)explode('-', $bookingDate)[2];
+            
+            $locations[0]['departure_day'] = $bookingDateTmp;
+            
+            $maxIndex = count($locations) - 1;
+            
+            for ($i = 1; $i < $maxIndex; ++$i) {
+                
+                
+                $tmpHour = (int) explode(':', $locations[$i]['departure_time'])[0];
+
+                if ($tmpHour < $hour) {
+                    
+                    
+                    $bookingDateTmp = str_replace($day, $day + 1, $bookingDateTmp);
+                    $hour = $tmpHour;
+                    $day++;
+                }
+                
+                $locations[$i]['departure_day'] = $bookingDateTmp;
+            }
+            
+            $locations[$maxIndex]['departure_day'] = $bookingDateTmp;
+           
+            
+            
+            $bus['locations'] = &$locations;
 
             if (!empty($bus ['start_date']) && !empty($bus ['end_date'])) {
                 $bus ['from_to'] = pjUtil::formatDate($bus ['start_date'], "Y-m-d", $this->option_arr ['o_date_format']) . ' - ' . pjUtil::formatDate($bus ['end_date'], "Y-m-d", $this->option_arr ['o_date_format']);

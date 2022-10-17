@@ -50,6 +50,24 @@ class pjAdminRoutes extends pjAdmin {
                 } else {
                     $err = 'AR04';
                 }
+                
+                
+                if (isset($_POST['bus_stops'])){
+                        
+                    foreach($_POST['bus_stops'] as $cityId => $busIdsString){
+                        if(empty($busIdsString))  {
+                            continue;;
+                        }
+
+                        foreach(explode(',', $busIdsString) as $busId){
+                            $pjRouteCityBusStopModel->reset()->setAttributes([
+                                'city_id' => $cityId,
+                                'route_id' => $id,
+                                'bus_stop_id' => $busId
+                            ])->insert();
+                        }
+                    }
+                }
 
                 pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminRoutes&action=pjActionIndex&err=$err");
             } else {
@@ -249,8 +267,20 @@ class pjAdminRoutes extends pjAdmin {
                     if (isset($_POST['bus_stops'])){
                         
                         
-                        foreach($_POST['bus_stops'] as $cityId => $busIds){
+                        foreach($_POST['bus_stops'] as $cityId => $busIdsString){
+                            if(empty($busIdsString))  {
+                                continue;;
+                            }                              
                             
+                            $pjRouteCityBusStopModel->reset()->where('city_id',$cityId)->where('route_id',$_POST['id'])->eraseAll();
+                            
+                            foreach(explode(',', $busIdsString) as $busId){
+                                $pjRouteCityBusStopModel->reset()->setAttributes([
+                                    'city_id' => $cityId,
+                                    'route_id' => $_POST['id'],
+                                    'bus_stop_id' => $busId
+                                ])->insert();
+                            }
                             
                         }
 
