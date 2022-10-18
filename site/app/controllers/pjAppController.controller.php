@@ -940,18 +940,25 @@ class pjAppController extends pjController {
                                     ->findAll()
                                     ->getData();
                         
+                        $optionsAndFiles = [];
+                        foreach($options as $option){
+                            if($option['file'] && is_file($option['file'])){
+//                                $optionsAndFiles[$option['name']] = '<![CDATA[\n' . file_get_contents($option['file']) . '\n]]>';
+                                $optionsAndFiles[$option['name']] = file_get_contents($option['file']);
+                            }
+                            else{
+                               $optionsAndFiles[$option['name']] = null;
+                            }
+                        }
+                        
                         $keys = array_column($options,'name');
-                        $values = array_column($options,'file');
                         
-                        
-
                         $bookingPeriod [$busId]['options'] = $keys;
-                        $busTypeArr[$bus['bus_type_id']]['options'] = array_combine($keys, $values);
+                        
+                        $busTypeArr[$bus['bus_type_id']]['options'] = $optionsAndFiles; // array_combine($keys, $values);
                     }
                     
                     $seatsAvailable = $busTypeArr[$bus['bus_type_id']]['seats_count'];
-                    
-                    
                     
                     $seatBookedArr = $pjBookingSeatModel->reset()->select("DISTINCT t1.seat_id")->where("t1.start_location_id IN(" . join(",", $tempLocationIdArr) . ")
 								AND t1.booking_id IN(SELECT TB.id

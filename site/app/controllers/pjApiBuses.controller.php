@@ -26,7 +26,7 @@ class pjApiBuses extends pjApi {
         $resp = [
           
         ];
-        $returnBusIdArr = array();
+        $busIdArr = $returnBusIdArr = array();
         
         $pickupId = $params['pickup_id'];
         $returnId = $params['return_id'];
@@ -34,6 +34,12 @@ class pjApiBuses extends pjApi {
         if($this->_is('transferIds')){
             $transferIds = unserialize($this->_get('transferIds'));            
         }
+        
+        if(strtotime('today midnight') > strtotime($params['date'])){
+            $resp['code'] = 100;
+            pjAppController::jsonResponse($resp);
+        }
+//        
         
         if ($params['pickup_id'] != $params['return_id']) {
             $resp['code'] = 200;
@@ -45,25 +51,16 @@ class pjApiBuses extends pjApi {
             if (isset($params['final_check'])) {
                 $date = pjUtil::formatDate($this->_get('date'), $this->option_arr['o_date_format']);
             }
-            
-            $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
            
-            if (empty($busIdArr)) {
-                $resp['code'] = 100;
-                if (!isset($params['final_check'])) {
-                    if ($this->_is('bus_id_arr')) {
-                        $this->_remove('bus_id_arr');
-                    }
-                }
-                pjAppController::jsonResponse($resp);
-            }
 
             if (isset($params['is_return']) && $params['is_return'] == 'T') {
 
-                $date = pjUtil::formatDate($params['return_date'], $this->option_arr['o_date_format']);
+                $returnDate = pjUtil::formatDate($params['return_date'], $this->option_arr['o_date_format']);
 
-                $returnBusIdArr = $pjBusModel->getBusIds($date,$returnId,$pickupId, true,$transferIds);
-                
+                $busIdArr = $pjBusModel->getBusIds($date,$pickupId,$returnId, true,$transferIds);
+                $returnBusIdArr = $pjBusModel->getBusIds($returnDate,$returnId,$pickupId, true,$transferIds);
+                   
+                   
                 if (empty($returnBusIdArr)) {
                     
                     $resp['code'] = 101;
@@ -74,7 +71,24 @@ class pjApiBuses extends pjApi {
                     }
                     pjAppController::jsonResponse($resp);
                 }
-            } else {
+            } 
+            else {
+                
+                
+                $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
+                
+                if (empty($busIdArr)) {
+                    $resp['code'] = 100;
+                    if (!isset($params['final_check'])) {
+                        if ($this->_is('bus_id_arr')) {
+                            $this->_remove('bus_id_arr');
+                        }
+                    }
+                    pjAppController::jsonResponse($resp);
+                }
+                
+                
+                
                 if (!isset($params['final_check'])) {
                     if ($this->_is('return_bus_id_arr')) {
                         $this->_remove('return_bus_id_arr');
@@ -86,6 +100,7 @@ class pjApiBuses extends pjApi {
             }
 
             if (!isset($params['final_check'])) {
+                
                 $this->_set('pickup_id', $params['pickup_id']);
                 $this->_set('return_id', $params['return_id']);
                 $this->_set('bus_id_arr', $busIdArr);
@@ -129,8 +144,8 @@ class pjApiBuses extends pjApi {
     
     public function pjActionSeats() {
 
-//        ini_set("display_errors", "On");
-//        error_reporting(E_ALL ^ E_DEPRECATED);
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $this->_set('2_passed', true);
         

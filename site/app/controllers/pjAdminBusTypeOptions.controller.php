@@ -262,5 +262,23 @@ class pjAdminBusTypeOptions extends pjAdmin {
     }
 
     
+    
+    public function pjActionDeleteBusTypeOptionFile(){
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
+        $pjBusTypeOptionItemModel = pjBusTypeOptionItemModel::factory();
+        $arr = $pjBusTypeOptionItemModel->find($_GET['id'])->getData();
+     
+        
+        if(is_file($arr['svg_source']) && unlink($arr['svg_source'])){
+            $db = pjRegistry::getInstance()->get('dbo');
+            $db->query("UPDATE `{$pjBusTypeOptionItemModel->getTable()}` SET svg_source = NULL WHERE `id` = {$_GET['id']}");
+        }
+        
+        pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionUpdateBusTypeOption&id=" . $_GET['id']);
+        
+    }
+    
 }
 ?>

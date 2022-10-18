@@ -36,8 +36,23 @@
             ?>
         
                     
+            <?php if($tpl['arr']['svg_source']): ?>
+                  
             <p>
                 <label class="title">Фото</label>
+                <span class="inline_block">
+                    <?= explode('/', $tpl['arr']['svg_source'])[4]?>
+                </span>
+                
+                <a href="index.php?controller=pjAdminBusTypeOptions&amp;action=pjActionDeleteBusTypeOptionFile&amp;id=<?=$tpl['arr']['id']?>" class="pj-table-icon-delete">X</a>
+            </p>
+                          
+                    
+            <?php endif;?>
+                    
+                    
+            <p>
+                <label class="title"><?php if(!$tpl['arr']['svg_source']): ?> Фото  <?php endif;?></label>
                 <span class="inline_block">
                     <input type="file" name="photo" id="photo" class="pj-form-field" accept=".svg" />
                 </span>
