@@ -15,6 +15,30 @@ class pjApiBuses extends pjApi {
     public function afterFilter(){}
 	
     
+    public function pjActionIndex(){
+        
+        
+        $pjBusModel = pjBusModel::factory()
+                    ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer');
+        
+          
+        $total = $pjBusModel->findCount()->getData();
+        
+        
+        $rowCount = isset($_GET['rowCount']) && (int) $_GET['rowCount'] > 0 ? (int) $_GET['rowCount'] : 50;
+        $pages = ceil($total / $rowCount);
+        $page = isset($_GET['page']) && (int) $_GET['page'] > 0 ? intval($_GET['page']) : 1;
+        $offset = ((int) $page - 1) * $rowCount;
+        if ($page > $pages) {
+            $page = $pages;
+        }
+        
+        $data = $pjBusModel->select(" t1.*, t2.content AS route")->limit($rowCount, $offset)->findAll()->getData();
+
+        pjAppController::jsonResponse($data);
+        
+    }
+    
     public function pjActionCheck() {
 // переработать метод для работы с пересадками
         ini_set("display_errors", "On");
