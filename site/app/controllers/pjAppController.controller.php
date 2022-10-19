@@ -477,7 +477,8 @@ class pjAppController extends pjController {
         $pjSeatModel = pjSeatModel::factory();
         $pjCityModel = pjCityModel::factory();
         $pjBusTypeOption = pjBusTypeOptionModel::factory();
-        $pjBusStopModel = pjBusStopModel::factory();
+        $pjBusStopModel = pjRouteCityBusStopModel::factory();
+//        $pjBusStopModel = pjBusStopModel::factory();
         
         $transferIds = isset($busIdArr['transferIds']) ? $busIdArr['transferIds'] : null;
         
@@ -798,13 +799,15 @@ class pjAppController extends pjController {
         
         
         foreach ($busArr as $k => $bus) {
+            
             $locations = $pjRouteCityModel->reset()
                     ->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.city_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left outer')
                     ->join('pjBusLocation', "(t3.bus_id='" . $bus ['id'] . "' AND t3.location_id=t1.city_id", 'inner')
                     ->select("t1.*, t2.content, t3.departure_time, t3.arrival_time")
                     ->where('t1.route_id', $bus ['route_id'])
-                    ->orderBy("`order` ASC")->findAll()->getData();
-            
+                    ->orderBy("`order` ASC")
+                    ->findAll()
+                    ->getData();
             
             
             $bookingDateTmp = $bookingDate;
@@ -813,30 +816,62 @@ class pjAppController extends pjController {
             $day = (int)explode('-', $bookingDate)[2];
             
             
-//            $pjBusStopModel
+            $busStops = [];
+           $pjBusStopModel->reset()->where('route_id',$bus['route_id']); 
+//         
+//            $dataPjBusStopModel =   
+            
+            if($pjBusStopModel->findCount()->getData()){
+                foreach($pjBusStopModel->findAll()->getData() as $resItem){
+                    
+                    if(!isset($busStops[$resItem['city_id']])){
+                        $busStops[$resItem['city_id']] = [];
+                    }
+                    
+                    $busStops[$resItem['city_id']][] = $resItem['bus_stop_id'];
+                    
+                }
+            }
+            
             $maxIndex = count($locations) - 1;
+            
             
             for ($i = 0; $i < $maxIndex; ++$i) {
                 
-                
+                $cityId = $locations[$i]['city_id'];
                 
                 if($locations[$i]['departure_time']){
                     
                     $tmpHour = (int) explode(':', $locations[$i]['departure_time'])[0];
 
                     if ($tmpHour < $hour) {
-
-
                         $bookingDateTmp = str_replace($day, $day + 1, $bookingDateTmp);
                         $hour = $tmpHour;
                         $day++;
                     }
                 }
                 
-                
-                
                 $locations[$i]['departure_day'] = $bookingDateTmp;
+                $locations[$i]['bus_stops'] = [];
                 
+                if(isset($busStops[$cityId])){
+//                    if(!isset($locations[$i]['bus_stops'][$cityId])){
+//                        $locations[$i]['bus_stops'][$cityId] = [];
+//                    }
+                    
+                    $tmpBusStopData = $pjBusStopModel->reset()
+                                    ->join('pjMultiLang', "t2.model='pjBusStopModel' AND t2.foreign_id=t1.bus_stop_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left outer')
+                                    ->join('pjMultiLang', "t3.model='pjBusStopModel' AND t3.foreign_id=t1.bus_stop_id AND t3.field='address' AND t3.locale='" . $localeId . "'", 'left outer')
+                                    ->select("t1.bus_stop_id,CONCAT(t2.content,', ',t3.content) as address")
+                                    ->where('route_id',$bus['route_id'])
+                                    ->whereIn('bus_stop_id',$busStops[$cityId])
+                                    ->findAll()
+                                    ->getData();
+//                     vd($tmpBusStopData);
+                     $locations[$i]['bus_stops'][$cityId] = $tmpBusStopData;
+                    
+                    
+                }
             }
             
             $locations[$maxIndex]['departure_day'] = $bookingDateTmp;
