@@ -20,10 +20,8 @@ class pjApiBuses extends pjApi {
         
         $pjBusModel = pjBusModel::factory()
                     ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer');
-        
           
         $total = $pjBusModel->findCount()->getData();
-        
         
         $rowCount = isset($_GET['rowCount']) && (int) $_GET['rowCount'] > 0 ? (int) $_GET['rowCount'] : 50;
         $pages = ceil($total / $rowCount);
@@ -47,9 +45,7 @@ class pjApiBuses extends pjApi {
         $params = Router::getParams();
 
         $transferIds = null;
-        $resp = [
-          
-        ];
+        $resp = [];
         $busIdArr = $returnBusIdArr = array();
         
         $pickupId = $params['pickup_id'];
@@ -168,8 +164,8 @@ class pjApiBuses extends pjApi {
     
     public function pjActionSeats() {
 
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $this->_set('2_passed', true);
         

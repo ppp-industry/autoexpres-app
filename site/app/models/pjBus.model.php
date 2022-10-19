@@ -46,6 +46,10 @@ class pjBusModel extends pjAppModel {
         
         if (empty($res) && $transferIds) {
 
+//            echo __LINE__;exit();
+//            vd($transferIds);
+            
+            
             $innerConditionFromTransfer = $innerConditionToTransfer = null;
             
             $tIds = [];

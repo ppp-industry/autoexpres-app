@@ -502,10 +502,16 @@ class pjFrontEnd extends pjFront {
                     ->reset()
                     ->select('t1.*, t2.content as name')
                     ->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
+                    
                     ->where("t1.id IN(SELECT TRD.to_location_id FROM `" . $pjRouteDetailModel->getTable() . "` AS TRD $where)")
+                    
                     ->orderBy("t2.content ASC")
                     ->findAll()
                     ->getData();
+            
+            
+//            vd($location_arr);
+            
         }
         if (isset($_GET['return_id'])) {
             $where = '';
