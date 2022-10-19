@@ -47,16 +47,17 @@ class pjPriceModel extends pjAppModel {
                 ->findAll()
                 ->getData();
 
-        foreach ($ticketArr as $k => $v) {
+        foreach ($ticketArr as $k => $ticketItem ){
             $returnStr = $isReturn == 'T' ? 'return_' : '';
 
-            if (isset($bookedData[$returnStr . 'ticket_cnt_' . $v['ticket_id']]) && (int) $bookedData[$returnStr . 'ticket_cnt_' . $v['ticket_id']] > 0) {
+            
+            if (isset($bookedData[$returnStr . 'ticket_cnt_' . $ticketItem['ticket_id']]) && (int) $bookedData[$returnStr . 'ticket_cnt_' . $ticketItem['ticket_id']] > 0) {
                 $discount = 0;
-                if (isset($v['discount']) && (float) $v['discount'] > 0 && $isReturn == 'T') {
-                    $discount = $v['discount'];
+                if (isset($ticketItem['discount']) && (float) $ticketItem['discount'] > 0 && $isReturn == 'T') {
+                    $discount = $ticketItem['discount'];
                 }
-                $price = $v['price'] - ($v['price'] * $discount / 100);
-                $subTotal += (int) $bookedData[$returnStr . 'ticket_cnt_' . $v['ticket_id']] * $price;
+                $price = $ticketItem['price'] - ($ticketItem['price'] * $discount / 100);
+                $subTotal += (int) $bookedData[$returnStr . 'ticket_cnt_' . $ticketItem['ticket_id']] * $price;
             }
         }
 

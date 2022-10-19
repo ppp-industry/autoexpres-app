@@ -17,10 +17,20 @@ class pjApiBuses extends pjApi {
     
     public function pjActionIndex(){
         
+        $isUkr = isset($_GET['is_ukr']) ? ($_GET['is_ukr'] == '1') : false;
+        $localeId = $this->getLocaleId();
+        
+        $pjRouteCityModel = pjRouteCityModel::factory();
+        
         
         $pjBusModel = pjBusModel::factory()
-                    ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer');
-          
+                    ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='{$localeId}'", 'left outer')
+                    ->join('pjRouteCity', "t3.route_id = t1.route_id", 'left')
+                    ->join('pjCity', "t4.id = t3.city_id", 'inner')
+                    ->where('is_ukraine',$isUkr ? 1 : 0)
+                    ->groupBy('t1.id')
+                    ->select('t1.*,t2.content');
+        
         $total = $pjBusModel->findCount()->getData();
         
         $rowCount = isset($_GET['rowCount']) && (int) $_GET['rowCount'] > 0 ? (int) $_GET['rowCount'] : 50;
@@ -33,6 +43,20 @@ class pjApiBuses extends pjApi {
         
         $data = $pjBusModel->select(" t1.*, t2.content AS route")->limit($rowCount, $offset)->findAll()->getData();
 
+        
+         foreach($data as &$busItem){
+                $busItem['locations'] = $pjRouteCityModel->reset()
+                    ->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.city_id AND t2.field='name' AND t2.locale='{$localeId}'", 'left outer')
+                    ->join('pjBusLocation', "(t3.bus_id='" . $busItem ['id'] . "' AND t3.location_id=t1.city_id", 'inner')
+                    ->select("t1.*, t2.content as name, t3.departure_time, t3.arrival_time")
+                    ->where('t1.route_id', $busItem ['route_id'])
+                    ->orderBy("`order` ASC")
+                    ->findAll()
+                    ->getData();
+        }
+        
+        
+        
         pjAppController::jsonResponse($data);
         
     }

@@ -855,9 +855,6 @@ class pjAppController extends pjController {
                 $locations[$i]['bus_stops'] = [];
                 
                 if(isset($busStops[$cityId])){
-//                    if(!isset($locations[$i]['bus_stops'][$cityId])){
-//                        $locations[$i]['bus_stops'][$cityId] = [];
-//                    }
                     
                     $tmpBusStopData = $pjBusStopModel->reset()
                                     ->join('pjMultiLang', "t2.model='pjBusStopModel' AND t2.foreign_id=t1.bus_stop_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left outer')
@@ -867,10 +864,8 @@ class pjAppController extends pjController {
                                     ->whereIn('bus_stop_id',$busStops[$cityId])
                                     ->findAll()
                                     ->getData();
-//                     vd($tmpBusStopData);
+
                      $locations[$i]['bus_stops'][$cityId] = $tmpBusStopData;
-                    
-                    
                 }
             }
             
@@ -1052,7 +1047,6 @@ class pjAppController extends pjController {
             if($transferId && $transferLocation){
                 $busArr[$k]['transferId'] = $transferId;
                 $busArr[$k]['transfer_location'] = $transferLocation;
-//                $busArr
             }
         }
         

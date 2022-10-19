@@ -56,7 +56,8 @@ class pjApiBooking extends pjApi {
 
                 $ret['total_format'] = pjUtil::formatCurrencySign(number_format($ret['total'], 2), $this->option_arr['o_currency']);
             }
-        } else {
+        } 
+        else {
 
             if ($this->checkStore() && $this->isBusReady() == true) {
                 $pickupId = $this->_get('pickup_id');
