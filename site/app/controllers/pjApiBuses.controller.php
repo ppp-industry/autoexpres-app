@@ -194,7 +194,7 @@ class pjApiBuses extends pjApi {
         $this->_set('2_passed', true);
         
         
-        $busList = [];
+        $returnBusList = $busList = [];
         
         if ($this->checkStore() && $this->isBusReady() == true) {
             $bookedData = $bookingPeriod = array();
@@ -223,8 +223,15 @@ class pjApiBuses extends pjApi {
                 $busIdArr = $this->_get('return_bus_id_arr');
                 $date = $this->_get('return_date');
                 
-                $busList['return'] = $this->getBusList($returnId,$pickupId, $busIdArr, $bookingPeriod, $bookedData, $date, 'T');
+                $returnBusList = $this->getBusList($returnId,$pickupId, $busIdArr, $bookingPeriod, $bookedData, $date, 'T');
                 
+                $keys = array_keys($returnBusList);
+                
+                array_walk($keys, function(&$item){
+                    $item .= '_return';
+                });
+                
+                $busList += array_combine($keys, array_values($returnBusList));
                
             }
         }

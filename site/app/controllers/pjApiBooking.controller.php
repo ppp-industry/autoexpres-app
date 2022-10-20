@@ -39,7 +39,7 @@ class pjApiBooking extends pjApi {
                 $busIdFromTransfer = isset($params['bus_id_from']) && (int) $params['bus_id_from'] > 0 ? $params['bus_id_from'] : null;
 
                 $pjPriceModel = pjPriceModel::factory();
-
+// не учтен return 
                 if ($busIdToTransfer) {
                     $ticketPriceArr = $pjPriceModel->getTicketPrice($busIdToTransfer, $pickupId, $transferId, $params, $this->option_arr, $this->getLocaleId(), 'F');
 
@@ -438,6 +438,8 @@ class pjApiBooking extends pjApi {
             $transferId = $this->_get('transferId');
 
             $_SESSION[$this->defaultStep]['3_passed'] = true;
+            
+            $res = [];
 
             if ($this->checkStore() && $this->isBusReady() == true) {
                 $bookedData = $this->_get('booked_data');
@@ -524,19 +526,23 @@ class pjApiBooking extends pjApi {
 
                     $ticket_price_arr = $pjPriceModel->getTicketPrice($bus_id, $pickupId, $returnId, $bookedData, $this->option_arr, $this->getLocaleId(), 'F');
 
-                    $this->set('from_location', $from_location);
-                    $this->set('to_location', $to_location);
-                    $this->set('bus_arr', $bus_arr);
-                    $this->set('ticket_arr', $ticket_price_arr['ticket_arr']);
-                    $this->set('price_arr', $ticket_price_arr);
+                    
+                    $res['from_location'] = $from_location;
+                    $res['to_location'] = $to_location;
+                    $res['bus_arr'] = $bus_arr;
+                    $res['ticket_arr'] = $ticket_price_arr['ticket_arr'];
+                    $res['price_arr'] = $ticket_price_arr;
+                    
+                    
 
                     if ($isReturn == "T") {
                         $return_bus_id = $bookedData['return_bus_id'];
 
                         $return_ticket_price_arr = $pjPriceModel->getTicketPrice($return_bus_id, $returnId, $pickupId, $bookedData, $this->option_arr, $this->getLocaleId(), 'T');
 
-                        $this->set('return_ticket_arr', $return_ticket_price_arr['ticket_arr']);
-                        $this->set('return_price_arr', $return_ticket_price_arr);
+                        
+                        $res['return_ticket_arr'] = $return_ticket_price_arr['ticket_arr'];
+                        $res['return_price_arr'] = $return_ticket_price_arr;
 
                         $_bus_arr = $pjBusModel
                                 ->reset()
@@ -571,10 +577,10 @@ class pjApiBooking extends pjApi {
                         $_from_location = $_pickup_location['name'];
                         $_to_location = $_return_location['name'];
 
-                        $this->set('is_return', $isReturn);
-                        $this->set('return_from_location', $_from_location);
-                        $this->set('return_to_location', $_to_location);
-                        $this->set('return_bus_arr', $_bus_arr);
+                        $res['is_return'] = $isReturn;
+                        $res['return_from_location'] = $_from_location;
+                        $res['return_to_location'] = $_to_location;
+                        $res['return_bus_arr'] = $_bus_arr;
                     }
 
                     $country_arr = pjCountryModel::factory()
@@ -593,25 +599,18 @@ class pjApiBooking extends pjApi {
 
                     $selected_seat_arr = $pjSeatModel->whereIn('t1.id', explode("|", $bookedData['selected_seats']))->findAll()->getDataPair('id', 'name');
                     $return_selected_seat_arr = (isset($bookedData['return_selected_seats']) && !empty($bookedData['return_selected_seats'])) ? $pjSeatModel->reset()->whereIn('t1.id', explode("|", $bookedData['return_selected_seats']))->findAll()->getDataPair('id', 'name') : array();
-
-
-
-
-                    $this->set('selected_seat_arr', $selected_seat_arr);
-                    $this->set('return_selected_seat_arr', $return_selected_seat_arr);
-
-
-                    $this->set('country_arr', $country_arr);
-
-
-
-                    $this->set('terms_conditions', $terms_conditions[0]['content']);
-
-                    $this->set('status', 'OK');
+                    
+                    $res['selected_seat_arr'] = $selected_seat_arr;
+                    $res['return_selected_seat_arr'] = $return_selected_seat_arr;
+                    $res['country_arr'] = $country_arr;
+                    $res['terms_conditions'] = $terms_conditions[0]['content'];
+                    $res['status'] = 'OK';
                 }
             } else {
-                $this->set('status', 'ERR');
+                $res['status'] = 'ERR';
             }
+            
+            pjAppController::jsonResponse($res);
         }
     }
 
