@@ -67,7 +67,7 @@ class Router {
             
             $query = parse_url($url, PHP_URL_QUERY);
         
-            $url = str_replace($query,'', $url);
+            $url = str_replace('?' . $query,'', $url);
             
             if(preg_match('/(en|uk|ru)/', $url,$matches)){
                 $lang = $matches[0];
