@@ -13,8 +13,7 @@ class pjApi extends pjFront {
         $action = Router::getAction();
         $controller = Router::getController();
 
-        echo $action;
-        exit();
+        
         if(isset($_GET['key'])){
             $this->defaultStore .= '_' . $_GET['key'];
         }
