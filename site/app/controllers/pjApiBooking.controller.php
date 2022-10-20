@@ -17,23 +17,33 @@ class pjApiBooking extends pjApi {
     }
 
     public function pjActionGetRoundtripPrice() {
-
+         ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
         $params = Router::getParams();
         $ticketPriceArr = $returnTicketPriceArr = null;
         $subTotal = 0;
         $ret = [
             'total' => 0
         ];
-        $busIdFromTransfer = $busIdToTransfer = $transferId = null;
+        $busIdFromTransfer = $busIdToTransfer = $transferIds = null;
 
         if ($this->_is('transferId')) {
-
-            $transferId = $this->_get('transferId');
+            $transferIds = unserialize($this->_get('transferIds'));     
 
             if ($this->checkStore() && $this->isBusReady() == true) {
                 $pickupId = $this->_get('pickup_id');
                 $returnId = $this->_get('return_id');
                 $isReturn = $this->_get('is_return');
+                
+                $tIds = [];
+            
+                foreach($transferIds as $transferCity => &$cities){
+                    if(in_array($pickupId, $cities) || in_array($returnId, $cities)){
+                        $tIds[] = $transferCity;
+                    }
+                }
+                
 
                 $busIdToTransfer = isset($params['bus_id_to']) && (int) $params['bus_id_to'] > 0 ? $params['bus_id_to'] : null;
                 $busIdFromTransfer = isset($params['bus_id_from']) && (int) $params['bus_id_from'] > 0 ? $params['bus_id_from'] : null;
@@ -41,14 +51,16 @@ class pjApiBooking extends pjApi {
                 $pjPriceModel = pjPriceModel::factory();
 // не учтен return 
                 if ($busIdToTransfer) {
-                    $ticketPriceArr = $pjPriceModel->getTicketPrice($busIdToTransfer, $pickupId, $transferId, $params, $this->option_arr, $this->getLocaleId(), 'F');
+//                    vd($busIdToTransfer);
+                    
+                    $ticketPriceArr = $pjPriceModel->getTicketPrice($busIdToTransfer, $pickupId, $tIds, $params, $this->option_arr, $this->getLocaleId(), 'F');
 
                     $ret['total'] += $ret['total_to'] = $ticketPriceArr['total'];
                     $ret['total_to_format'] = $ticketPriceArr['total_format'];
                 }
 
                 if ($busIdFromTransfer) {
-                    $ticketPriceArr = $pjPriceModel->getTicketPrice($busIdFromTransfer, $transferId, $returnId, $params, $this->option_arr, $this->getLocaleId(), 'F');
+                    $ticketPriceArr = $pjPriceModel->getTicketPrice($busIdFromTransfer, $tIds, $returnId, $params, $this->option_arr, $this->getLocaleId(), 'F');
 
                     $ret['total'] += $ret['total_from'] = $ticketPriceArr['total'];
                     $ret['total_from_format'] = $ticketPriceArr['total_format'];
@@ -58,7 +70,6 @@ class pjApiBooking extends pjApi {
             }
         } 
         else {
-
             if ($this->checkStore() && $this->isBusReady() == true) {
                 $pickupId = $this->_get('pickup_id');
                 $returnId = $this->_get('return_id');
@@ -80,10 +91,12 @@ class pjApiBooking extends pjApi {
 
             if ($ticketPriceArr) {
                 $subTotal += $ticketPriceArr['sub_total'];
+                $ret['sub_total'] = $ticketPriceArr['sub_total'];
             }
 
             if ($returnTicketPriceArr) {
                 $subTotal += $returnTicketPriceArr['sub_total'];
+                $ret['return_sub_total'] = $returnTicketPriceArr['sub_total'];
             }
 
             if ($subTotal) {

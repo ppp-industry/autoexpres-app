@@ -13,21 +13,18 @@ if (!defined("ROOT_PATH")) {
 class pjApiBuses extends pjApi {
 
     public function afterFilter(){}
-	
-    
+            
+            
     public function pjActionIndex(){
         
         $isUkr = isset($_GET['is_ukr']) ? ($_GET['is_ukr'] == '1') : false;
-        $localeId = $this->getLocaleId();
         
-        $pjRouteCityModel = pjRouteCityModel::factory();
         
         
         $pjBusModel = pjBusModel::factory()
                     ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='{$localeId}'", 'left outer')
-                    ->join('pjRouteCity', "t3.route_id = t1.route_id", 'left')
-                    ->join('pjCity', "t4.id = t3.city_id", 'inner')
-                    ->where('is_ukraine',$isUkr ? 1 : 0)
+                    ->join('pjRoute', "t3.id = t1.route_id", 'inner')
+                    ->where('is_international',$isUkr ? 0 : 1)
                     ->groupBy('t1.id')
                     ->select('t1.*,t2.content');
         
