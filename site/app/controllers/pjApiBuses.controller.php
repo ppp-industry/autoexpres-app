@@ -17,8 +17,12 @@ class pjApiBuses extends pjApi {
             
     public function pjActionIndex(){
         
-        $isUkr = isset($_GET['is_ukr']) ? ($_GET['is_ukr'] == '1') : false;
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
         
+        $localeId = $this->getLocaleId();
+        $isUkr = isset($_GET['is_ukr']) ? ($_GET['is_ukr'] == '1') : false;
+        $pjRouteCityModel = pjRouteCityModel::factory();
         
         
         $pjBusModel = pjBusModel::factory()
