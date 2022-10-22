@@ -76,11 +76,12 @@ class pjPriceModel extends pjAppModel {
         $depositFormat = pjUtil::formatCurrencySign(number_format($deposit, 2), $optionArr['o_currency']);
 
         return [
-            'ticket_arr' => $ticketArr, 
-            'sub_total' => $subTotal, 
-            'tax' => $tax, 
+            
             'total' => $total, 
+            'sub_total' => $subTotal, 
             'deposit' => $deposit,
+            'ticket_arr' => $ticketArr, 
+            'tax' => $tax, 
             'sub_total_format' => $subTotalFormat,
             'tax_format' => $taxFormat, 
             'total_format' => $totalFormat, 

@@ -9,10 +9,8 @@ class pjApi extends pjFront {
 
     public function __construct() {
         self::allowCORS();
-//        echo __LINE__;exit();
         $action = Router::getAction();
         $controller = Router::getController();
-
         
         if(isset($_GET['key'])){
             $this->defaultStore .= '_' . $_GET['key'];
@@ -36,8 +34,6 @@ class pjApi extends pjFront {
             header("HTTP/1.1 403 Forbidden");
             exit;
         }
-//            
-        
     }
 
     protected function generate_string($strength = 16) {
@@ -98,10 +94,8 @@ class pjApi extends pjFront {
         else{
             $storage = $res[0];
             $storage['data'] = unserialize($storage['data']);
-            return isset($storage['data'][$key]);
-            
-        }
-        
+            return isset($storage['data'][$key]);   
+        }   
     }
 
     protected function _set($key, $value) {
@@ -132,7 +126,6 @@ class pjApi extends pjFront {
     protected function _getStore(){
         $model = pjDbSessionDataModel::factory();
         $model->where('storage_key', $this->defaultStore)->limit(1);
-
         $res = $model->findAll()->getData();
         
         if(!empty($res)){
@@ -144,7 +137,6 @@ class pjApi extends pjFront {
     protected function _remove($key) {
         $model = pjDbSessionDataModel::factory();
         $model->where('storage_key', $this->defaultStore)->limit(1);
-
         $res = $model->findAll()->getData();
         
         if(!empty($res)){
@@ -155,15 +147,11 @@ class pjApi extends pjFront {
                 unset($storage['data'][$key]);
             }
             
-            $storage['data'] = serialize($storage['data']);
-            
+            $storage['data'] = serialize($storage['data']);       
             $model->reset()->setAttributes(['id' => $storage['id']])->modify($storage);
                     
         } 
     }
-    
-    
-    
 }
 
 ?>
