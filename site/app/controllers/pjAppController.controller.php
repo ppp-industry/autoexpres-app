@@ -525,6 +525,33 @@ class pjAppController extends pjController {
         $fromLocation = $pickupLocation ['name'];
         $toLocation = $returnLocation ['name'];
         
+        $locationsHundler = function(&$locations) use ($bookingDate){
+
+            $bookingDateTmp = $bookingDate;
+            $hour = (int) explode(':', $locations[0]['departure_time'])[0];
+            $day = (int)explode('-', $bookingDate)[2];
+            $maxIndex = count($locations) - 1;
+
+            for ($i = 0; $i < $maxIndex; ++$i) {
+
+                if ($locations[$i]['departure_time']) {
+
+                    $tmpHour = (int) explode(':', $locations[$i]['departure_time'])[0];
+
+                    if ($tmpHour < $hour) {
+                        $bookingDateTmp = str_replace($day, $day + 1, $bookingDateTmp);
+                        $hour = $tmpHour;
+                        $day++;
+                    }
+                }
+                $locations[$i]['departure_day'] = $bookingDateTmp;
+            }
+
+            $locations[$maxIndex]['departure_day'] = $bookingDateTmp;
+            
+        };
+        
+        
         if($transferIds){
             
             $locationIdArrFrom = $locationIdArrTo = array();
@@ -540,7 +567,7 @@ class pjAppController extends pjController {
                     $busArrFrom,$bookingPeriod,$locationIdArrFrom,$pjBusStopModel,$pjRouteCityModel,$pjBusTypeModel,
                     $pjBusLocationModel,$pjSeatModel,$pjPriceModel,$pjBookingSeatModel,
                     $pjBookingModel,$pjBusTypeOption,$transferId,$returnId,$bookingDate,$ticketColumns,$bookedData,$isReturn,
-                    $busTypeArrFrom,$bookedSeatArrFrom,$seatArrFrom,$selectedSeatArrFrom
+                    $busTypeArrFrom,$bookedSeatArrFrom,$seatArrFrom,$selectedSeatArrFrom,$transferId
                 ); 
             
                 $this->hundleBusData(
@@ -566,12 +593,11 @@ class pjAppController extends pjController {
             
             foreach($busArrToIds as $key => &$toID){
                 if($bookingPeriod[$toID]['arrival_time_timestamp'] > $lastFromBusDepartureTimeTimestamp){
-                    unset($bookingPeriod[$toID],$busArrTo[$toID],$busArrToIds[$key]);   
+                    unset($bookingPeriod[$toID],$busArrTo[$toID],$busArrToIds[$key]);       
                 }
             }
-            
+
             foreach($busArrFrom as &$itemFrom){
-                
                 
                 if(!isset($bookingPeriod[$itemFrom['id']])){
                     continue;;
@@ -588,20 +614,40 @@ class pjAppController extends pjController {
                     }
                 }
                 
+                $departureTimeStart = $bookingPeriod[$id]['departure_time'];
+                $arrivalTimeTransfer = $bookingPeriod[$id]['arrival_time'];
+                
+                $departureTimeTransfer = $bookingPeriod[$itemFrom['id']]['departure_time'];
+                $arrivalTimeEnd = $bookingPeriod[$itemFrom['id']]['arrival_time'];
+                
+                $arrivalTimeTransferTimestamp = strtotime($arrivalTimeTransfer);
+                $departureTimeTransferTimestamp = strtotime($departureTimeTransfer);
+                $arrivalTimeEndTimestamp = strtotime($arrivalTimeEnd);
+                $departureTimeStartTimestamp = strtotime($departureTimeStart);
+                
+                if($arrivalTimeTransferTimestamp > $departureTimeTransferTimestamp){
+                    $departureTimeTransferTimestamp += 86400;
+                    $departureTimeTransfer = date('Y-m-d H:i:s', $departureTimeTransferTimestamp);   
+                }
+                
+                if($departureTimeTransferTimestamp > $arrivalTimeEndTimestamp){
+                    $arrivalTimeEndTimestamp += 86400;
+                    $arrivalTimeEnd = date('Y-m-d H:i:s', $arrivalTimeEndTimestamp);
+                }
+                
                 $busArrKey = $id . '_' . $itemFrom['id'];
                 if(isset($busArr[$busArrKey])){
                     continue;;
                 }
                 
+                $durationInSeconds = $arrivalTimeEndTimestamp - $departureTimeStartTimestamp;
                 
-                $durationInSeconds = $bookingPeriod[$itemFrom['id']]['arrival_time_timestamp'] - $bookingPeriod[$id]['departure_time_timestamp'];
                 $days = floor($durationInSeconds / 86400);
                 $hoursMod = $durationInSeconds - ($days * 86400);
                 $hours = floor($hoursMod / 3600);
                 $minutsMod = $hoursMod % 3600;
                 $minuts = floor($minutsMod / 60);
                 $duration = '';
-                
                 $localeId =  $this->getLocaleId();
                 switch ($localeId){
                     case 1:
@@ -615,13 +661,16 @@ class pjAppController extends pjController {
                         break;
                 }
                 
+                $locationsHundler($busArrTo[$id]['locations']);
+                $locationsHundler($itemFrom['locations']);
+                
                 $busArr[$busArrKey] = [
                     
-                    'departure_time_to_transfer_city' => $bookingPeriod[$id]['departure_time'],
-                    'arrival_time_to_transfer_city' => $bookingPeriod[$id]['arrival_time'],
+                    'departure_time_start' => $departureTimeStart,
+                    'arrival_time_transfer' => $arrivalTimeTransfer,
                     
-                    'departure_time_from_transfer_city' => $bookingPeriod[$itemFrom['id']]['departure_time'],
-                    'arrival_time_from_transfer_city' => $bookingPeriod[$itemFrom['id']]['arrival_time'],
+                    'departure_time_transfer' => $departureTimeTransfer,
+                    'arrival_time_end' => $arrivalTimeEnd,
                     
                     'route_id_to_transfer' => $busArrTo[$id]['route_id'],
                     'route_id_from_transfer' => $itemFrom['route_id'],
@@ -662,8 +711,6 @@ class pjAppController extends pjController {
 
             $transLocations = array_column($transferLocations, 'name');
             
-//            $busArr = array_filter($busArr,$filterFunction);
-            
             return [
                 'booking_period' => $bookingPeriod,
                 'busArr' => $busArr,
@@ -691,9 +738,11 @@ class pjAppController extends pjController {
                 $busTypeArr,$bookedSeatArr,$seatArr,$selectedSeatArr
             );
             
-//            echo __LINE__;exit();
-            
             $busArr = array_filter($busArr,$filterFunction);
+            
+            foreach($busArr as &$bus){
+               $locationsHundler($bus['locations']);
+            }
             
             return [
                 'booking_period' => $bookingPeriod,
@@ -811,10 +860,7 @@ class pjAppController extends pjController {
                     ->getData();
             
           
-            $bookingDateTmp = $bookingDate;
             
-            $hour = (int) explode(':', $locations[0]['departure_time'])[0];
-            $day = (int)explode('-', $bookingDate)[2];
             
             
             $busStops = [];
@@ -831,44 +877,8 @@ class pjAppController extends pjController {
                 }
             }
             
-            $maxIndex = count($locations) - 1;
             
-            
-            for ($i = 0; $i < $maxIndex; ++$i) {
-                
-                $cityId = $locations[$i]['city_id'];
-                
-                if($locations[$i]['departure_time']){
-                    
-                    $tmpHour = (int) explode(':', $locations[$i]['departure_time'])[0];
-
-                    if ($tmpHour < $hour) {
-                        $bookingDateTmp = str_replace($day, $day + 1, $bookingDateTmp);
-                        $hour = $tmpHour;
-                        $day++;
-                    }
-                }
-                
-                $locations[$i]['departure_day'] = $bookingDateTmp;
-                $locations[$i]['bus_stops'] = [];
-                
-                if(isset($busStops[$cityId])){
-                    
-                    $tmpBusStopData = $pjBusStopModel->reset()
-                                    ->join('pjMultiLang', "t2.model='pjBusStopModel' AND t2.foreign_id=t1.bus_stop_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left outer')
-                                    ->join('pjMultiLang', "t3.model='pjBusStopModel' AND t3.foreign_id=t1.bus_stop_id AND t3.field='address' AND t3.locale='" . $localeId . "'", 'left outer')
-                                    ->select("t1.bus_stop_id,CONCAT(t2.content,', ',t3.content) as address")
-                                    ->where('route_id',$bus['route_id'])
-                                    ->whereIn('bus_stop_id',$busStops[$cityId])
-                                    ->findAll()
-                                    ->getData();
-
-                     $locations[$i]['bus_stops'][$cityId] = $tmpBusStopData;
-                }
-            }
-            
-            $locations[$maxIndex]['departure_day'] = $bookingDateTmp;
-           
+//           
             
             
             $bus['locations'] = &$locations;
@@ -906,16 +916,37 @@ class pjAppController extends pjController {
             if (!empty($pickupArr) && !empty($returnArr)) {
                 $seconds = 0;
                 $startCount = false;
-                foreach ($locations as $key => $lo) {
+                
+                foreach ($locations as $key => &$location) {
+                    
+                    $cityId = $location['city_id'];
+                    
+                    
+                    if (isset($busStops[$cityId])) {
+
+                        $tmpBusStopData = $pjBusStopModel->reset()
+                                ->join('pjMultiLang', "t2.model='pjBusStopModel' AND t2.foreign_id=t1.bus_stop_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left outer')
+                                ->join('pjMultiLang', "t3.model='pjBusStopModel' AND t3.foreign_id=t1.bus_stop_id AND t3.field='address' AND t3.locale='" . $localeId . "'", 'left outer')
+                                ->select("t1.bus_stop_id,CONCAT(t2.content,', ',t3.content) as address")
+                                ->where('route_id', $bus['route_id'])
+                                ->whereIn('bus_stop_id', $busStops[$cityId])
+                                ->findAll()
+                                ->getData();
+
+                        $location['bus_stops'][$cityId] = $tmpBusStopData;
+                    }
+
+
+
                     $nextLocation = $locations [$key + 1];
 
-                    if ($lo ['city_id'] == $pickupId) {
+                    if ($location ['city_id'] == $pickupId) {
                         $startCount = true;
                     }
                     if (isset($nextLocation) && $startCount == true) {
-                        $seconds += pjUtil::calSeconds($lo ['departure_time'], $nextLocation ['arrival_time']);
-                        if ($key + 1 < count($locations) && $key > 0 && $lo ['city_id'] != $pickupId) {
-                            $seconds += pjUtil::calSeconds($lo ['arrival_time'], $lo ['departure_time']);
+                        $seconds += pjUtil::calSeconds($location ['departure_time'], $nextLocation ['arrival_time']);
+                        if ($key + 1 < count($locations) && $key > 0 && $location ['city_id'] != $pickupId) {
+                            $seconds += pjUtil::calSeconds($location ['arrival_time'], $location ['departure_time']);
                         }
                     }
                     if ($nextLocation ['city_id'] == $returnId) {
@@ -935,7 +966,7 @@ class pjAppController extends pjController {
                     $timestamp = strtotime($bookingPeriod [$busId] ['departure_time']) + $seconds;
                     $bookingPeriod [$busId] ['arrival_time'] = date('Y-m-d H:i:s', $timestamp);
                     $bookingPeriod [$busId] ['arrival_time_timestamp'] = $timestamp;
-            }
+                }
             }
             
             $tempLocationIdArr = $pjRouteCityModel->getLocationIdPair($bus ['route_id'], $pickupId, $returnId);
