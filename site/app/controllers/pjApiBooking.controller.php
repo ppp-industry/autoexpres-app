@@ -336,9 +336,6 @@ class pjApiBooking extends pjApi {
                     
                     
                     
-                    
-                    
-                    
                     $pjBookingTicketModel = pjBookingTicketModel::factory();
                     foreach ($ticket_arr as $k => $v) {
                         if (isset($booked_data ['return_ticket_cnt_' . $v ['ticket_id']]) && $booked_data ['return_ticket_cnt_' . $v ['ticket_id']] > 0) {
@@ -352,20 +349,7 @@ class pjApiBooking extends pjApi {
                             //                         создаем билет 
                             $pjBookingTicketModel->reset()->setAttributes($data)->insert();
                         }
-                    }
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+                    }                    
                     
 
                     $seat_id_arr = explode("|", $booked_data ['return_selected_seats']);
@@ -457,6 +441,47 @@ class pjApiBooking extends pjApi {
             }
         };
         
+        $checkDate = function(&$end,&$start,&$time){
+            if($end < $start){
+                
+                $end += (86400 * ceil(($start  - $end) / 86400));
+                $time = date('Y-m-d H:i:s', $end);
+            }
+        };
+        
+        $calcDuration = function($end,$start){
+            
+            $durationInSeconds = $end - $start;
+
+            $days = floor($durationInSeconds / 86400);
+            $hoursMod = $durationInSeconds - ($days * 86400);
+            $hours = floor($hoursMod / 3600);
+            $minutsMod = $hoursMod % 3600;
+            $minuts = floor($minutsMod / 60);
+            $duration = '';
+            $localeId =  $this->getLocaleId();
+
+
+            switch ($localeId){
+                case 1:
+                    $duration = ($days ? $days. 'D ' : '') . $hours . 'H ' . $minuts .'M';
+                    break;
+                case 2:
+                    $duration = ($days ? $days. 'Д ' : '')  . $hours . 'Ч ' . $minuts .'М';
+                    break;
+                case 3:
+                    $duration = ($days ? $days. 'Д ' : '')  . $hours . 'Г ' . $minuts .'Хв';
+                    break;
+            }
+            
+            return [
+                $durationInSeconds,
+                $duration
+            ];
+                
+                
+        };
+        
         if ($this->isXHR() || isset($_GET['_escaped_fragment_'])) {
 
             $res = [];
@@ -465,15 +490,17 @@ class pjApiBooking extends pjApi {
                 
                 $bookedData = $_POST;
                 
-                 $transferIds = false;
+                 $transferId = false;
             
-                if ($this->_is('transferIds')) {
-                    $transferIds = unserialize($this->_get('transferIds'));
+                if ($bookedData['transfer_id']) {
+                    $transferId = $bookedData['transfer_id'];
                 }
                 
                 $pickupId = $this->_get('pickup_id');
                 $returnId = $this->_get('return_id');
                 $isReturn = $this->_get('is_return');
+                
+                $date = $this->_get('date');
                 
                 $pjBusLocationModel = pjBusLocationModel::factory();
                 
@@ -481,35 +508,51 @@ class pjApiBooking extends pjApi {
                     
                 $pickup_location = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->find($pickupId)->getData();
                 $return_location = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->find($returnId)->getData();
+                
+                
                 $from_location = $pickup_location['name'];
                 $to_location = $return_location['name'];
                 
-                if ($transferIds && !in_array($returnId, array_keys($transferIds))) {
+                if ($transferId) {
+                    $res['summary'] = [];
                     
-                    $tIds = [];
-                    foreach($transferIds as $transferCity => &$cities){
-                        if(in_array($pickupId, $cities) || in_array($returnId, $cities)){
-                            $tIds[] = $transferCity;
-                        }
-                    }
                     
-                    $tickets = [];
-                foreach($bookedData as $key => $item){
-                    if(preg_match('/ticket_cnt_/', $key)){
-                        $tickets[] = str_replace('ticket_cnt_', '', $key);
-                    }
-                }
-//                vd($tickets);
-                    
-                    $departure_time  = $_departure_time = $arrival_time = $_arrival_time = $duration = $_duration = NULL;
+                    $duration_start = $duration_end = $arrival_time_end = $departure_time_end = $departure_time_start  = $_departure_time = $arrival_time_start = $_arrival_time = $duration = $_duration = NULL;
                     $busIdStart =   $bookedData['bus_id_start'];
                     $busIEnd = $bookedData['bus_id_end'];
-                      
                     
                     $pickup_arr = $pjBusLocationModel->where('bus_id', $busIdStart)->where("location_id", $pickupId)->limit(1)->findAll()->getData();
-                    $return_arr = $pjBusLocationModel->reset()->where('bus_id', $busIEnd)->where("location_id", $returnId)->limit(1)->findAll()->getData();
-//                    $transfer = $pjBusLocationModel->reset()->where('bus_id', $busIdStart)->whereIn("location_id", $tIds)->limit(1)->findAll()->getData();
-                   
+                    $transfer_arr = $pjBusLocationModel->reset()->where('bus_id', $busIdStart)->whereIn("location_id", $transferId)->limit(1)->findAll()->getData();
+                    $return_arr = $pjBusLocationModel->reset()->where('bus_id', $busIEnd)->where("location_id", $returnId)->limit(1)->findAll()->getData();                    
+
+                    if (!empty($pickup_arr) && !empty($transfer_arr)) {
+                        
+
+                        $departure_time_start = $date . ' ' . pjUtil::formatTime($pickup_arr[0]['departure_time'], 'H:i:s', $this->option_arr['o_time_format']);
+                        $arrival_time_start = $date . ' ' . pjUtil::formatTime($transfer_arr[0]['arrival_time'], 'H:i:s', $this->option_arr['o_time_format']);
+                    }
+                    
+                    if (!empty($return_arr) && !empty($transfer_arr)) {
+//                                                echo __LINE__;exit();
+                        $departure_time_end = $date . ' ' . pjUtil::formatTime($transfer_arr[0]['departure_time'], 'H:i:s', $this->option_arr['o_time_format']);
+                        $arrival_time_end = $date . ' ' . pjUtil::formatTime($return_arr[0]['arrival_time'], 'H:i:s', $this->option_arr['o_time_format']);
+                    }
+                    
+                    if (isset($departure_time_start,$arrival_time_start,$departure_time_end,$arrival_time_end)) {
+                        
+                        $departure_time_start_timestamp = strtotime($departure_time_start);
+                        $arrival_time_start_timestamp = strtotime($arrival_time_start);
+                        $departure_time_end_timestamp = strtotime($departure_time_end);
+                        $arrival_time_end_timestamp = strtotime($arrival_time_end);
+                        
+                        $checkDate($arrival_time_start_timestamp,$departure_time_start_timestamp,$arrival_time_start);
+                        $checkDate($departure_time_end_timestamp,$arrival_time_start_timestamp,$departure_time_end);
+                        $checkDate($arrival_time_end_timestamp,$departure_time_end_timestamp,$arrival_time_end);
+                        
+                        list($duration_start_seconds, $duration_start) = $calcDuration($arrival_time_start_timestamp,$departure_time_start_timestamp);
+                        list($duration_end_seconds, $duration_end) = $calcDuration($arrival_time_end_timestamp,$departure_time_end_timestamp);
+                        list($duration_total_seconds, $duration_total) = $calcDuration($arrival_time_end_timestamp,$departure_time_start_timestamp);
+                    }
                     
                     $pjBusModel = pjBusModel::factory();
                     $bus_arr_start = $pjBusModel
@@ -518,19 +561,22 @@ class pjApiBooking extends pjApi {
                             ->find($busIdStart)
                             ->getData();
                     
-                    
-                    
                     $bus_arr_end = $pjBusModel
                             ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
                             ->select("t1.*, t2.content as route_title")
                             ->find($busIEnd)
                             ->getData();
                     
+                    $bus_arr_start['departure_time'] = $departure_time_start;
+                    $bus_arr_start['arrival_time'] = $arrival_time_start;
+                    $bus_arr_start['duration'] = $duration_start;
+                    $bus_arr_start['duration_seconds'] = $duration_start_seconds;
                     
                     
-                    
-                    
-                    
+                    $bus_arr_end['departure_time'] = $departure_time_end;
+                    $bus_arr_end['arrival_time'] = $arrival_time_end;
+                    $bus_arr_end['duration'] = $duration_end;
+                    $bus_arr_end['duration_seconds'] = $duration_end_seconds;
                     
 
                     $res['bus_arr_start'] = $bus_arr_start;
@@ -538,9 +584,12 @@ class pjApiBooking extends pjApi {
 
                     $pjPriceModel = pjPriceModel::factory();
                     
-                    $ticket_price_arr_start = $pjPriceModel->getTicketPrice($busIdStart, $pickupId, $tIds, $bookedData, $this->option_arr, $this->getLocaleId(), 'F',$tickets);
+                    $ticket_price_arr_start = $pjPriceModel->getTicketPrice($busIdStart, $pickupId, $transferId, $bookedData, $this->option_arr, $this->getLocaleId(), 'F');
                     
-                    $ticket_price_arr_end = $pjPriceModel->getTicketPrice($busIEnd, $tIds, $returnId, $bookedData, $this->option_arr, $this->getLocaleId(), 'F',$tickets);                    
+                    
+                    $ticket_price_arr_end = $pjPriceModel->getTicketPrice($busIEnd, $transferId, $returnId, $bookedData, $this->option_arr, $this->getLocaleId(), 'F',true);                    
+//                    vd($ticket_price_arr_end);
+                    
                     
                     $filter('sub_total_format',$ticket_price_arr_start);
                     $filter('tax_format',$ticket_price_arr_start);
@@ -557,8 +606,15 @@ class pjApiBooking extends pjApi {
                     
                     $res['ticket_arr_end'] = $ticket_price_arr_end['ticket_arr'];
                     $res['price_arr_end'] = $ticket_price_arr_end;
-//                    
                     
+                    
+                    $res['summary']['duraion'] = $duration_total;
+                    $res['summary']['duraion_seconds'] = $duration_total_seconds;
+                    
+                    $res['summary']['total'] = $ticket_price_arr_start['total'] + $ticket_price_arr_end['total'];
+                    $res['summary']['sub_total'] = $ticket_price_arr_start['sub_total'] + $ticket_price_arr_end['sub_total'];
+                    $res['summary']['deposit'] = $ticket_price_arr_start['deposit'] + $ticket_price_arr_end['deposit'];
+                    $res['summary']['tax'] = $ticket_price_arr_start['tax'] + $ticket_price_arr_end['tax'];
                 }
                 else {
                     

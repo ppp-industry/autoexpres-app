@@ -649,6 +649,7 @@ class pjAppController extends pjController {
                 $minuts = floor($minutsMod / 60);
                 $duration = '';
                 $localeId =  $this->getLocaleId();
+                
                 switch ($localeId){
                     case 1:
                         $duration = $days . 'D ' . $hours . 'H ' . $minuts .'M';
@@ -845,7 +846,6 @@ class pjAppController extends pjController {
     ){
         
         $localeId = $this->getLocaleId();
-//        $bookingDate
         
         
         foreach ($busArr as $k => $bus) {
@@ -858,10 +858,6 @@ class pjAppController extends pjController {
                     ->orderBy("`order` ASC")
                     ->findAll()
                     ->getData();
-            
-          
-            
-            
             
             $busStops = [];
             $pjBusStopModel->reset()->where('route_id',$bus['route_id']); 
