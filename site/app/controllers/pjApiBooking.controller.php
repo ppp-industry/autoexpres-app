@@ -109,15 +109,7 @@ class pjApiBooking extends pjApi {
         pjAppController::jsonResponse($ret);
     }
 
-    public function pjActionSaveTickets() {
-
-        $this->setAjax(true);
-        $resp = array();
-        $resp['code'] = 200;
-        $this->_set('booked_data', $_POST);
-        pjAppController::jsonResponse($resp);
-    }
-
+   
     public function pjActionSaveForm() {
        
         
@@ -454,6 +446,11 @@ class pjApiBooking extends pjApi {
         ini_set("display_errors", "On");
         error_reporting(E_ALL ^ E_DEPRECATED);
         
+        
+        $this->setAjax(true);
+        
+        $this->_set('booked_data', $_POST);
+        
         $filter = function($key,&$arr){
             if(isset($arr[$key])){
                 $arr[$key] = strip_tags($arr[$key]);
@@ -466,7 +463,7 @@ class pjApiBooking extends pjApi {
             
             if ($this->checkStore() && $this->isBusReady() == true) {
                 
-                $bookedData = $this->_get('booked_data');
+                $bookedData = $_POST;
                 
                  $transferIds = false;
             
@@ -474,14 +471,18 @@ class pjApiBooking extends pjApi {
                     $transferIds = unserialize($this->_get('transferIds'));
                 }
                 
-//                $bus_id = $bookedData['bus_id'];
-
                 $pickupId = $this->_get('pickup_id');
                 $returnId = $this->_get('return_id');
                 $isReturn = $this->_get('is_return');
+                
                 $pjBusLocationModel = pjBusLocationModel::factory();
                 
-                 
+                $pjCityModel = pjCityModel::factory();
+                    
+                $pickup_location = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->find($pickupId)->getData();
+                $return_location = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->find($returnId)->getData();
+                $from_location = $pickup_location['name'];
+                $to_location = $return_location['name'];
                 
                 if ($transferIds && !in_array($returnId, array_keys($transferIds))) {
                     
@@ -492,37 +493,81 @@ class pjApiBooking extends pjApi {
                         }
                     }
                     
+                    $tickets = [];
+                foreach($bookedData as $key => $item){
+                    if(preg_match('/ticket_cnt_/', $key)){
+                        $tickets[] = str_replace('ticket_cnt_', '', $key);
+                    }
+                }
+//                vd($tickets);
                     
                     $departure_time  = $_departure_time = $arrival_time = $_arrival_time = $duration = $_duration = NULL;
-                    $busIdToTransfer =  $bookedData['bus_id_to'];
-                    $busIdFromTransfer = $bookedData['bus_id_from'];
-//                    
-                    $transferArrTo = $pjBusLocationModel->reset()->where('bus_id', $busIdToTransfer)->where("location_id", $transferId)->limit(1)->findAll()->getData();
+                    $busIdStart =   $bookedData['bus_id_start'];
+                    $busIEnd = $bookedData['bus_id_end'];
+                      
+                    
+                    $pickup_arr = $pjBusLocationModel->where('bus_id', $busIdStart)->where("location_id", $pickupId)->limit(1)->findAll()->getData();
+                    $return_arr = $pjBusLocationModel->reset()->where('bus_id', $busIEnd)->where("location_id", $returnId)->limit(1)->findAll()->getData();
+//                    $transfer = $pjBusLocationModel->reset()->where('bus_id', $busIdStart)->whereIn("location_id", $tIds)->limit(1)->findAll()->getData();
+                   
+                    
+                    $pjBusModel = pjBusModel::factory();
+                    $bus_arr_start = $pjBusModel
+                            ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
+                            ->select("t1.*, t2.content as route_title")
+                            ->find($busIdStart)
+                            ->getData();
                     
                     
-                    $transferArrFrom = $pjBusLocationModel->reset()->where('bus_id', $busIdFromTransfer)->where("location_id", $transferId)->limit(1)->findAll()->getData();
+                    
+                    $bus_arr_end = $pjBusModel
+                            ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
+                            ->select("t1.*, t2.content as route_title")
+                            ->find($busIEnd)
+                            ->getData();
                     
                     
                     
                     
                     
-//                    
-//                    if (!empty($transferArrTo)) {
-//                        $departure_time = pjUtil::formatTime($pickup_arr[0]['departure_time'], 'H:i:s', $this->option_arr['o_time_format']);
-//                    }
-//                    if (!empty($transferArrFrom)) {
-//                        $arrival_time = pjUtil::formatTime($return_arr[0]['arrival_time'], 'H:i:s', $this->option_arr['o_time_format']);
-//                    }
-//  
+                    
+                    
+
+                    $res['bus_arr_start'] = $bus_arr_start;
+                    $res['bus_arr_end'] = $bus_arr_end;
+
+                    $pjPriceModel = pjPriceModel::factory();
+                    
+                    $ticket_price_arr_start = $pjPriceModel->getTicketPrice($busIdStart, $pickupId, $tIds, $bookedData, $this->option_arr, $this->getLocaleId(), 'F',$tickets);
+                    
+                    $ticket_price_arr_end = $pjPriceModel->getTicketPrice($busIEnd, $tIds, $returnId, $bookedData, $this->option_arr, $this->getLocaleId(), 'F',$tickets);                    
+                    
+                    $filter('sub_total_format',$ticket_price_arr_start);
+                    $filter('tax_format',$ticket_price_arr_start);
+                    $filter('total_format',$ticket_price_arr_start);
+                    $filter('deposit_format',$ticket_price_arr_start);
+                    
+                    $filter('sub_total_format',$ticket_price_arr_end);
+                    $filter('tax_format',$ticket_price_arr_end);
+                    $filter('total_format',$ticket_price_arr_end);
+                    $filter('deposit_format',$ticket_price_arr_end);
+                    
+                    $res['ticket_arr_start'] = $ticket_price_arr_start['ticket_arr'];
+                    $res['price_arr_start'] = $ticket_price_arr_start;
+                    
+                    $res['ticket_arr_end'] = $ticket_price_arr_end['ticket_arr'];
+                    $res['price_arr_end'] = $ticket_price_arr_end;
 //                    
                     
                 }
                 else {
                     
                     $bus_id = $bookedData['bus_id'];
-                    
+                        
                     $pickup_arr = $pjBusLocationModel->where('bus_id', $bus_id)->where("location_id", $pickupId)->limit(1)->findAll()->getData();
-                    $return_arr = $pjBusLocationModel->reset()->where('bus_id', $bus_id)->where("location_id", $returnId)->limit(1)->findAll()->getData();                    
+                    $return_arr = $pjBusLocationModel->reset()->where('bus_id', $bus_id)->where("location_id", $returnId)->limit(1)->findAll()->getData();
+                  
+                    
                     $departure_time  = $_departure_time = $arrival_time = $_arrival_time = $duration = $_duration = NULL;
 
                     if (!empty($pickup_arr)) {
@@ -533,20 +578,11 @@ class pjApiBooking extends pjApi {
                     }
                     
                     if (!empty($pickup_arr) && !empty($return_arr)) {
-
-
                         $duration_arr = pjUtil::calDuration($pickup_arr[0]['departure_time'], $return_arr[0]['arrival_time']);
-
                         $hour_str = $duration_arr['hours'] . ' ' . ($duration_arr['hours'] != 1 ? strtolower(__('front_hours', true, false)) : strtolower(__('front_hour', true, false)));
                         $minute_str = $duration_arr['minutes'] > 0 ? ($duration_arr['minutes'] . ' ' . ($duration_arr['minutes'] != 1 ? strtolower(__('front_minutes', true, false)) : strtolower(__('front_minute', true, false))) ) : '';
                         $duration = $hour_str . ' ' . $minute_str;
                     }
-
-                    $pjCityModel = pjCityModel::factory();
-                    $pickup_location = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->find($pickupId)->getData();
-                    $return_location = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->find($returnId)->getData();
-                    $from_location = $pickup_location['name'];
-                    $to_location = $return_location['name'];
 
                     $pjBusModel = pjBusModel::factory();
                     $bus_arr = $pjBusModel
@@ -569,8 +605,7 @@ class pjApiBooking extends pjApi {
                     $filter('total_format',$ticket_price_arr);
                     $filter('deposit_format',$ticket_price_arr);
                     
-                    $res['from_location'] = $from_location;
-                    $res['to_location'] = $to_location;
+                    
                     $res['bus_arr'] = $bus_arr;
                     $res['ticket_arr'] = $ticket_price_arr['ticket_arr'];
                     $res['price_arr'] = $ticket_price_arr;
@@ -623,29 +658,36 @@ class pjApiBooking extends pjApi {
                         $res['return_bus_arr'] = $_bus_arr;
                     }
                     
-                    $country_arr = pjCountryModel::factory()
-                                    ->select('t1.id, t2.content AS country_title')
-                                    ->join('pjMultiLang', "t2.model='pjCountry' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
-                                    ->orderBy('`country_title` ASC')->findAll()->getData();
-
-                    $terms_conditions = pjMultiLangModel::factory()->select('t1.*')
-                                    ->where('t1.model', 'pjOption')
-                                    ->where('t1.locale', $this->getLocaleId())
-                                    ->where('t1.field', 'o_terms')
-                                    ->limit(0, 1)
-                                    ->findAll()->getData();
-
                     $pjSeatModel = pjSeatModel::factory();
 
                     $selected_seat_arr = $pjSeatModel->whereIn('t1.id', explode("|", $bookedData['selected_seats']))->findAll()->getDataPair('id', 'name');
                     $return_selected_seat_arr = (isset($bookedData['return_selected_seats']) && !empty($bookedData['return_selected_seats'])) ? $pjSeatModel->reset()->whereIn('t1.id', explode("|", $bookedData['return_selected_seats']))->findAll()->getDataPair('id', 'name') : array();
+
+                    
                     
                     $res['selected_seat_arr'] = $selected_seat_arr;
                     $res['return_selected_seat_arr'] = $return_selected_seat_arr;
-                    $res['country_arr'] = $country_arr;
-                    $res['terms_conditions'] = $terms_conditions[0]['content'];
-                    $res['status'] = 'OK';
+                    
                 }
+                
+                $country_arr = pjCountryModel::factory()
+                                ->select('t1.id, t2.content AS country_title')
+                                ->join('pjMultiLang', "t2.model='pjCountry' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
+                                ->orderBy('`country_title` ASC')->findAll()->getData();
+
+
+                $terms_conditions = pjMultiLangModel::factory()->select('t1.*')
+                                ->where('t1.model', 'pjOption')
+                                ->where('t1.locale', $this->getLocaleId())
+                                ->where('t1.field', 'o_terms')
+                                ->limit(0, 1)
+                                ->findAll()->getData();
+
+                $res['from_location'] = $from_location;
+                $res['to_location'] = $to_location;
+                $res['country_arr'] = $country_arr;
+                $res['terms_conditions'] = $terms_conditions[0]['content'];
+                $res['status'] = 'OK';
             } 
             
             else {

@@ -21,7 +21,7 @@ class pjPriceModel extends pjAppModel {
         return new pjPriceModel($attr);
     }
 
-    public function getTicketPrice($busId, $pickupId, $returnId, $bookedData, $optionArr, $localeId, $isReturn) {
+    public function getTicketPrice($busId, $pickupId, $returnId, $bookedData, $optionArr, $localeId, $isReturn,$ticketId = false) {
         $subTotal = 0;
         $tax = 0;
         $total = 0;
@@ -31,8 +31,53 @@ class pjPriceModel extends pjAppModel {
         $taxFormat = '';
         $totalFormat = '';
         $depositFormat = '';
-
-        $ticketArr = $this
+        $ticketArr = null;
+        
+        if($ticketId){
+        
+                if(!is_array($pickupId)){
+                    $pickupId = [$pickupId];
+                }
+                if(!is_array($returnId)){
+                    $returnId = [$returnId];
+                }
+//                else{
+//                    $this->where('t1.from_location_id', $pickupId);
+//                }
+//                
+//                if(is_array($returnId)){
+//                    
+//                }
+//                else{
+//                    $this->where('t1.from_location_id', $returnId);
+//                }
+                
+//                vd();
+            $ticketArr = $this
+                ->reset()
+                ->join('pjTicket', 't1.ticket_id = t2.id', 'left')
+                ->join('pjMultiLang', "t3.model='pjTicket' AND t3.foreign_id=t1.ticket_id AND t3.field='title' AND t3.locale='" . $localeId . "'", 'left outer')
+                ->join('pjBus', 't1.bus_id = t4.id', 'left')
+                ->select("t1.*, t2.seats_count, t3.content as ticket, t4.discount")
+                ->where('t1.bus_id', $busId)
+                    
+                ->whereIn('t2.id', $ticketId)
+                ->whereIn('t1.from_location_id', $pickupId)
+                ->whereIn('t1.to_location_id', $returnId)
+                    
+                ->where('is_return = "F"')
+                ->index("FORCE KEY (`ticket_id`)")
+                ->limit(1)
+                ->orderBy("ticket ASC")
+                ->findAll()
+                ->getData();
+            
+//            $ticketArr = array_unique($ticketArr);
+            
+//            vd($ticketArr);
+        }
+        else{
+            $ticketArr = $this
                 ->reset()
                 ->join('pjTicket', 't1.ticket_id = t2.id', 'left')
                 ->join('pjMultiLang', "t3.model='pjTicket' AND t3.foreign_id=t1.ticket_id AND t3.field='title' AND t3.locale='" . $localeId . "'", 'left outer')
@@ -46,6 +91,8 @@ class pjPriceModel extends pjAppModel {
                 ->orderBy("ticket ASC")
                 ->findAll()
                 ->getData();
+        }
+                
 
         foreach ($ticketArr as $k => $ticketItem ){
             $returnStr = $isReturn == 'T' ? 'return_' : '';
