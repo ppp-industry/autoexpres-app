@@ -13,10 +13,13 @@ class pjBookingModel extends pjAppModel {
         array('name' => 'id', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'uuid', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'bus_id', 'type' => 'int', 'default' => ':NULL'),
+        array('name' => 'bus_end', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'pickup_id', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'return_id', 'type' => 'int', 'default' => ':NULL'),
+        array('name' => 'transfer_id', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'is_return', 'type' => 'enum', 'default' => ':NULL'),
         array('name' => 'back_id', 'type' => 'int', 'default' => ':NULL'),
+        array('name' => 'back_id_end', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'return_date', 'type' => 'date', 'default' => ':NULL'),
         array('name' => 'booking_date', 'type' => 'date', 'default' => ':NULL'),
         array('name' => 'booking_time', 'type' => 'varchar', 'default' => ':NULL'),
@@ -51,6 +54,7 @@ class pjBookingModel extends pjAppModel {
         array('name' => 'cc_num', 'type' => 'varchar', 'default' => ':NULL'),
         array('name' => 'cc_exp', 'type' => 'varchar', 'default' => ':NULL'),
         array('name' => 'cc_code', 'type' => 'varchar', 'default' => ':NULL'),
+        array('name' => 'with_transfer', 'type' => 'smallint', 'default' => 0),
             //array('name' => 'passport', 'type' => 'varchar', 'default' => ':NULL'),
             //array('name' => 'prod_location', 'type' => 'varchar', 'default' => ':NULL')
     );

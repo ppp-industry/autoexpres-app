@@ -591,11 +591,11 @@ class pjAppController extends pjController {
             $busArr = [];
             $busArrTo = array_combine($busArrToIds, $busArrTo);
             
-            foreach($busArrToIds as $key => &$toID){
-                if($bookingPeriod[$toID]['arrival_time_timestamp'] > $lastFromBusDepartureTimeTimestamp){
-                    unset($bookingPeriod[$toID],$busArrTo[$toID],$busArrToIds[$key]);       
-                }
-            }
+//            foreach($busArrToIds as $key => &$toID){
+//                if($bookingPeriod[$toID]['arrival_time_timestamp'] > $lastFromBusDepartureTimeTimestamp){
+//                    unset($bookingPeriod[$toID],$busArrTo[$toID],$busArrToIds[$key]);       
+//                }
+//            }
 
             foreach($busArrFrom as &$itemFrom){
                 
