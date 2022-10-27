@@ -19,7 +19,6 @@ class pjBookingModel extends pjAppModel {
         array('name' => 'transfer_id', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'is_return', 'type' => 'enum', 'default' => ':NULL'),
         array('name' => 'back_id', 'type' => 'int', 'default' => ':NULL'),
-        array('name' => 'back_id_end', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'return_date', 'type' => 'date', 'default' => ':NULL'),
         array('name' => 'booking_date', 'type' => 'date', 'default' => ':NULL'),
         array('name' => 'booking_time', 'type' => 'varchar', 'default' => ':NULL'),

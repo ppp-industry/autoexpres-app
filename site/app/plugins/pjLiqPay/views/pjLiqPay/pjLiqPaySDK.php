@@ -199,7 +199,7 @@ class LiqPay
         if (!isset($params['description'])) {
             throw new InvalidArgumentException('description is null');
         }
-
+        
         return $params;
     }
 

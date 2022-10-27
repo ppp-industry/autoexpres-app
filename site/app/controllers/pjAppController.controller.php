@@ -739,7 +739,7 @@ class pjAppController extends pjController {
                 $busTypeArr,$bookedSeatArr,$seatArr,$selectedSeatArr
             );
             
-            $busArr = array_filter($busArr,$filterFunction);
+            $busArr = array_values(array_filter($busArr,$filterFunction));
             
             foreach($busArr as &$bus){
                $locationsHundler($bus['locations']);
