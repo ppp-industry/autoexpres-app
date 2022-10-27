@@ -10,18 +10,6 @@ $public_key = 'sandbox_i42968995129';
 $private_key = 'sandbox_UXFowv7bgWRt3gbLR30XmLhO5s3YV3kacoqrWaFH';
 $liqpay = new LiqPay($public_key, $private_key);
 
-
-// echo '<pre>';
-
-// print_r( $_SESSION );
-
-// echo '<hr>';
-
-// print_r( get_defined_vars() );
-// echo '</pre>';
-// die();
-
-
 $pjLiqPayFormParams = array(
     'action'         => 'pay',
     'amount'         => $tpl['arr']['amount'],
@@ -36,7 +24,6 @@ $pjLiqPayFormParams = array(
 /*	'sandbox'		 => '1'   */
 );
 if(isset($tpl['arr']['paytypes'])){
-//    echo __LINE__;exit();
     $pjLiqPayFormParams['paytypes'] = $tpl['arr']['paytypes'];
 }
 

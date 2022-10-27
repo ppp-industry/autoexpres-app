@@ -7,14 +7,70 @@
  */
 class pjApiPayment extends pjApi {
 
-    public function afterFilter() {
+    public function afterFilter() {}
+    
+    public function pjActionThankYou(){
+         echo $_GET['status'];
+        exit();    
+    }
+    
+    
+    public function pjActionCheckPayment(){
         
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        $host = $_SERVER['HTTP_HOST'];
+        
+        $id = $_GET['id'];
+        $pjBookingModel = pjBookingPaymentModel::factory();
+        $res = $pjBookingModel->where('booking_id',$id)->findAll()->getData();
+        
+        $status = null;
+        
+        if(empty($res)){
+            $status = 404;
+        }
+        else{
+            if($res[0]['status'] == 'paid'){
+                $status = 200;
+            }
+            else{
+                $status = 100;
+            }
+        }
+        
+        $returnUrl = 'http://' . $host. '/api/payment/thankYou?status=' . $status;
+        pjUtil::redirect($returnUrl);
     }
     
     
       public function pjActionGetPaymentForm() {
           
-        $getLiqPayParams = function($arr,$currency,$thankYou,$liqPayAdress) {
+          
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
+        $host = $_SERVER['HTTP_HOST'];
+        $key = $_GET['key'];
+        
+        $notifyUrl = $host . '/api/payment/confirmLiqPay?key=' . $key;
+
+        $response = '';
+        $arr = pjBookingModel::factory()
+                        ->select('t1.*')
+                        ->find($_GET['booking_id'])->getData();
+
+        $host = $_SERVER['HTTP_HOST'];
+        $returnUrl = 'http://' . $host. '/api/payment/checkPayment?key=' . $key . '&id=' . $arr['id'];
+
+        if (!empty($arr['back_id'])) {
+            $back_arr = pjBookingModel::factory()
+                            ->select('t1.*')
+                            ->find($arr['back_id'])->getData();
+            $arr['deposit'] += $back_arr['deposit'];
+        }
+
+        $getLiqPayParams = function($arr,$currency,$liqPayAdress,$returnUrl) use ($notifyUrl,$host){
             return array(
                 'name' => 'bsLiqPay',
                 'id' => $arr['id'],
@@ -23,59 +79,52 @@ class pjApiPayment extends pjApi {
                 'custom' => $arr['id'],
                 'amount' => number_format($arr['deposit'], 2, '.', ''),
                 'currency_code' => $currency,
-                'return' => $thankYou,
+                'return' => $returnUrl,
+
+                'target' => '_self',
+
                 'notify_url' => PJ_INSTALL_URL . 'index.php?controller=pjFrontEnd&action=pjActionConfirmLiqPay',
                 'target' => '_self',
+
             );
         };
 
-        $response = '';
-            $arr = pjBookingModel::factory()
-                            ->select('t1.*')
-                            ->find($_GET['booking_id'])->getData();
 
-            if (!empty($arr['back_id'])) {
-                $back_arr = pjBookingModel::factory()
-                                ->select('t1.*')
-                                ->find($arr['back_id'])->getData();
-                $arr['deposit'] += $back_arr['deposit'];
-            }
-            
-//            vd($this->option_arr['o_liqpay_address']);
-            
-            switch ($arr['payment_method']) {
-               
-                case 'liqpay':
-                    $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$this->option_arr['o_thank_you_page'],$this->option_arr['o_liqpay_address']);
-                    
-                    $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
-                    
-                    break;
-                case 'gpay':
-                    $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$this->option_arr['o_thank_you_page'],$this->option_arr['o_liqpay_address']);
-                    $params['paytypes'] = 'gpay';
-                    $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
-                    
-                    
-                    break;
-                case 'apay':
-                    $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$this->option_arr['o_thank_you_page'],$this->option_arr['o_liqpay_address']);
-                    $params['paytypes'] = 'apay';
-                    $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
-                    
-                    
-                    break;
-               
-            }
-            
-            echo $response;
-            exit();
+        switch ($arr['payment_method']) {
+
+            case 'liqpay':
+                $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$this->option_arr['o_liqpay_address'],$returnUrl);
+
+                $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
+
+                break;
+            case 'gpay':
+                $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$this->option_arr['o_liqpay_address'],$returnUrl);
+                $params['paytypes'] = 'gpay';
+                $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
+
+
+                break;
+            case 'apay':
+                $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$this->option_arr['o_liqpay_address'],$returnUrl);
+                $params['paytypes'] = 'apay';
+                $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
+
+
+                break;
+
+        }
+
+        echo $response;
+        exit();
         
     }
     
     
     public function pjActionConfirmLiqPay() {
         $this->setAjax(true);
+        
+        file_put_contents('post.data', var_export($_POST, true));
 
         if (pjObject::getPlugin('pjLiqPay') === NULL) {
             $this->log('LiqPay plugin not installed');

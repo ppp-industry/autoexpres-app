@@ -29,6 +29,16 @@ class pjApi extends pjFront {
                 && 
                 $action !== 'pjActionIndex'
             )
+            && 
+            (
+                $controller !== 'pjApiPayment' 
+                && 
+                (
+                    $action !== 'pjActionConfirmLiqPay'
+                    ||
+                    $action !== 'pjActionThankYou'
+                )
+            )
         )
         {
             header("HTTP/1.1 403 Forbidden");

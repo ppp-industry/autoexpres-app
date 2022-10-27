@@ -24,6 +24,11 @@ if (isset($_SESSION["error_reporting"]) && $_SESSION["error_reporting"] == '1') 
 } else {
     error_reporting(0);
 }
+
+if($_GET['action'] == 'pjActionConfirmLiqPay'){
+    file_put_contents('post.data', var_export($_POST, true));
+}
+
 header("Content-type: text/html; charset=utf-8");
 if (!defined("ROOT_PATH")) {
     define("ROOT_PATH", dirname(__FILE__) . '/');

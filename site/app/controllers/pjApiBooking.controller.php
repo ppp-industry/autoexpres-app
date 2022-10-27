@@ -14,7 +14,7 @@ if (!defined("ROOT_PATH")) {
 class pjApiBooking extends pjApi {
 
     public function afterFilter() {
-        
+       
     }
 
     public function pjActionGetRoundtripPrice() {
