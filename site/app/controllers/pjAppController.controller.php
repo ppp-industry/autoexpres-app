@@ -698,7 +698,7 @@ class pjAppController extends pjController {
                 ];
             }
 
-            $transLocations = array_column($transferLocations, 'name');
+            $transLocations = array_values($transferLocations);
             
             return [
                 'booking_period' => $bookingPeriod,

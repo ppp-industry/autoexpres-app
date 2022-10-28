@@ -80,15 +80,40 @@ class pjApiBuses extends pjApi {
         
         $filter = function(&$busIdArr,$pickupId, $returnId, $localeId) use ($pjPriceModel){
             
-            foreach($busIdArr as $key => $busId){
-               $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
-               
-               if (is_null($arr[0]['price'])) {
-                    unset($busIdArr[$key]);
+            if(isset($busIdArr['transferIds'])){
+                foreach($busIdArr['to'] as $key => $busId){
+                    $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
                     
+                    if(empty($arr)){
+                        continue;;
+                    }
+                    
+                    if (is_null($arr[0]['price'])) {
+                        unset($busIdArr['to'][$key]);
+                    }
                 }
-
+                
+                foreach($busIdArr['from'] as $key => $busId){
+                    $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
+                    if(empty($arr)){
+                        continue;;
+                    }
+                    
+                    if (is_null($arr[0]['price'])) {
+                        unset($busIdArr['from'][$key]);
+                    }
+                }
             }
+            else{
+                foreach($busIdArr as $key => $busId){
+                    $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
+
+                    if (is_null($arr[0]['price'])) {
+                        unset($busIdArr[$key]);
+                    }
+                }
+            }            
+            
         };
         
         if($this->_is('transferIds')){
@@ -118,7 +143,7 @@ class pjApiBuses extends pjApi {
                 $returnDate = pjUtil::formatDate($params['return_date'], $this->option_arr['o_date_format']);
                 $busIdArr = $pjBusModel->getBusIds($date,$pickupId,$returnId, true,$transferIds);
                 $returnBusIdArr = $pjBusModel->getBusIds($returnDate,$returnId,$pickupId, true,$transferIds);
-               
+                
                 
                 $filter($busIdArr,$pickupId, $returnId, $localeId);
                 $filter($returnBusIdArr,$returnId, $pickupId, $localeId);
