@@ -78,8 +78,7 @@ class pjAppController extends pjController {
         $this->appendCss('pj-all.css', PJ_FRAMEWORK_LIBS_PATH . 'pj/css/');
         $this->appendCss('admin.css');
 
-        
-        if ($_GET['controller'] != 'pjInstaller') {
+        if (isset($_GET['controller']) ? $_GET['controller'] : Router::getController() != 'pjInstaller') {
             $this->models['Option'] = pjOptionModel::factory();
             $this->option_arr = $this->models['Option']->getPairs($this->getForeignId());
             $this->set('option_arr', $this->option_arr);
@@ -481,18 +480,17 @@ class pjAppController extends pjController {
 //        $pjBusStopModel = pjBusStopModel::factory();
         
         $transferIds = isset($busIdArr['transferIds']) ? $busIdArr['transferIds'] : null;
-        
 
         $cityPreparedQuery = "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'";
 
         $pickupLocation = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', $cityPreparedQuery, 'left outer')->find($pickupId)->getData();
         $returnLocation = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', $cityPreparedQuery, 'left outer')->find($returnId)->getData();
         
+        $fromLocation = $pickupLocation['name'];
+        $toLocation = $returnLocation['name'];
         
         $transferLocations = $transferIds ?
                 $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', $cityPreparedQuery, 'left outer')->whereIn('t1.id',$transferIds)->findAll()->getDataPair('id','name') : null;
-
-        
         
         $ticketColumns = 0;
         $bookingDate = pjUtil::formatDate($date, $this->option_arr ['o_date_format']);
@@ -509,21 +507,6 @@ class pjAppController extends pjController {
                 return true;
             }
         };
-        
-        
-//        bus_id_arr
-        if($transferIds){
-            $busIdArrFrom = &$busIdArr['from'];
-            $busIdArrTo = &$busIdArr['to'];
-            
-            $busArrFrom = pjBusModel::factory()->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjBusType', "t3.id=t1.bus_type_id", 'left outer')->select(" t1.*, t2.content AS route, t3.seats_map")->where("(t1.id IN(" . join(',', $busIdArrFrom) . "))")->index("FORCE KEY (`bus_type_id`)")->orderBy("route asc")->findAll()->getData();
-            $busArrTo = pjBusModel::factory()->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjBusType', "t3.id=t1.bus_type_id", 'left outer')->select(" t1.*, t2.content AS route, t3.seats_map")->where("(t1.id IN(" . join(',', $busIdArrTo) . "))")->index("FORCE KEY (`bus_type_id`)")->orderBy("route asc")->findAll()->getData();
-        }
-        else{   
-            $busArr = pjBusModel::factory()->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjBusType', "t3.id=t1.bus_type_id", 'left outer')->select(" t1.*, t2.content AS route, t3.seats_map")->where("(t1.id IN(" . join(',', $busIdArr) . "))")->index("FORCE KEY (`bus_type_id`)")->orderBy("route asc")->findAll()->getData();
-        }
-        $fromLocation = $pickupLocation ['name'];
-        $toLocation = $returnLocation ['name'];
         
         $locationsHundler = function(&$locations) use ($bookingDate){
 
@@ -551,8 +534,13 @@ class pjAppController extends pjController {
             
         };
         
-        
         if($transferIds){
+            $busIdArrFrom = &$busIdArr['from'];
+            $busIdArrTo = &$busIdArr['to'];
+            
+            $busArrFrom = pjBusModel::factory()->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjBusType', "t3.id=t1.bus_type_id", 'left outer')->select(" t1.*, t2.content AS route, t3.seats_map")->where("(t1.id IN(" . join(',', $busIdArrFrom) . "))")->index("FORCE KEY (`bus_type_id`)")->orderBy("route asc")->findAll()->getData();
+            $busArrTo = pjBusModel::factory()->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjBusType', "t3.id=t1.bus_type_id", 'left outer')->select(" t1.*, t2.content AS route, t3.seats_map")->where("(t1.id IN(" . join(',', $busIdArrTo) . "))")->index("FORCE KEY (`bus_type_id`)")->orderBy("route asc")->findAll()->getData();
+            
             
             $locationIdArrFrom = $locationIdArrTo = array();
             
@@ -730,6 +718,8 @@ class pjAppController extends pjController {
             ];
         }
         else{
+            $busArr = pjBusModel::factory()->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjBusType', "t3.id=t1.bus_type_id", 'left outer')->select(" t1.*, t2.content AS route, t3.seats_map")->where("(t1.id IN(" . join(',', $busIdArr) . "))")->index("FORCE KEY (`bus_type_id`)")->orderBy("route asc")->findAll()->getData();
+            
             $busTypeArr = $bookedSeatArr = $seatArr = $selectedSeatArr = array();
             $locationIdArr = array();
             $this->hundleBusData(

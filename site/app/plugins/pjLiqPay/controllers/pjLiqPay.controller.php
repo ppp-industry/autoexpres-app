@@ -102,7 +102,8 @@ class pjLiqPay extends pjLiqPayAppController {
 
     public function pjActionConfirm() {
         $this->setLayout('pjActionEmpty');
-        $pk = base64_decode('YjhTNzVPVDVPdDZ5dzVya3VXenc=') . base64_decode('SGc4cHFKU29CbGt4MkRHT1RkaG4=');
+//        $pk = base64_decode('YjhTNzVPVDVPdDZ5dzVya3VXenc=') . base64_decode('SGc4cHFKU29CbGt4MkRHT1RkaG4=');
+        $pk = 'sandbox_UXFowv7bgWRt3gbLR30XmLhO5s3YV3kacoqrWaFH';
         $response = json_decode(base64_decode($_POST["data"]), true);
         $sign = base64_encode(sha1($pk . $_POST['data'] . $pk, 1));
         if ($sign == $_POST["signature"])

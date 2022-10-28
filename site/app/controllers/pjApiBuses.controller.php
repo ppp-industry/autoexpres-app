@@ -68,13 +68,28 @@ class pjApiBuses extends pjApi {
         error_reporting(E_ALL ^ E_DEPRECATED);
         
         $params = Router::getParams();
+        $localeId = $this->getLocaleId();
 
+        $pjPriceModel = pjPriceModel::factory();
         $transferIds = null;
         $resp = [];
         $busIdArr = $returnBusIdArr = array();
         
         $pickupId = $params['pickup_id'];
         $returnId = $params['return_id'];
+        
+        $filter = function(&$busIdArr,$pickupId, $returnId, $localeId) use ($pjPriceModel){
+            
+            foreach($busIdArr as $key => $busId){
+               $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
+               
+               if (is_null($arr[0]['price'])) {
+                    unset($busIdArr[$key]);
+                    
+                }
+
+            }
+        };
         
         if($this->_is('transferIds')){
             $transferIds = unserialize($this->_get('transferIds'));            
@@ -101,11 +116,14 @@ class pjApiBuses extends pjApi {
             if (isset($params['is_return']) && $params['is_return'] == 'T') {
 
                 $returnDate = pjUtil::formatDate($params['return_date'], $this->option_arr['o_date_format']);
-
                 $busIdArr = $pjBusModel->getBusIds($date,$pickupId,$returnId, true,$transferIds);
                 $returnBusIdArr = $pjBusModel->getBusIds($returnDate,$returnId,$pickupId, true,$transferIds);
-                   
-                   
+               
+                
+                $filter($busIdArr,$pickupId, $returnId, $localeId);
+                $filter($returnBusIdArr,$returnId, $pickupId, $localeId);
+                
+                
                 if (empty($returnBusIdArr)) {
                     
                     $resp['code'] = 101;
@@ -121,6 +139,7 @@ class pjApiBuses extends pjApi {
                 
                 
                 $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
+                $filter($busIdArr,$pickupId, $returnId, $localeId);
                 
                 if (empty($busIdArr)) {
                     $resp['code'] = 100;
@@ -167,7 +186,8 @@ class pjApiBuses extends pjApi {
                 
                 $resp['code'] = 200;
                 pjAppController::jsonResponse($resp);
-            } else {
+            } 
+            else {
                 $store = $this->_getStore();
                 
                 $availArr = $this->getBusAvailability($store['booked_data']['bus_id'], $store, $this->option_arr);

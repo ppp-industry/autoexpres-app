@@ -32,20 +32,7 @@ class pjPriceModel extends pjAppModel {
         $totalFormat = '';
         $depositFormat = '';
 
-        $ticketArr = $this
-                ->reset()
-                ->join('pjTicket', 't1.ticket_id = t2.id', 'left')
-                ->join('pjMultiLang', "t3.model='pjTicket' AND t3.foreign_id=t1.ticket_id AND t3.field='title' AND t3.locale='" . $localeId . "'", 'left outer')
-                ->join('pjBus', 't1.bus_id = t4.id', 'left')
-                ->select("t1.*, t2.seats_count, t3.content as ticket, t4.discount")
-                ->where('t1.bus_id', $busId)
-                ->where('t1.from_location_id', $pickupId)
-                ->where('t1.to_location_id', $returnId)
-                ->where('is_return = "F"')
-                ->index("FORCE KEY (`ticket_id`)")
-                ->orderBy("ticket ASC")
-                ->findAll()
-                ->getData();
+        $ticketArr = $this->getTicketArr($busId,$pickupId,$returnId,$localeId);
         
         foreach ($ticketArr as $k => $ticketItem ){
             $returnStr = $isReturn == 'T' ? 'return_' : '';
@@ -89,6 +76,27 @@ class pjPriceModel extends pjAppModel {
         ];
         
     }
+    
+//    $ticketArr
+    
+    
+    public function getTicketArr($busId,$pickupId,$returnId,$localeId){
+        return $this
+                ->reset()
+                ->join('pjTicket', 't1.ticket_id = t2.id', 'left')
+                ->join('pjMultiLang', "t3.model='pjTicket' AND t3.foreign_id=t1.ticket_id AND t3.field='title' AND t3.locale='" . $localeId . "'", 'left outer')
+                ->join('pjBus', 't1.bus_id = t4.id', 'left')
+                ->select("t1.*, t2.seats_count, t3.content as ticket, t4.discount")
+                ->where('t1.bus_id', $busId)
+                ->where('t1.from_location_id', $pickupId)
+                ->where('t1.to_location_id', $returnId)
+                ->where('is_return = "F"')
+                ->index("FORCE KEY (`ticket_id`)")
+                ->orderBy("ticket ASC")
+                ->findAll()
+                ->getData();
+    }
+    
 
 }
 

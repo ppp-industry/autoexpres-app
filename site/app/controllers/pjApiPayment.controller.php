@@ -70,11 +70,11 @@ class pjApiPayment extends pjApi {
             $arr['deposit'] += $back_arr['deposit'];
         }
 
-        $getLiqPayParams = function($arr,$currency,$liqPayAdress,$returnUrl) use ($notifyUrl,$host){
+        $getLiqPayParams = function($arr,$currency,$returnUrl) use ($notifyUrl,$host){
             return array(
                 'name' => 'bsLiqPay',
                 'id' => $arr['id'],
-                'business' => $liqPayAdress,
+//                'business' => $liqPayAdress,
                 'item_name' => __('front_label_bus_schedule', true, false),
                 'custom' => $arr['id'],
                 'amount' => number_format($arr['deposit'], 2, '.', ''),
@@ -93,20 +93,20 @@ class pjApiPayment extends pjApi {
         switch ($arr['payment_method']) {
 
             case 'liqpay':
-                $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$this->option_arr['o_liqpay_address'],$returnUrl);
+                $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$returnUrl);
 
                 $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
 
                 break;
             case 'gpay':
-                $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$this->option_arr['o_liqpay_address'],$returnUrl);
+                $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$returnUrl);
                 $params['paytypes'] = 'gpay';
                 $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
 
 
                 break;
             case 'apay':
-                $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$this->option_arr['o_liqpay_address'],$returnUrl);
+                $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$returnUrl);
                 $params['paytypes'] = 'apay';
                 $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
 
