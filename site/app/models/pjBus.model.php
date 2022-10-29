@@ -26,7 +26,8 @@ class pjBusModel extends pjAppModel {
         return new pjBusModel($attr);
     }
 
-    public function getBusIds($date, $pickup_id, $return_id, $isReturn, &$transferIds = null) {
+    public function getBusIds($date, $pickup_id, $return_id, $isReturn, &$transferIds = null) {        
+        
         error_reporting(E_ALL ^ E_DEPRECATED);
         $day_of_week = strtolower(date('l', strtotime($date)));
         $currentTime = new \DateTime();
@@ -46,58 +47,81 @@ class pjBusModel extends pjAppModel {
         
         if (empty($res) && $transferIds) {
 
-//            echo __LINE__;exit();
-//            vd($transferIds);
+            $dateCondition = null;
             
             
+            if (!$isReturn && $date == $currentTime->format('Y-m-d')) {
+                $dateCondition = "STR_TO_DATE(CONCAT('{$currentTime->format('Y-m-d')}', ' ', t1.departure_time), '%Y-%m-%d %H:%i:%s') >= '$departure_time'";
+            }
+
             $innerConditionFromTransfer = $innerConditionToTransfer = null;
             
-            $tIds = [];
+            $totalTo = $totalFrom = $tIds = [];
             
             foreach($transferIds as $transferCity => &$cities){
                 if(in_array($pickup_id, $cities) || in_array($return_id, $cities)){
-                    $tIds[] = $transferCity;
+                    
+                    $queryToTransferCity = $this
+                        ->reset()
+                        ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')")
+                        ->where("t1.route_id IN(SELECT TRD.route_id FROM `" . pjRouteDetailModel::factory()->getTable() . "` AS TRD WHERE TRD.from_location_id = $pickup_id AND TRD.to_location_id = $transferCity)");
+                    
+                    if ($dateCondition) {
+                        $queryToTransferCity->where($dateCondition);
+                    }
+                 
+                    $tmp = $queryToTransferCity->findAll()->getDataPair(null, 'id');
+                    
+                    $diff = null;
+                    if(empty($totalTo)){
+                        $diff = $tmp;
+                    }
+                    else{
+                        $diff = array_diff($totalTo, $tmp);;
+                    }
+                  
+                    $totalTo = array_merge($diff,$totalTo);
+//                    
+                    $tmpTo = $diff;
+                    
+                    
+            
+                    $queryFromTransferCity = $this
+                            ->reset()
+                            ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')")
+                            ->where("t1.route_id IN(SELECT TRD.route_id FROM `" . pjRouteDetailModel::factory()->getTable() . "` AS TRD WHERE TRD.from_location_id = $transferCity AND TRD.to_location_id = $return_id)");
+
+                    if ($dateCondition) {
+                        $queryFromTransferCity->where($dateCondition);
+                    }
+                    
+                    $tmp = $queryFromTransferCity->findAll()->getDataPair(null, 'id');
+                    
+                    $diff = null;
+                    if(empty($totalFrom)){
+                        $diff = $tmp;
+                    }
+                    else{
+                        $diff = array_diff($totalFrom, $tmp);;
+                    }
+                  
+                    $totalFrom = array_merge($diff,$totalFrom);
+                    
+                    $tmpFrom = $diff;
+                    
+                    if(!empty($tmpFrom) && !empty($tmpTo)){
+                        $tIds[$transferCity] = [];
+                        
+                        $tIds[$transferCity]['to'] = $tmpTo;
+                        $tIds[$transferCity]['from'] = $tmpFrom;
+                    }
+                    
                 }
             }
-            
-            if (count($tIds) > 0) {
-                $imploded = implode(',', $tIds);
-                $innerConditionToTransfer = <<<SQL
-                        TRD.from_location_id = $pickup_id AND TRD.to_location_id in ($imploded)
-SQL;
-                $innerConditionFromTransfer = <<<SQL
-                        TRD.from_location_id in ($imploded) AND TRD.to_location_id = $return_id
-SQL;
-            }
-
-            $queryToTransferCity = $this
-                    ->reset()
-                    ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')")
-                    ->where("t1.route_id IN(SELECT TRD.route_id FROM `" . pjRouteDetailModel::factory()->getTable() . "` AS TRD WHERE $innerConditionToTransfer)");
-            if (!$isReturn && $date == $currentTime->format('Y-m-d')) {
-                $queryToTransferCity->where("STR_TO_DATE(CONCAT('{$currentTime->format('Y-m-d')}', ' ', t1.departure_time), '%Y-%m-%d %H:%i:%s') >= '$departure_time'");
-            }
-            $resTo = $queryToTransferCity->findAll()->getDataPair(null, 'id');
-            
-            $queryFromTransferCity = $this
-                    ->reset()
-                    ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')")
-                    ->where("t1.route_id IN(SELECT TRD.route_id FROM `" . pjRouteDetailModel::factory()->getTable() . "` AS TRD WHERE $innerConditionFromTransfer)");
-            if (!$isReturn && $date == $currentTime->format('Y-m-d')) {
-                $queryFromTransferCity->where("STR_TO_DATE(CONCAT('{$currentTime->format('Y-m-d')}', ' ', t1.departure_time), '%Y-%m-%d %H:%i:%s') >= '$departure_time'");
-            }
-
-
-            $resFrom = $queryFromTransferCity->findAll()->getDataPair(null, 'id');
-
-            if (!empty($resTo) && !empty($resFrom)) {
-
-                return [
-                    'to' => $resTo,
-                    'from' => $resFrom,
-                    'transferIds' => $tIds
-                ];
-            }
+             
+            return [
+                'transferIds' => $tIds
+            ];
         }
         return $res;
     }

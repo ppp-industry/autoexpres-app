@@ -81,27 +81,33 @@ class pjApiBuses extends pjApi {
         $filter = function(&$busIdArr,$pickupId, $returnId, $localeId) use ($pjPriceModel){
             
             if(isset($busIdArr['transferIds'])){
-                foreach($busIdArr['to'] as $key => $busId){
-                    $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
-                    
-                    if(empty($arr)){
-                        continue;;
-                    }
-                    
-                    if (is_null($arr[0]['price'])) {
-                        unset($busIdArr['to'][$key]);
-                    }
-                }
                 
-                foreach($busIdArr['from'] as $key => $busId){
-                    $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
-                    if(empty($arr)){
-                        continue;;
+                foreach($busIdArr['transferIds'] as $city => &$busess) {
+
+                    foreach($busess['to'] as $key => &$busId){
+                        $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
+
+                        if(empty($arr)){
+                            continue;;
+                        }
+
+                        if (is_null($arr[0]['price'])) {
+                            unset($busIdArr['transferIds'][$city]['to'][$key]);
+                        }
                     }
-                    
-                    if (is_null($arr[0]['price'])) {
-                        unset($busIdArr['from'][$key]);
+
+                    foreach($busess['from'] as $key => &$busId){
+                        $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
+
+                        if(empty($arr)){
+                            continue;;
+                        }
+
+                        if (is_null($arr[0]['price'])) {
+                            unset($busIdArr['transferIds'][$city]['from'][$key]);
+                        }
                     }
+
                 }
             }
             else{
@@ -112,19 +118,24 @@ class pjApiBuses extends pjApi {
                         unset($busIdArr[$key]);
                     }
                 }
-            }            
-            
+            }  
         };
         
-        if($this->_is('transferIds')){
-            $transferIds = unserialize($this->_get('transferIds'));            
+        if($params['transfer_id']){
+            $transferIds = [
+                $params['transfer_id'] => [$pickupId,$returnId]
+            ];
+        }
+        else{
+            if($this->_is('transferIds')){
+                $transferIds = unserialize($this->_get('transferIds'));            
+            }
         }
         
         if(strtotime('today midnight') > strtotime($params['date'])){
             $resp['code'] = 100;
             pjAppController::jsonResponse($resp);
         }
-//        
         
         if ($params['pickup_id'] != $params['return_id']) {
             $resp['code'] = 200;
@@ -141,9 +152,9 @@ class pjApiBuses extends pjApi {
             if (isset($params['is_return']) && $params['is_return'] == 'T') {
 
                 $returnDate = pjUtil::formatDate($params['return_date'], $this->option_arr['o_date_format']);
+                
                 $busIdArr = $pjBusModel->getBusIds($date,$pickupId,$returnId, true,$transferIds);
                 $returnBusIdArr = $pjBusModel->getBusIds($returnDate,$returnId,$pickupId, true,$transferIds);
-                
                 
                 $filter($busIdArr,$pickupId, $returnId, $localeId);
                 $filter($returnBusIdArr,$returnId, $pickupId, $localeId);
@@ -162,7 +173,6 @@ class pjApiBuses extends pjApi {
             } 
             else {
                 
-                
                 $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
                 $filter($busIdArr,$pickupId, $returnId, $localeId);
                 
@@ -175,8 +185,6 @@ class pjApiBuses extends pjApi {
                     }
                     pjAppController::jsonResponse($resp);
                 }
-                
-                
                 
                 if (!isset($params['final_check'])) {
                     if ($this->_is('return_bus_id_arr')) {
