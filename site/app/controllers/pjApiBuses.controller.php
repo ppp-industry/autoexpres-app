@@ -64,8 +64,8 @@ class pjApiBuses extends pjApi {
     
     public function pjActionCheck() {
 // переработать метод для работы с пересадками
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $params = Router::getParams();
         $localeId = $this->getLocaleId();
@@ -249,8 +249,8 @@ class pjApiBuses extends pjApi {
     
     public function pjActionSeats() {
 
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $this->_set('2_passed', true);
         
