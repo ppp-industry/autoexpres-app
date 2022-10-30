@@ -504,11 +504,10 @@ class pjAppController extends pjController {
             }
         };
         
-        $locationsHundler = function(&$locations) use ($bookingDate){
+        $locationsHundler = function(&$locations) use (&$bookingDate){
 
             $bookingDateTmp = $bookingDate;
             $hour = (int) explode(':', $locations[0]['departure_time'])[0];
-            $day = (int)explode('-', $bookingDate)[2];
             $maxIndex = count($locations) - 1;
 
             for ($i = 0; $i < $maxIndex; ++$i) {
@@ -518,16 +517,16 @@ class pjAppController extends pjController {
                     $tmpHour = (int) explode(':', $locations[$i]['departure_time'])[0];
 
                     if ($tmpHour < $hour) {
-                        $bookingDateTmp = str_replace($day, $day + 1, $bookingDateTmp);
+                        
+                        $bookingDateTmp = date($this->option_arr ['o_date_format'], strtotime($bookingDateTmp . '+ 1 day'));
                         $hour = $tmpHour;
-                        $day++;
                     }
                 }
                 $locations[$i]['departure_day'] = $bookingDateTmp;
             }
 
             $locations[$maxIndex]['departure_day'] = $bookingDateTmp;
-            
+            $bookingDate = $bookingDateTmp;
         };
         
         if($transferIds){
@@ -645,6 +644,9 @@ class pjAppController extends pjController {
                 }
                 
                 $locationsHundler($busArrTo[$id]['locations']);
+                $bookingDate =  $bookingDate = pjUtil::formatDate(date($this->option_arr ['o_date_format'], strtotime($departureTimeTransfer)), $this->option_arr ['o_date_format']);
+                
+                
                 $locationsHundler($itemFrom['locations']);
                 
                 $busArr[$busArrKey] = [
