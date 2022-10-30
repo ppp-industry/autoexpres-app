@@ -111,17 +111,21 @@ class pjApiBuses extends pjApi {
                 }
             }
             else{
-                foreach($busIdArr as $key => $busId){
-                    $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
+                if($busIdArr){
+                    foreach($busIdArr as $key => $busId){
+                        $arr = $pjPriceModel->getTicketArr($busId, $pickupId, $returnId, $localeId);
 
-                    if (is_null($arr[0]['price'])) {
-                        unset($busIdArr[$key]);
-                    }
+                        if (is_null($arr[0]['price'])) {
+                            unset($busIdArr[$key]);
+                        }
+                    }    
                 }
+                
+                
             }  
         };
         
-        if($params['transfer_id']){
+        if(isset($params['transfer_id'])){
             $transferIds = [
                 $params['transfer_id'] => [$pickupId,$returnId]
             ];
@@ -174,6 +178,9 @@ class pjApiBuses extends pjApi {
             else {
                 
                 $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
+                
+//                vd($busIdArr);
+                
                 $filter($busIdArr,$pickupId, $returnId, $localeId);
                 
                 if (empty($busIdArr)) {
@@ -242,8 +249,8 @@ class pjApiBuses extends pjApi {
     
     public function pjActionSeats() {
 
-//        ini_set("display_errors", "On");
-//        error_reporting(E_ALL ^ E_DEPRECATED);
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $this->_set('2_passed', true);
         

@@ -49,13 +49,11 @@ class pjBusModel extends pjAppModel {
 
             $dateCondition = null;
             
-            
             if (!$isReturn && $date == $currentTime->format('Y-m-d')) {
                 $dateCondition = "STR_TO_DATE(CONCAT('{$currentTime->format('Y-m-d')}', ' ', t1.departure_time), '%Y-%m-%d %H:%i:%s') >= '$departure_time'";
             }
 
             $innerConditionFromTransfer = $innerConditionToTransfer = null;
-            
             $totalTo = $totalFrom = $tIds = [];
             
             foreach($transferIds as $transferCity => &$cities){
@@ -81,10 +79,7 @@ class pjBusModel extends pjAppModel {
                     }
                   
                     $totalTo = array_merge($diff,$totalTo);
-//                    
                     $tmpTo = $diff;
-                    
-                    
             
                     $queryFromTransferCity = $this
                             ->reset()
@@ -106,7 +101,6 @@ class pjBusModel extends pjAppModel {
                     }
                   
                     $totalFrom = array_merge($diff,$totalFrom);
-                    
                     $tmpFrom = $diff;
                     
                     if(!empty($tmpFrom) && !empty($tmpTo)){
@@ -115,17 +109,21 @@ class pjBusModel extends pjAppModel {
                         $tIds[$transferCity]['to'] = $tmpTo;
                         $tIds[$transferCity]['from'] = $tmpFrom;
                     }
-                    
                 }
             }
              
-            return [
-                'transferIds' => $tIds
-            ];
+            if(!empty($tIds)){
+                return [
+                    'transferIds' => $tIds
+                ];
+            }
+            else {
+                return null;
+            }
+            
         }
         return $res;
     }
-
 }
 
 ?>
