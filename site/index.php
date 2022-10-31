@@ -25,7 +25,7 @@ if (isset($_SESSION["error_reporting"]) && $_SESSION["error_reporting"] == '1') 
     error_reporting(0);
 }
 
-if($_GET['action'] == 'pjActionConfirmLiqPay'){
+if(isset($_GET['action']) == 'pjActionConfirmLiqPay' || preg_match('/api\/payment\/confirmLiqPay/', $_SERVER['REQUEST_URI'])){
     file_put_contents('post.data', var_export($_POST, true));
 }
 

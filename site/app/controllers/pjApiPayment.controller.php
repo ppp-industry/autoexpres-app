@@ -60,7 +60,7 @@ class pjApiPayment extends pjApi {
                         ->select('t1.*')
                         ->find($_GET['booking_id'])->getData();
 
-        $host = $_SERVER['HTTP_HOST'];
+        
         $returnUrl = 'http://' . $host. '/api/payment/checkPayment?key=' . $key . '&id=' . $arr['id'];
 
         if (!empty($arr['back_id'])) {
@@ -70,7 +70,7 @@ class pjApiPayment extends pjApi {
             $arr['deposit'] += $back_arr['deposit'];
         }
 
-        $getLiqPayParams = function($arr,$currency,$returnUrl) use ($notifyUrl,$host){
+        $getLiqPayParams = function($arr,$currency,$returnUrl) use ($notifyUrl){
             return array(
                 'name' => 'bsLiqPay',
                 'id' => $arr['id'],
