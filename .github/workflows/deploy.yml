@@ -19,7 +19,7 @@ jobs:
 #      - run: npm ci
 #      - run: npm run build
       # Deploy
-      - run: cd site && rsync -e "ssh -p 20022 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@185.65.246.107:/home/ppp-industry/sites/pavluk-app.ppp-industry.com
+      - run: cd site && rsync -e "ssh -p 22 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@185.65.246.107:/home/ppp-industry/sites/pavluk-app.ppp-industry.com
 
 
 
