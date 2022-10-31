@@ -1,5 +1,31 @@
-name: Deploy
+#name: Deploy
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#
+#jobs:
+#  deploy:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      # Setup key
+#      - run: set -eu
+#      - run: mkdir "$HOME/.ssh"
+#      - run: echo "${{ secrets.key }}" > "$HOME/.ssh/key"
+#      - run: chmod 600 "$HOME/.ssh/key"
+#      # Build
+##      - run: npm ci
+##      - run: npm run build
+#      # Deploy
+#      - run: cd site && rsync -e "ssh -p 20022 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@:185.65.246.107/home/ppp-industry/sites/pavluk-app.ppp-industry.com
+#
+#
+#
 
+
+name: Deploy pavluk-app
 on:
   push:
     branches:
@@ -10,13 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # Setup key
-      - run: set -eu
-      - run: mkdir "$HOME/.ssh"
-      - run: echo "${{ secrets.key }}" > "$HOME/.ssh/key"
-      - run: chmod 600 "$HOME/.ssh/key"
-      # Build
-#      - run: npm ci
-#      - run: npm run build
-      # Deploy
-      - run: cd site && rsync -e "ssh -p 20022 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@:185.65.246.107/home/ppp-industry/sites/pavluk-app.ppp-industry.com
+      - name: upload files
+        uses: burnett01/rsync-deployments@5.2
+      - name: build & start project
+        uses: appleboy/ssh-action@master
+        with:
+          script: cd site && rsync -e "ssh -p 20022 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@:185.65.246.107/home/ppp-industry/sites/pavluk-app.ppp-industry.com
