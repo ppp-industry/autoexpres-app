@@ -6,6 +6,8 @@ if (!defined("ROOT_PATH")) {
 }
 
 class pjApi extends pjFront {
+    
+    private $storageData,$storageId;
 
     public function __construct() {
         self::allowCORS();
@@ -44,6 +46,9 @@ class pjApi extends pjFront {
             header("HTTP/1.1 403 Forbidden");
             exit;
         }
+        
+        
+        $this->initStorage();
     }
 
     protected function generate_string($strength = 16) {
@@ -62,105 +67,81 @@ class pjApi extends pjFront {
     }
     
     protected function checkStore(){
-        $model = pjDbSessionDataModel::factory();
-        $model->where('storage_key', $this->defaultStore)->limit(1);
-
-        $res = $model->findAll()->getData();
-        if(empty($res)){
-            return false;
-        }
-        else{
-            $storage = $res[0];
-            $storage['data'] = unserialize($storage['data']);
-            return count($storage['data']) > 0;            
-        }
+        return count($this->storageData) > 0;
     }
     
-    protected function _get($key) {
-        $model = pjDbSessionDataModel::factory();
-        $model->where('storage_key', $this->defaultStore)->limit(1);
-
-        $res = $model->findAll()->getData();
-        if(empty($res)){
-            return false;
-        }
-        else{
-            $storage = $res[0];
-            $storage['data'] = unserialize($storage['data']);
-            return isset($storage['data'][$key]) ? $storage['data'][$key] : false;            
-        }
+    protected function _get($key) {  
+        return isset($this->storageData[$key]) ? $this->storageData[$key] : false;
+        
     }
     
     protected function _is($key) {
-        
-        $model = pjDbSessionDataModel::factory();
-        $model->where('storage_key', $this->defaultStore)->limit(1);
-
-        $res = $model->findAll()->getData();
-        if(empty($res)){
-            
-            return false;
-        }
-        else{
-            $storage = $res[0];
-            $storage['data'] = unserialize($storage['data']);
-            return isset($storage['data'][$key]);   
-        }   
+        return isset($this->storageData[$key]);
     }
 
     protected function _set($key, $value) {
+        
         $model = pjDbSessionDataModel::factory();
-        $model->where('storage_key', $this->defaultStore)->limit(1);
-
-        $res = $model->findAll()->getData();
         
-        if(empty($res)){
-            
-            $model->setAttributes([
+        $this->storageData[$key] = $value;
+        
+        if(is_null($this->storageId)){   
+            $this->storageId = $model->setAttributes([
                 'storage_key' => $this->defaultStore,
-                'data' => serialize([
-                    $key => $value
-                ])
-            ])->insert();            
-        }   
-        
+                'data' => serialize($this->storageData)
+            ])->insert()->getInsertId();
+        }
         else{
-            $storage = $res[0];
-            $storage['data'] = unserialize($storage['data']);
-            $storage['data'][$key] = $value;
-            $storage['data'] = serialize($storage['data']);
+            $modify = [
+                'data' => serialize($this->storageData)
+            ];
             
-            $model->reset()->setAttributes(['id' => $storage['id']])->modify($storage);
+            $model->reset()->setAttributes(['id' => $this->storageId])->modify($modify);
         }
     }
     protected function _getStore(){
-        $model = pjDbSessionDataModel::factory();
-        $model->where('storage_key', $this->defaultStore)->limit(1);
-        $res = $model->findAll()->getData();
-        
-        if(!empty($res)){
-            return $res[0];
-        } 
-        return null;
+        return $this->storageData;
     }
     
     protected function _remove($key) {
-        $model = pjDbSessionDataModel::factory();
-        $model->where('storage_key', $this->defaultStore)->limit(1);
-        $res = $model->findAll()->getData();
+        
+        if(isset($this->storageData[$key])){
+            $model = pjDbSessionDataModel::factory();
+            unset($this->storageData[$key]);
+            
+            $modify = [
+                'data' => serialize($this->storageData)
+            ];
+            
+            if($this->storageId){
+                $model->reset()->setAttributes(['id' => $this->storageId])->modify($modify);
+            }
+            else{
+                $modify['storage_key'] = $this->defaultStore;
+                $this->storageId = $model->setAttributes($modify)->insert()->getInsertId();
+            }
+        }
+        
+    }
+    
+    protected function destroyStorage(){
+        if($this->storageId){
+            pjDbSessionDataModel::factory()->whereIn('id', $this->storageId)->eraseAll();
+        }
+    }
+
+
+    private function initStorage(){
+        $res = pjDbSessionDataModel::factory()->where('storage_key', $this->defaultStore)->findAll()->getData();
         
         if(!empty($res)){
-             $storage = $res[0];
-            $storage['data'] = unserialize($storage['data']);
-            
-            if(isset($storage['data'][$key])){
-                unset($storage['data'][$key]);
-            }
-            
-            $storage['data'] = serialize($storage['data']);       
-            $model->reset()->setAttributes(['id' => $storage['id']])->modify($storage);
-                    
+            $this->storageData = unserialize($res[0]['data']);
+            $this->storageId = $res[0]['id'];
         } 
+        else{
+            $this->storageData = [];
+            $this->storageId = null;
+        }     
     }
 }
 
