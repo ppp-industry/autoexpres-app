@@ -489,7 +489,11 @@ class pjAppController extends pjController {
         $toLocation = $returnLocation['name'];
         
         $transferLocations = $transferIds ?
-                $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', $cityPreparedQuery, 'left outer')->whereIn('t1.id', array_keys($transferIds))->findAll()->getDataPair('id','name') : null;
+        $pjCityModel->reset()->select('t1.*, t2.content as name')
+                            ->join('pjMultiLang', $cityPreparedQuery, 'left outer')
+                            ->whereIn('t1.id', array_keys($transferIds))
+                            ->findAll()
+                            ->getDataPair('id','name') : null;
         
         $ticketColumns = 0;
         $bookingDate = pjUtil::formatDate($date, $this->option_arr ['o_date_format']);
@@ -506,26 +510,45 @@ class pjAppController extends pjController {
         
         $locationsHundler = function(&$locations) use (&$bookingDate){
 
-            $bookingDateTmp = $bookingDate;
-            $hour = (int) explode(':', $locations[0]['departure_time'])[0];
-            $maxIndex = count($locations) - 1;
-
-            for ($i = 0; $i < $maxIndex; ++$i) {
-
+            $bookingDateTmpArrival = $bookingDateTmp = $bookingDate;
+            $maxIndex = count($locations);
+            
+            $hourDeparture = (int) explode(':', $locations[0]['departure_time'])[0];
+            $hourArrival = 0;
+            
+            $locations[0]['departure_day'] = $bookingDateTmp;
+            $locations[0]['arival_day'] = null;
+            
+             for ($i = 1;$i < $maxIndex; ++$i) {
+                
                 if ($locations[$i]['departure_time']) {
 
-                    $tmpHour = (int) explode(':', $locations[$i]['departure_time'])[0];
+                    $tmpHourDeparture = (int) explode(':', $locations[$i]['departure_time'])[0];
 
-                    if ($tmpHour < $hour) {
+                    if ($tmpHourDeparture < $hourDeparture) {
                         
                         $bookingDateTmp = date($this->option_arr ['o_date_format'], strtotime($bookingDateTmp . '+ 1 day'));
-                        $hour = $tmpHour;
+                        $hourDeparture = $tmpHourDeparture;
                     }
                 }
+                
+                if ($locations[$i]['arrival_time']) {
+
+                    $tmpHourArrival = (int) explode(':', $locations[$i]['arrival_time'])[0];
+
+                    if ($tmpHourArrival < $hourArrival) {
+                        
+                        $bookingDateTmpArrival = date($this->option_arr ['o_date_format'], strtotime($bookingDateTmpArrival . '+ 1 day'));
+                        $hourArrival = $tmpHourArrival;
+                    }
+                }   
+                
                 $locations[$i]['departure_day'] = $bookingDateTmp;
+                $locations[$i]['arival_day'] = $bookingDateTmpArrival;
             }
 
-            $locations[$maxIndex]['departure_day'] = $bookingDateTmp;
+            $locations[$maxIndex - 1]['departure_day'] = null;
+            
             $bookingDate = $bookingDateTmp;
         };
         
@@ -844,6 +867,7 @@ class pjAppController extends pjController {
                     ->getData();
             
             $busStops = [];
+            
             $pjBusStopModel->reset()->where('route_id',$bus['route_id']); 
 
             if($pjBusStopModel->findCount()->getData()){
