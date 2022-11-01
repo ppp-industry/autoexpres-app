@@ -24,12 +24,14 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
                    $(".bus-stop").on('click',function(){
                        
                        var cityId = $(this).data('city');
+                       var routeId = $(this).data('route');
                         $( "#busStopSelect" ).dialog({
                         dialogClass: "no-close",
                         width: 610,
                         open: function (){
                             $.get('index.php?controller=pjAdminRoutes&action=pjActionGetBusStopsByCity',{
                                 city : cityId,
+                                route : routeId,
                             },(data) => {
                                 
 
@@ -51,15 +53,17 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
                                     if($this.is(':checked')){
                                         targetVal.push(val);
                                     }
-                                    else{
-                                        
+                                    else{   
                                         targetVal = targetVal.filter(e => e !== val);
                                     }
                                     
-                                    
                                     targetInput.val(targetVal.join(','));
                                     
-                                    
+                                    $.post('index.php?controller=pjAdminRoutes&action=pjActionSetBusStopsByCity',{
+                                        city : cityId,
+                                        route : routeId,
+                                        bus_stops:targetVal.join(',')
+                                    });  
                                     
                                 })
                                 

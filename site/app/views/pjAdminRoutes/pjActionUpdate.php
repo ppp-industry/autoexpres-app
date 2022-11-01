@@ -99,8 +99,8 @@ if (isset($tpl['status'])) {
 								</span>
 							</p>
 							<div class="location-icons">
-                                                            <input type="hidden" name="bus_stops[<?=$city_id?>]" />
-                                                            <button type="button" data-city="<?=$city_id?>" class="bus-stop" style="">
+                                                            <input type="hidden" name="bus_stops[<?=$city_id?>]" <?php if(isset($tpl['arr']['mapBusStops'][$city_id])):?> value="<?= implode(',', $tpl['arr']['mapBusStops'][$city_id])?>" <?php endif?>  />
+                                                            <button type="button" data-route="<?=$_GET['id']?>" data-city="<?=$city_id?>" class="bus-stop" style="">
                                                                     <img src="/app/web/img/backend/bus_stop.png" style="height: 24px;">
                                                         </button>
 								<a href="javascript:void(0);" class="location-delete-icon"></a>
