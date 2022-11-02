@@ -11,6 +11,7 @@ class pjRouteModel extends pjAppModel {
     protected $table = 'routes';
     protected $schema = array(
         array('name' => 'id', 'type' => 'int', 'default' => ':NULL'),
+        array('name' => 'back_id', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'status', 'type' => 'enum', 'default' => 'T')
     );
     public $i18n = array('title');

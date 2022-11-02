@@ -70,18 +70,15 @@ class pjAdminRoutes extends pjAdmin {
                 }
 
                 pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminRoutes&action=pjActionIndex&err=$err");
-            } else {
-                $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                                ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                                ->where('t2.file IS NOT NULL')
-                                ->orderBy('t1.sort ASC')->findAll()->getData();
-
-                $lp_arr = array();
-                foreach ($locale_arr as $item) {
-                    $lp_arr[$item['id'] . "_"] = $item['file'];
-                }
-                $this->set('lp_arr', $locale_arr);
-                $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+            } 
+            else {
+                $routes = $pjRouteModel->where('t1.id != ' . $_GET['id'])
+                        ->select("t1.*, t2.content as title")
+                        ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->findAll()->getData();
+                
+                $this->set('routes', $routes);
+                
+                $this->setLocales();
 
                 if (isset($_GET['id'])) {
                     $direction = 'ASC';
@@ -101,6 +98,9 @@ class pjAdminRoutes extends pjAdmin {
                         ->getData();
                 $this->set('city_arr', $city_arr);
 
+                $this->appendJs('chosen.jquery.js', PJ_THIRD_PARTY_PATH . 'chosen/');
+                $this->appendCss('chosen.css', PJ_THIRD_PARTY_PATH . 'chosen/');
+                
                 $this->appendJs('jquery.validate.min.js', PJ_THIRD_PARTY_PATH . 'validate/');
                 $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
                 $this->appendJs('jquery.tipsy.js', PJ_THIRD_PARTY_PATH . 'tipsy/');
@@ -248,6 +248,8 @@ class pjAdminRoutes extends pjAdmin {
         if ($this->isAdmin() || $this->isEditor()) {
 
             $pjRouteCityBusStopModel = pjRouteCityBusStopModel::factory();
+            $busStops = $pjRouteCityBusStopModel->where('route_id',$_POST['id'])->findAll()->getData();;
+            
             
             if (isset($_POST['route_update'])) {
                 $pjMultiLangModel = pjMultiLangModel::factory();
@@ -259,14 +261,29 @@ class pjAdminRoutes extends pjAdmin {
                 }
 
                 $pjRouteModel->reset()->where('id', $_POST['id'])->limit(1)->modifyAll($_POST);
+                
+                if(isset($_POST['back_id'])){
+                    
+                    
+                    $cities = array_unique(array_column($busStops, 'city_id'));
+                    $backBusStops = $pjRouteCityBusStopModel->reset()->whereIn('city_id',$cities)->where('route_id',$_POST['back_id'])->findAll()->getData();
+                    
+                    if(empty($backBusStops)){
+                        foreach($busStops as $busStop){
+                            $pjRouteCityBusStopModel->reset()->setAttributes([
+                                'city_id' => $busStop['city_id'],
+                                'route_id' => $_POST['back_id'],
+                                'bus_stop_id' => $busStop['bus_stop_id']
+                            ])->insert();
+                        }
+                    }
+                }
+                
                 if (isset($_POST['i18n'])) {
                     $pjMultiLangModel->updateMultiLang($_POST['i18n'], $_POST['id'], 'pjRoute', 'data');
                 }
 
                 if (!isset($_POST['has_bookings'])) {
-                    
-                    
-                    
                     
                     $pjRouteCityModel = pjRouteCityModel::factory();
                     $pjRouteCityModel->where('route_id', $_POST['id'])->eraseAll();
@@ -300,7 +317,15 @@ class pjAdminRoutes extends pjAdmin {
                 }
 
                 pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminRoutes&action=pjActionUpdate&id=" . $_POST['id'] . "&err=AR01");
-            } else {
+            } 
+            else {
+                $pjRouteModel = pjRouteModel::factory();
+                $routes = $pjRouteModel->where('t1.id != ' . $_GET['id'])
+                        ->select("t1.*, t2.content as title")
+                        ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->findAll()->getData();
+                
+                $this->set('routes', $routes);
+                
                 $pjMultiLangModel = pjMultiLangModel::factory();
 
                 $arr = pjRouteModel::factory()->find($_GET['id'])->getData();
@@ -311,7 +336,7 @@ class pjAdminRoutes extends pjAdmin {
                 $arr['i18n'] = $pjMultiLangModel->getMultiLang($arr['id'], 'pjRoute');
                 $arr['city'] = pjRouteCityModel::factory()->getCity($arr['id'], 'ASC');
                 
-                $busStops = $pjRouteCityBusStopModel->where('route_id',$arr['id'])->findAll()->getData();;
+                
                 
                 $mapBusStops = [];
                 foreach($busStops as $busStop){
@@ -319,17 +344,12 @@ class pjAdminRoutes extends pjAdmin {
                         $mapBusStops[$busStop['city_id']] = [];
                     }
                     
-                    $mapBusStops[$busStop['city_id']][] = $busStop['bus_stop_id'];
-                    
+                    $mapBusStops[$busStop['city_id']][] = $busStop['bus_stop_id'];    
                 }
-//                vd($mapBusStops);
-                $arr['mapBusStops'] = $mapBusStops;
-
                 
+                $arr['mapBusStops'] = $mapBusStops;
                 
                 $this->setLocales();
-                
-                
                 
                 $this->set('arr', $arr);
 
@@ -348,6 +368,9 @@ class pjAdminRoutes extends pjAdmin {
                         ->getData();
                 $this->set('cnt_bookings', $cnt_bookings);
 
+                $this->appendJs('chosen.jquery.js', PJ_THIRD_PARTY_PATH . 'chosen/');
+                $this->appendCss('chosen.css', PJ_THIRD_PARTY_PATH . 'chosen/');
+                
                 $this->appendJs('jquery.validate.min.js', PJ_THIRD_PARTY_PATH . 'validate/');
                 $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
                 $this->appendJs('jquery.tipsy.js', PJ_THIRD_PARTY_PATH . 'tipsy/');
@@ -392,6 +415,11 @@ class pjAdminRoutes extends pjAdmin {
             
             $pjRouteCityBusStopModel->reset()->where('city_id',$_POST['city'])->where('route_id',$_POST['route'])->eraseAll();            
               
+            $back = null;
+            $pjRouteModel = pjRouteModel::factory();
+            $arr = $pjRouteModel->find($_POST['route'])->getData();
+            
+            
             foreach(explode(',', $_POST['bus_stops']) as $busId){
                 
                 $pjRouteCityBusStopModel->reset()->setAttributes([
@@ -400,6 +428,16 @@ class pjAdminRoutes extends pjAdmin {
                     'bus_stop_id' => $busId
                 ])->insert();
                 
+                
+                if(isset($arr['back_id'])){
+                    
+                    $pjRouteCityBusStopModel->reset()->setAttributes([
+                        'city_id' => $_POST['city'],
+                        'route_id' => $arr['back_id'],
+                        'bus_stop_id' => $busId
+                    ])->insert();
+                    
+                }
             }
         }
     }

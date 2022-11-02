@@ -46,6 +46,27 @@ if (isset($tpl['status']))
 			if(isset($tpl['city_arr']) && count($tpl['city_arr']) > 0)
 			{
 				?>
+                                
+                                      
+                        <p>
+                            <label class="title">Зворотній маршрут:</label>
+                           
+                            
+                            <span class="inline_block">
+                                <select name="back_id" class="pj-form-field w300 required bs-city">
+                                        <option value="">-- <?php __('lblChoose'); ?>--</option>
+                                        <?php
+                                        foreach($tpl['routes'] as $v)
+                                        {
+                                                ?>
+                                        <option value="<?php echo $v['id'];?>"><?php echo pjSanitize::clean($v['title']);?></option><?php
+                                        } 
+                                        ?>
+                                </select>
+                            </span>
+                        </p>   
+                                
+                                
 				<div id="bs_location_list" class="bs-location-list">
 					<?php
 					if(!isset($_GET['id']))

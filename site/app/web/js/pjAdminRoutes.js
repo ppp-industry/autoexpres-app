@@ -5,6 +5,7 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 		var $frmCreateRoute = $("#frmCreateRoute"),
 			$frmUpdateRoute = $("#frmUpdateRoute"),
 			$dialogPrompt = $("#dialogPrompt"),
+			$backId = $('select[name="back_id"]'),
 			datagrid = ($.fn.datagrid !== undefined);
 		
 		function setLocations()
@@ -155,6 +156,10 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 			});
 		}
 		
+                if($backId.length > 0){
+                    $('select[name="back_id"]').chosen();
+                }
+                    
 		$("#bs_location_list").sortable({
 			handle : '.location-move-icon',
 			stop: function(e){
