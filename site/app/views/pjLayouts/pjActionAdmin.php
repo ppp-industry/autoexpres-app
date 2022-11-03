@@ -21,7 +21,7 @@
 		<div id="container">
     		<div id="header">
     			<div id="logo">
-					<a href="#" target="_blank">Bus Reservation System(test)</a>
+					<a href="#" target="_blank">Bus Reservation System</a>
 					<span>v<?php echo PJ_SCRIPT_VERSION;?></span>
 				</div>
 			</div>
