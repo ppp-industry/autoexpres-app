@@ -137,7 +137,7 @@ class Router {
         } 
         else {
             header("HTTP/1.1 301 Moved Permanently");
-            pjUtil::redirect(PJ_INSTALL_URL . basename($_SERVER['PHP_SELF']) . "?controller=pjAdmin&action=pjActionIndex");
+            pjUtil::redirect( basename($_SERVER['PHP_SELF']) . "?controller=pjAdmin&action=pjActionIndex");
         }
     }
 

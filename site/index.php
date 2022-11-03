@@ -25,9 +25,9 @@ if (isset($_SESSION["error_reporting"]) && $_SESSION["error_reporting"] == '1') 
     error_reporting(0);
 }
 
-if(isset($_GET['action']) == 'pjActionConfirmLiqPay' || preg_match('/api\/payment\/confirmLiqPay/', $_SERVER['REQUEST_URI'])){
-    file_put_contents('post.data', var_export($_POST, true));
-}
+//if(isset($_GET['action']) == 'pjActionConfirmLiqPay' || preg_match('/api\/payment\/confirmLiqPay/', $_SERVER['REQUEST_URI'])){
+//    file_put_contents('post.data', var_export($_POST, true));
+//}
 
 header("Content-type: text/html; charset=utf-8");
 if (!defined("ROOT_PATH")) {

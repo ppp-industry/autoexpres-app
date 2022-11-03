@@ -7,7 +7,7 @@ if (!defined("PJ_PREFIX")) define("PJ_PREFIX", env('MARIADB_PREFIX',''));
 
 if (!defined("PJ_INSTALL_FOLDER")) define("PJ_INSTALL_FOLDER", "");
 if (!defined("PJ_INSTALL_PATH")) define("PJ_INSTALL_PATH", "/home/lfgbyisb/ticket.autoexpres.kiev.ua/");
-if (!defined("PJ_INSTALL_URL")) define("PJ_INSTALL_URL", "http://localhost/");
+if (!defined("PJ_INSTALL_URL")) define("PJ_INSTALL_URL",(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . '/');
 if (!defined("PJ_SALT")) define("PJ_SALT", "B47A515O");
 if (!defined("PJ_INSTALLATION")) define("PJ_INSTALLATION", "1.1111111111111E+28");
 ?>
