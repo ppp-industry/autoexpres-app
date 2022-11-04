@@ -240,8 +240,8 @@ class pjAdminRoutes extends pjAdmin {
     }
 
     public function pjActionUpdate() {
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $this->checkLogin();
 
@@ -389,8 +389,8 @@ class pjAdminRoutes extends pjAdmin {
         $route = $_GET['route'];
         $this->setAjax(true);
         
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $pjBusStopModel = pjBusStopModel::factory();
         $pjBusStopModel->where('location_id',$city);

@@ -260,8 +260,8 @@ class pjImage extends pjUpload {
      */
     public function loadImage($path = NULL) {
         
-                ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//                ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         
         if (!is_null($path)) {

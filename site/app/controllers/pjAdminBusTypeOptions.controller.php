@@ -131,8 +131,8 @@ class pjAdminBusTypeOptions extends pjAdmin {
     }
 
     public function pjActionSaveBusTypeOption() {
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $this->setAjax(true);
 
@@ -148,8 +148,8 @@ class pjAdminBusTypeOptions extends pjAdmin {
 
     
     public function pjActionUpdateBusTypeOption(){
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
          $this->checkLogin();
 
@@ -235,8 +235,8 @@ class pjAdminBusTypeOptions extends pjAdmin {
     }
     
     public function pjActionDeleteBusTypeOption(){
-         ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//         ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $this->setAjax(true);
 
@@ -264,8 +264,8 @@ class pjAdminBusTypeOptions extends pjAdmin {
     
     
     public function pjActionDeleteBusTypeOptionFile(){
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $pjBusTypeOptionItemModel = pjBusTypeOptionItemModel::factory();
         $arr = $pjBusTypeOptionItemModel->find($_GET['id'])->getData();

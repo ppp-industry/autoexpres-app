@@ -13,8 +13,8 @@ class pjApiPayment extends pjApi {
     
     public function pjActionCheckPayment(){
         
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         $host = $_SERVER['HTTP_HOST'];
         
         $id = $_GET['id'];
@@ -47,10 +47,8 @@ class pjApiPayment extends pjApi {
     
     
       public function pjActionGetPaymentForm() {
-          
-          
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $host = $_SERVER['HTTP_HOST'];
         $key = $_GET['key'];
