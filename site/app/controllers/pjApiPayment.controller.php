@@ -9,10 +9,6 @@ class pjApiPayment extends pjApi {
 
     public function afterFilter() {}
     
-    public function pjActionThankYou(){
-         echo $_GET['status'];
-        exit();    
-    }
     
     
     public function pjActionCheckPayment(){
@@ -33,26 +29,19 @@ class pjApiPayment extends pjApi {
         else{
             if($res[0]['status'] == 'paid'){
                 
-                
                 $status = 200;
-                
                 $arr = $pjBookingModel->reset()->select('t1.*, t2.departure_time, t2.arrival_time, t3.content as route_title, t4.content as from_location, t5.content as to_location')->join('pjBus', "t2.id=t1.bus_id", 'left outer')->join('pjMultiLang', "t3.model='pjRoute' AND t3.foreign_id=t2.route_id AND t3.field='title' AND t3.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjMultiLang', "t4.model='pjCity' AND t4.foreign_id=t1.pickup_id AND t4.field='name' AND t4.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjMultiLang', "t5.model='pjCity' AND t5.foreign_id=t1.return_id AND t5.field='name' AND t5.locale='" . $this->getLocaleId() . "'", 'left outer')->find($id)->getData();
-
                 $tickets = pjBookingTicketModel::factory()->join('pjMultiLang', "t2.model='pjTicket' AND t2.foreign_id=t1.ticket_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjTicket', "t3.id=t1.ticket_id", 'left')->select('t1.*, t2.content as title')->where('booking_id', $arr ['id'])->findAll()->getData();
-
                 $arr ['tickets'] = $tickets;
                 
-                
                 pjFrontEnd::pjActionConfirmSend($this->option_arr, $arr, PJ_SALT, 'confirm');
-                
-                
             }
             else{
                 $status = 100;
             }
         }
         
-        $returnUrl = 'http://' . $host. '/api/payment/thankYou?status=' . $status;
+        $returnUrl = $this->_get('back_url') . '?status=' . $status;
         pjUtil::redirect($returnUrl);
     }
     
@@ -65,6 +54,9 @@ class pjApiPayment extends pjApi {
         
         $host = $_SERVER['HTTP_HOST'];
         $key = $_GET['key'];
+        
+        
+        $this->_set('back_url', $_GET['return_host'] . $_GET['return_query']);
         
         $notifyUrl = $host . '/api/payment/confirmLiqPay?key=' . $key;
 
