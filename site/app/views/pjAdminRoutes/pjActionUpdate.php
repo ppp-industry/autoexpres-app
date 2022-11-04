@@ -77,7 +77,7 @@ if (isset($tpl['status'])) {
                            
                             
                             <span class="inline_block">
-                                <select name="back_id" class="pj-form-field w300 required bs-city">
+                                <select name="back_id" class="pj-form-field w300">
                                         <option value="">-- <?php __('lblChoose'); ?>--</option>
                                         <?php
                                         foreach($tpl['routes'] as $v)
