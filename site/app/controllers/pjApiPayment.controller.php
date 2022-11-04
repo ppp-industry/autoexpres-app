@@ -56,7 +56,7 @@ class pjApiPayment extends pjApi {
         $key = $_GET['key'];
         
         
-        $this->_set('back_url', $_GET['return_host'] . $_GET['return_query']);
+        $this->_set('back_url', $_GET['return_url']);
         
         $notifyUrl = $host . '/api/payment/confirmLiqPay?key=' . $key;
 
