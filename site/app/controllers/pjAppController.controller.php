@@ -194,7 +194,7 @@ class pjAppController extends pjController {
         return $result;
     }
 
-    public function getData($option_arr, $booking_arr, $salt, $locale_id) {
+    public static function getData($option_arr, $booking_arr, $salt, $locale_id) {
         $country = NULL;
         if (isset($booking_arr['c_country']) && !empty($booking_arr['c_country'])) {
             $country_arr = pjCountryModel::factory()
@@ -344,7 +344,7 @@ class pjAppController extends pjController {
         return compact('search', 'replace');
     }
 
-    public function getAdminEmail() {
+    public static function getAdminEmail() {
         $arr = pjUserModel::factory()->find(1)->getData();
         return $arr['email'];
     }
@@ -354,7 +354,7 @@ class pjAppController extends pjController {
         return !empty($arr['phone']) ? $arr['phone'] : null;
     }
 
-    public function getAllEmails() {
+    public static function getAllEmails() {
         $user_arr = pjUserModel::factory()->where('t1.status', 'T')->findAll()->getData();
         $arr = array();
         foreach ($user_arr as $v) {
@@ -365,7 +365,7 @@ class pjAppController extends pjController {
         return $arr;
     }
 
-    public function getAllPhones() {
+    public static function getAllPhones() {
         $user_arr = pjUserModel::factory()->where('t1.status', 'T')->findAll()->getData();
         $arr = array();
         foreach ($user_arr as $v) {

@@ -52,7 +52,7 @@ class pjCron extends pjAppController {
                         ->limit(0, 1)
                         ->findAll()->getData();
 
-        $admin_email = $this->getAdminEmail();
+        $admin_email = self::getAdminEmail();
         foreach ($arr as $k => $v) {
             $v['tickets'] = $pjBookingTicketModel
                     ->reset()
@@ -63,7 +63,7 @@ class pjCron extends pjAppController {
                     ->findAll()
                     ->getData();
 
-            $tokens = pjAppController::getData($option_arr, $v, PJ_SALT, $this->getLocaleId());
+            $tokens = self::getData($option_arr, $v, PJ_SALT, $this->getLocaleId());
             $message = str_replace($tokens['search'], $tokens['replace'], $lang_message[0]['content']);
 
             if ($option_arr['o_email_notify'] == 1) {

@@ -4,8 +4,13 @@ if (!defined("ROOT_PATH")) {
     header("HTTP/1.1 403 Forbidden");
     exit;
 }
-
 class pjAdminBusTypeOptions extends pjAdmin {
+    
+    
+    public function __construct($requireLogin = false) {
+        parent::__construct($requireLogin);
+    }
+    
 
     public function pjActionCreate() {
         $this->checkLogin();

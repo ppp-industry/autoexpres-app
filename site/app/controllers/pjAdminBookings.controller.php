@@ -1379,7 +1379,7 @@ class pjAdminBookings extends pjAdmin {
                             ->setSmtpPass($this->option_arr['o_smtp_pass'])
                     ;
                 }
-                $from_email = $this->getAdminEmail();
+                $from_email = self::getAdminEmail();
                 if (!empty($this->option_arr['o_sender_email'])) {
                     $from_email = $this->option_arr['o_sender_email'];
                 }
@@ -1416,7 +1416,7 @@ class pjAdminBookings extends pjAdmin {
                         ->findAll()
                         ->getData();
 
-                $arr['data'] = pjAppController::getData($this->option_arr, $arr, PJ_SALT, $this->getLocaleId());
+                $arr['data'] = self::getData($this->option_arr, $arr, PJ_SALT, $this->getLocaleId());
 
                 $lang_message = pjMultiLangModel::factory()
                                 ->select('t1.*')

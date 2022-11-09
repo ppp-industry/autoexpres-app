@@ -982,7 +982,7 @@ class pjFrontEnd extends pjFront {
         }
     }
 
-    public function pjActionConfirmSend($option_arr, $booking_arr, $salt, $opt) {
+    public static function pjActionConfirmSend($option_arr, $booking_arr, $salt, $opt) {
         $Email = new pjEmail();
         if ($option_arr['o_send_email'] == 'smtp') {
             $Email
@@ -994,17 +994,20 @@ class pjFrontEnd extends pjFront {
             ;
         }
         $Email->setContentType('text/html');
+        
+        $localeId = isset($_SESSION['BusReservation_LocaleId']) && (int) $_SESSION['BusReservation_LocaleId'] > 0 ? (int) $_SESSION['BusReservation_LocaleId'] : false;
 
-        $tokens = pjAppController::getData($option_arr, $booking_arr, PJ_SALT, $this->getLocaleId());
+        $tokens = self::getData($option_arr, $booking_arr, PJ_SALT, $localeId);
 
         $pjMultiLangModel = pjMultiLangModel::factory();
 
-        $locale_id = isset($booking_arr['locale_id']) && (int) $booking_arr['locale_id'] > 0 ? (int) $booking_arr['locale_id'] : $this->getLocaleId();
+        $locale_id = isset($booking_arr['locale_id']) && (int) $booking_arr['locale_id'] > 0 ? (int) $booking_arr['locale_id'] : $localeId;
 
-        $admin_email = $this->getAdminEmail();
+        $admin_email = self::getAdminEmail();
 
-        $admin_emails = $this->getAllEmails();
-        $admin_phones = $this->getAllPhones();
+        $admin_emails = self::getAllEmails();
+        $admin_phones = self::getAllPhones();
+        $controller = new pjController();
 
         $from_email = $admin_email;
         if (!empty($option_arr['o_sender_email'])) {
@@ -1080,7 +1083,9 @@ class pjFrontEnd extends pjFront {
                 );
                 foreach ($admin_phones as $phone) {
                     $params['number'] = $phone;
-                    $this->requestAction(array('controller' => 'pjSms', 'action' => 'pjActionSend', 'params' => $params), array('return'));
+                    
+                    $controller->requestAction(array('controller' => 'pjSms', 'action' => 'pjActionSend', 'params' => $params), array('return'));
+                    
                 }
             }
         }
@@ -1151,7 +1156,9 @@ class pjFrontEnd extends pjFront {
                 );
                 foreach ($admin_phones as $phone) {
                     $params['number'] = $phone;
-                    $this->requestAction(array('controller' => 'pjSms', 'action' => 'pjActionSend', 'params' => $params), array('return'));
+                    
+                    $controller->requestAction(array('controller' => 'pjSms', 'action' => 'pjActionSend', 'params' => $params), array('return'));
+                    
                 }
             }
         }

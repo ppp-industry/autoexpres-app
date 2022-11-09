@@ -13,14 +13,17 @@ class pjApiPayment extends pjApi {
     
     public function pjActionCheckPayment(){
         
-//        ini_set("display_errors", "On");
-//        error_reporting(E_ALL ^ E_DEPRECATED);
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
         $host = $_SERVER['HTTP_HOST'];
         
         $id = $_GET['id'];
-        $pjBookingModel = pjBookingPaymentModel::factory();
-        $res = $pjBookingModel->where('booking_id',$id)->findAll()->getData();
         
+        $pjBookingModelPayment = pjBookingPaymentModel::factory();
+        
+//        vd($pjBookingModelPayment);
+        $pjBookingModel = pjBookingModel::factory();
+        $res = $pjBookingModelPayment->where('booking_id',$id)->findAll()->getData();
         $status = null;
         
         if(empty($res)){
@@ -47,24 +50,37 @@ class pjApiPayment extends pjApi {
     
     
       public function pjActionGetPaymentForm() {
-//        ini_set("display_errors", "On");
-//        error_reporting(E_ALL ^ E_DEPRECATED);
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $host = $_SERVER['HTTP_HOST'];
         $key = $_GET['key'];
         
+        $arr = pjBookingModel::factory()
+                        ->select('t1.*')
+                        ->find($_GET['booking_id'])->getData();
         
-        $this->_set('back_url', $_GET['return_url']);
+               
+        
+      if(isset($_GET['return_url'])){
+        $this->_set('back_url', $_GET['return_url']);  
+      }
+        
         
         $notifyUrl = $host . '/api/payment/confirmLiqPay?key=' . $key;
 
         $response = '';
-        $arr = pjBookingModel::factory()
-                        ->select('t1.*')
-                        ->find($_GET['booking_id'])->getData();
+        
 
         
         $returnUrl = 'http://' . $host. '/api/payment/checkPayment?key=' . $key . '&id=' . $arr['id'];
+        
+        if($arr['payment_method'] == 'cash'){
+            
+            $this->setPaidStatus($_GET['booking_id']);
+            pjUtil::redirect($returnUrl);
+        } 
+        
 
         if (!empty($arr['back_id'])) {
             $back_arr = pjBookingModel::factory()
@@ -208,10 +224,7 @@ class pjApiPayment extends pjApi {
                 'headers' => "MIME-Version: 1.0\r\n" . "Content-type: text/html; charset=utf-8\r\n" . "From: <admin@mail.com>\r\n",
             );
 
-            pjBookingPaymentModel::factory()
-                    ->where('booking_id', $response['order_id'])
-                    ->where('payment_type', 'online')
-                    ->modifyAll(array('status' => 'paid'));
+            $this->setPaidStatus($response['order_id']);
 
             pjFrontEnd::pjActionConfirmSend($this->option_arr, $booking_arr, PJ_SALT, 'payment');
         } elseif (!$response) {
@@ -220,6 +233,12 @@ class pjApiPayment extends pjApi {
             $this->log('Booking not confirmed');
         }
         pjUtil::redirect($this->option_arr['o_thank_you_page']);
+    }
+    
+    private function setPaidStatus($bookingId){
+        pjBookingPaymentModel::factory()
+                    ->where('booking_id',$bookingId )
+                    ->modifyAll(array('status' => 'paid'));
     }
 
 }

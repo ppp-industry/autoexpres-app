@@ -1026,16 +1026,16 @@ class pjFrontEnd extends pjFront
 		}
 		$Email->setContentType('text/html');
 
-		$tokens = pjAppController::getData($option_arr, $booking_arr, PJ_SALT, $this->getLocaleId());
+		$tokens = self::getData($option_arr, $booking_arr, PJ_SALT, $this->getLocaleId());
 							
 		$pjMultiLangModel = pjMultiLangModel::factory();
 		
 		$locale_id = isset($booking_arr['locale_id']) && (int) $booking_arr['locale_id'] > 0 ? (int) $booking_arr['locale_id'] : $this->getLocaleId();
 	
-		$admin_email = $this->getAdminEmail();
+		$admin_email = self::getAdminEmail();
 		
-		$admin_emails = $this->getAllEmails();
-		$admin_phones = $this->getAllPhones();
+		$admin_emails = self::getAllEmails();
+		$admin_phones = self::getAllPhones();
 		
 		$from_email = $admin_email;
 		if(!empty($option_arr['o_sender_email']))
