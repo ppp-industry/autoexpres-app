@@ -8,6 +8,9 @@ if (!defined("ROOT_PATH")) {
 class pjAdminRoutes extends pjAdmin {
 
     public function pjActionCreate() {
+        ini_set("display_errors", "On");
+       error_reporting(E_ALL ^ E_DEPRECATED);
+
         $this->checkLogin();
 
         if ($this->isAdmin() || $this->isEditor()) {
@@ -72,9 +75,21 @@ class pjAdminRoutes extends pjAdmin {
                 pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminRoutes&action=pjActionIndex&err=$err");
             } 
             else {
-                $routes = $pjRouteModel->where('t1.id != ' . $_GET['id'])
+                $routes = [];
+                if(isset($_GET['id'])){
+                    
+                    $routes = pjRouteModel::factory()->where('t1.id != ' . $_GET['id'])
                         ->select("t1.*, t2.content as title")
                         ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->findAll()->getData();
+                
+                }
+                else{
+                    
+                    $routes = pjRouteModel::factory()
+                        ->select("t1.*, t2.content as title")
+                        ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->findAll()->getData();
+                
+                }
                 
                 $this->set('routes', $routes);
                 
