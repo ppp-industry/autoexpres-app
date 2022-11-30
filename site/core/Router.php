@@ -78,8 +78,10 @@ class Router {
                     'en' => 1
                 ];
                 
+//                echo __LINE__;exit();
+                
                 if(isset($langToId[$lang])){
-                    $_SESSION['admin_locale_id'] = $langToId[$lang];
+                    $_SESSION['BusReservation_LocaleId'] = $_SESSION['admin_locale_id'] = $langToId[$lang];
                 }
             }
             
