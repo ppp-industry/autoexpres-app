@@ -20,7 +20,7 @@ class pjApiCities extends pjApi {
     
     
     public function pjActionIndex(){
-        
+         
         $pjCityModel = pjCityModel::factory();
         $pjRouteDetailModel = pjRouteDetailModel::factory();
         
