@@ -985,6 +985,10 @@ class pjApiBooking extends pjApi {
         $transport = Swift_SmtpTransport::newInstance($host, $port,$security);
         $transport->setUsername($user);
         $transport->setPassword($pass);
+        $transport->setStreamOptions([
+            'ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]
+        ]);
+        
         $mailer = Swift_Mailer::newInstance($transport);
 //                echo __LINE__;exit();
         
