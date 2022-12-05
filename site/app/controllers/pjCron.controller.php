@@ -80,6 +80,144 @@ class pjCron extends pjAppController {
         __('lblCronJobCompleted');
         exit;
     }
+    
+    
+    public function  pjActionMail(){
+        require_once ROOT_PATH . 'core/libs/swift_mailer/lib/swift_required.php';
+        
+        $port = $this->option_arr['o_smtp_port'];
+        $host = $this->option_arr['o_smtp_host']; 
+        $user = $this->option_arr['o_smtp_user'];
+        $pass = $this->option_arr['o_smtp_pass'];
+        $security = $port == 587 ? 'tls' : null;
+        
+        $transport = Swift_SmtpTransport::newInstance($host, $port,$security);
+        $transport->setUsername($user);
+        $transport->setPassword($pass);
+        $transport->setStreamOptions([
+            'ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]
+        ]);
+        
+        $mailer = Swift_Mailer::newInstance($transport);
+        
+        $pjMultiLangModel = pjMultiLangModel::factory();
+        $pjBookingMailModel =  pjBookingMail::factory();
+        $pjBookingMailModel->where('status',pjBookingMail::STATUS_NEW);
+        $mails = $pjBookingMailModel->limit(20)->findAll()->getData();
+        $locale_id = $this->getLocaleId();
+
+        
+        $lang_message_payment = $pjMultiLangModel->reset()->select('t1.*')
+                            ->where('t1.model', 'pjOption')
+                            ->where('t1.locale', $locale_id)
+                            ->where('t1.field', 'o_email_payment_message')
+                            ->limit(0, 1)
+                            ->findAll()->getData();
+        $lang_subject_payment = $pjMultiLangModel->reset()->select('t1.*')
+                            ->where('t1.model', 'pjOption')
+                            ->where('t1.locale', $locale_id)
+                            ->where('t1.field', 'o_email_payment_subject')
+                            ->limit(0, 1)
+                            ->findAll()->getData();
+        
+        
+        $lang_message_confirm = $pjMultiLangModel->reset()->select('t1.*')
+                            ->where('t1.model', 'pjOption')
+                            ->where('t1.locale', $locale_id)
+                            ->where('t1.field', 'o_email_confirmation_message')
+                            ->limit(0, 1)
+                            ->findAll()->getData();
+        $lang_subject_confirm = $pjMultiLangModel->reset()->select('t1.*')
+                        ->where('t1.model', 'pjOption')
+                        ->where('t1.locale', $locale_id)
+                        ->where('t1.field', 'o_email_confirmation_subject')
+                        ->limit(0, 1)
+                        ->findAll()->getData();
+        
+        $lang_message_cancel = $pjMultiLangModel->reset()->select('t1.*')
+                            ->where('t1.model', 'pjOption')
+                            ->where('t1.locale', $locale_id)
+                            ->where('t1.field', 'o_email_cancel_message')
+                            ->limit(0, 1)
+                            ->findAll()->getData();
+        $lang_subject_cancel = $pjMultiLangModel->reset()->select('t1.*')
+                        ->where('t1.model', 'pjOption')
+                        ->where('t1.locale', $locale_id)
+                        ->where('t1.field', 'o_email_cancel_subject')
+                        ->limit(0, 1)
+                        ->findAll()->getData();
+        
+        foreach($mails as $mail){
+            $arr = pjBookingModel::factory()->reset()->select('t1.*, t2.departure_time, t2.arrival_time, t3.content as route_title, t4.content as from_location, t5.content as to_location')->join('pjBus', "t2.id=t1.bus_id", 'left outer')->join('pjMultiLang', "t3.model='pjRoute' AND t3.foreign_id=t2.route_id AND t3.field='title' AND t3.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjMultiLang', "t4.model='pjCity' AND t4.foreign_id=t1.pickup_id AND t4.field='name' AND t4.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjMultiLang', "t5.model='pjCity' AND t5.foreign_id=t1.return_id AND t5.field='name' AND t5.locale='" . $this->getLocaleId() . "'", 'left outer')->find($mail['booking_id'])->getData();
+            $arr['tickets'] = pjBookingTicketModel::factory()
+					->join('pjMultiLang', "t2.model='pjTicket' AND t2.foreign_id=t1.ticket_id AND t2.field='title' AND t2.locale='".$this->getLocaleId()."'", 'left outer')
+					->join('pjTicket', "t3.id=t1.ticket_id", 'left')
+					->select('t1.*, t2.content as title')
+					->where('booking_id', $mail['booking_id'])
+					->findAll()
+					->getData();
+            
+            
+            $tokens = self::getData($this->option_arr, $arr, PJ_SALT, $locale_id);
+            $res = null;
+            
+            switch($mail['type']){
+                case pjBookingMail::TYPE_CONFIRM:
+                    $res = $this->hundleConfirmMail($mailer, $arr,$tokens,$lang_message_confirm,$lang_subject_confirm);
+                    break;
+                case pjBookingMail::TYPE_CANCEL:
+                    $res = $this->hundleCanselMail($mailer, $arr,$tokens,$lang_message_cancel,$lang_subject_cancel);
+                    break;
+                case pjBookingMail::TYPE_PAYMENT:
+                    $res = $this->hundlePaymentMail($mailer, $arr,$tokens,$lang_message_payment,$lang_subject_payment);
+                    break;
+            }
+            
+            if($res){
+                $pjBookingMailModel
+                        ->reset()
+                        ->where('id', $mail['id'])
+                        ->limit(1)
+                        ->modifyAll(['status' => pjBookingMail::STATUS_CLOSE]);
+            }
+            
+        }
+
+        
+        exit();
+       
+    }
+    
+    private function hundleConfirmMail($mailer,$booking_arr,$tokens,$lang_message,$lang_subject){
+                                
+        $messageText = str_replace($tokens['search'], $tokens['replace'], $lang_message[0]['content']);
+        $message = Swift_Message::newInstance()
+                                    ->setFrom($this->option_arr['o_smtp_user'])
+                                    ->setCharset('UTF-8')
+                                    ->setSubject($lang_subject[0]['content'])
+                                    ->setBody($messageText)
+                                    ->setTo($booking_arr['c_email']);
+            
+        return $mailer->send($message, $failures);
+                                
+                                
+    }
+    
+    private function hundleCanselMail($mailer,$booking_arr,$tokens,$lang_message,$lang_subject){
+        
+    }
+    
+    private function hundlePaymentMail($mailer,$booking_arr,$tokens,$lang_message,$lang_subject){
+        $messageText = str_replace($tokens['search'], $tokens['replace'], $lang_message[0]['content']);
+        $message = Swift_Message::newInstance()
+                                    ->setFrom($this->option_arr['o_smtp_user'])
+                                    ->setCharset('UTF-8')
+                                    ->setSubject($lang_subject[0]['content'])
+                                    ->setBody($messageText)
+                                    ->setTo($booking_arr['c_email']);
+            
+        return $mailer->send($message, $failures);
+    }
 
 }
 

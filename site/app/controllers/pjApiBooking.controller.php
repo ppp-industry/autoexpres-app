@@ -23,12 +23,6 @@ class pjApiBooking extends pjApi {
         ini_set("display_errors", "On");
         error_reporting(E_ALL ^ E_DEPRECATED);
         
-        
-         
-        
-        
-
-        
         if (!isset($_POST['step_checkout'])) {
             exit();
         }
@@ -261,7 +255,7 @@ class pjApiBooking extends pjApi {
                 $data ['booking_route'] .= ', ' . $bus_arr_end ['route'] . ', ' . $depart_arrive_end. ' з ' . $trans_location . ' до' .$to_location ;;
 
                 $id = $pjBookingModel->setAttributes(array_merge($FORM, $data))->insert()->getInsertId();
-                
+                pjBookingMail::makeModel($id, pjBookingMail::TYPE_CONFIRM);
                 makePayment($FORM,$id,$payment);
                 
                 
@@ -418,12 +412,8 @@ class pjApiBooking extends pjApi {
                 $data ['booking_route'] .= __('front_from', true, false) . ' ' . $from_location . ' ' . __('front_to', true, false) . ' ' . $to_location;
 
                 $id = $pjBookingModel->setAttributes(array_merge($FORM, $data))->insert()->getInsertId();
-            
+                pjBookingMail::makeModel($id, pjBookingMail::TYPE_CONFIRM);
                 makePayment($FORM,$id,$payment);
-                
-//                pjFrontEnd::pjActionConfirmSend($this->option_arr, $arr, PJ_SALT, 'confirm');
-                
-                
                 
                 if ($id !== false && (int) $id > 0) {
                     
@@ -505,21 +495,7 @@ class pjApiBooking extends pjApi {
                     
                     hundleTicketArr($ticket_arr, $pjBookingTicketModel, $booked_data,$id);
                     locationArrHundler($location_pair,$location_arr);
-                    locationPairHundler($booked_data,$location_pair,$ticket_arr,$id);
-
-                   
-                    $arr = pjBookingModel::factory()->reset()->select('t1.*, t2.departure_time, t2.arrival_time, t3.content as route_title, t4.content as from_location, t5.content as to_location')->join('pjBus', "t2.id=t1.bus_id", 'left outer')->join('pjMultiLang', "t3.model='pjRoute' AND t3.foreign_id=t2.route_id AND t3.field='title' AND t3.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjMultiLang', "t4.model='pjCity' AND t4.foreign_id=t1.pickup_id AND t4.field='name' AND t4.locale='" . $this->getLocaleId() . "'", 'left outer')->join('pjMultiLang', "t5.model='pjCity' AND t5.foreign_id=t1.return_id AND t5.field='name' AND t5.locale='" . $this->getLocaleId() . "'", 'left outer')->find($id)->getData();
-                    $arr['tickets'] = pjBookingTicketModel::factory()
-					->join('pjMultiLang', "t2.model='pjTicket' AND t2.foreign_id=t1.ticket_id AND t2.field='title' AND t2.locale='".$this->getLocaleId()."'", 'left outer')
-					->join('pjTicket', "t3.id=t1.ticket_id", 'left')
-					->select('t1.*, t2.content as title')
-					->where('booking_id', $id)
-					->findAll()
-					->getData();
-                 
-                    $this->confirmSend($arr);
-                    
-                    
+                    locationPairHundler($booked_data,$location_pair,$ticket_arr,$id); 
                     
                     $json = array(
                         'code' => 200,
@@ -967,77 +943,4 @@ class pjApiBooking extends pjApi {
         pjAppController::jsonResponse($res);
     }
 
-    
-    private function confirmSend($booking_arr) {
-        
-        
-        
-        require_once ROOT_PATH . 'core/libs/swift_mailer/lib/swift_required.php';
-        
-        $port = $this->option_arr['o_smtp_port'];
-        $host = $this->option_arr['o_smtp_host']; 
-        $user = $this->option_arr['o_smtp_user'];
-        $pass = $this->option_arr['o_smtp_pass'];
-        $security = $port == 587 ? 'tls' : null;
-
-        
-//        echo __LINE__;exit();
-        $transport = Swift_SmtpTransport::newInstance($host, $port,$security);
-        $transport->setUsername($user);
-        $transport->setPassword($pass);
-        $transport->setStreamOptions([
-            'ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]
-        ]);
-        
-        $mailer = Swift_Mailer::newInstance($transport);
-//                echo __LINE__;exit();
-        
-        $tokens = self::getData($this->option_arr, $booking_arr, PJ_SALT, $this->getLocaleId());
-//                echo __LINE__;exit();
-        $pjMultiLangModel = pjMultiLangModel::factory();
-        
-        $locale_id = isset($booking_arr['locale_id']) && (int) $booking_arr['locale_id'] > 0 ? (int) $booking_arr['locale_id'] : $this->getLocaleId();
-
-		
-        if ($this->option_arr['o_email_payment'] == 1 ){
-//            echo __LINE__;exit();
-            
-                $lang_message = $pjMultiLangModel->reset()->select('t1.*')
-                                                        ->where('t1.model','pjOption')
-                                                        ->where('t1.locale', $locale_id)
-                                                        ->where('t1.field', 'o_email_payment_message')
-                                                        ->limit(0, 1)
-                                                        ->findAll()->getData();
-                
-                $lang_subject = $pjMultiLangModel->reset()->select('t1.*')
-                                                        ->where('t1.model','pjOption')
-                                                        ->where('t1.locale', $locale_id)
-                                                        ->where('t1.field', 'o_email_payment_subject')
-                                                        ->limit(0, 1)
-                                                        ->findAll()->getData();
-
-            if (count($lang_message) === 1 && count($lang_subject) === 1){
-                    $messageText = str_replace($tokens['search'], $tokens['replace'], $lang_message[0]['content']);
-
-                    $htmlMessage = pjUtil::textToHtml($messageText);
-                    
-                    $message = Swift_Message::newInstance()
-                                    ->setFrom($user)
-                                    ->setCharset('UTF-8')
-                                    ->setSubject($lang_subject[0]['content'])
-                                    ->setBody($messageText)
-                                    ->setTo($booking_arr['c_email']);
-
-//                    echo $messageText;exit();
-                    
-                    if(!$mailer->send($message, $failures)){
-//                        var_dump($failures);
-                    };
-   
-    }
-        }      
-    }
-    
-    
-    
 }
