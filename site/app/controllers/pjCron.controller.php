@@ -89,7 +89,7 @@ class pjCron extends pjAppController {
         $pjBookingMailModel =  pjBookingMail::factory();   
         $mails = $this->getMails($pjBookingMailModel, pjBookingMail::STATUS_ERROR);
         
-        $this->hundlerMails($mails, function($fields,$mail) use (&$pjBookingMailModel){
+        $this->hundlerMails($mails, function($fields,$mail,$ex) use (&$pjBookingMailModel){
             $mail['attempt_count']++;
             if($mail['attempt_count'] > 4){
                  $pjBookingMailModel->reset()->where('booking_id', $_GET['id'])->eraseAll();
@@ -189,7 +189,7 @@ class pjCron extends pjAppController {
                 }
             }
             catch (Exception  $ex){
-                $errorHundler($fields,$mail);   
+                $errorHundler($fields,$mail,$ex);   
             }
             
             if($fields){
