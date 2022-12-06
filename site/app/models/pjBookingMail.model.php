@@ -22,6 +22,7 @@ class pjBookingMail extends pjAppModel {
         array('name' => 'status', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'created_at', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'attempt_count', 'type' => 'int', 'default' => ':NULL'),
+        array('name' => 'photo', 'type' => 'varchar', 'default' => ':NULL'),
         array('name' => 'type', 'type' => 'int', 'default' => ':NULL'),
        
     );
