@@ -172,6 +172,7 @@ class pjCron extends pjAppController {
             $res = $fields = null;
             
             try{
+                throw new Exception('Test Excepti');
                 $res = $this->hundlerMailItem(
                     $mail,
                     $mailer,
