@@ -129,6 +129,8 @@ class pjCron extends pjAppController {
         $lang_message_payment,
         $lang_subject_payment
     ){
+        $locale_id = $this->getLocaleId();
+        
         $arr = $this->getBookingData($mail['booking_id']);
         $res = null;        
         $tokens = self::getData($this->option_arr, $arr, PJ_SALT, $locale_id);
