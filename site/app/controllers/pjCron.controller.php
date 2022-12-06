@@ -122,28 +122,28 @@ class pjCron extends pjAppController {
     private function hundlerMailItem(
         $mail,
         $mailer,
-        $lang_message_confirm,
-        $lang_subject_confirm,
-        $lang_message_cancel,
-        $lang_subject_cancel,
-        $lang_message_payment,
-        $lang_subject_payment
+        $langMessageConfirm,
+        $langSubjectConfirm,
+        $langMessageCancel,
+        $langSubjectCancel,
+        $langMessagePayment,
+        $langSubjectPayment
     ){
-        $locale_id = $this->getLocaleId();
+        $localeId = $this->getLocaleId();
         
         $arr = $this->getBookingData($mail['booking_id']);
         $res = null;        
-        $tokens = self::getData($this->option_arr, $arr, PJ_SALT, $locale_id);
+        $tokens = self::getData($this->option_arr, $arr, PJ_SALT, $localeId);
 
         switch($mail['type']){
             case pjBookingMail::TYPE_CONFIRM:
-                $res = $this->hundleConfirmMail($mailer, $arr,$tokens,$lang_message_confirm,$lang_subject_confirm);
+                $res = $this->hundleConfirmMail($mailer, $arr,$tokens,$langMessageConfirm,$langSubjectConfirm);
                 break;
             case pjBookingMail::TYPE_CANCEL:
-                $res = $this->hundleCanselMail($mailer, $arr,$tokens,$lang_message_cancel,$lang_subject_cancel);
+                $res = $this->hundleCanselMail($mailer, $arr,$tokens,$langMessageCancel,$langSubjectCancel);
                 break;
             case pjBookingMail::TYPE_PAYMENT:
-                $res = $this->hundlePaymentMail($mailer, $arr,$tokens,$lang_message_payment,$lang_subject_payment);
+                $res = $this->hundlePaymentMail($mailer, $arr,$tokens,$langMessagePayment,$langSubjectPayment);
                 break;
         }
         
@@ -157,12 +157,12 @@ class pjCron extends pjAppController {
     ){
 //        
         list( 
-            $lang_message_payment,
-            $lang_subject_payment,
-            $lang_message_confirm,
-            $lang_subject_confirm,
-            $lang_message_cancel,
-            $lang_subject_cancel
+            $langMessagePayment,
+            $langSubjectPayment,
+            $langMessageConfirm,
+            $langSubjectConfirm,
+            $langMessageCancel,
+            $langSubjectCancel
         ) = $this->getMessagesAndSubjects();
         
         $mailer = $this->getMailer();
@@ -172,20 +172,15 @@ class pjCron extends pjAppController {
             $res = $fields = null;
             
             try{
-                if($k < 2){
-                    
-                throw new Exception('Test Excepti');
-                
-                }
                 $res = $this->hundlerMailItem(
                     $mail,
                     $mailer,
-                    $lang_message_confirm,
-                    $lang_subject_confirm,
-                    $lang_message_cancel,
-                    $lang_subject_cancel,
-                    $lang_message_payment,
-                    $lang_subject_payment
+                    $langMessageConfirm,
+                    $langSubjectConfirm,
+                    $langMessageCancel,
+                    $langSubjectCancel,
+                    $langMessagePayment,
+                    $langSubjectPayment
                 );
                 
                 if($res){
