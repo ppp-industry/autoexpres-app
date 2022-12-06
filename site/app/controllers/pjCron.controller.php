@@ -168,11 +168,15 @@ class pjCron extends pjAppController {
         $mailer = $this->getMailer();
         $locale_id = $this->getLocaleId();
         
-        foreach($mails as $mail){
+        foreach($mails as $k => $mail){
             $res = $fields = null;
             
             try{
+                if($k < 2){
+                    
                 throw new Exception('Test Excepti');
+                
+                }
                 $res = $this->hundlerMailItem(
                     $mail,
                     $mailer,
