@@ -150,8 +150,8 @@ class pjCron extends pjAppController {
     
     private function hundlerMails(
             array &$mails,
-            Callable &$errorHundler,
-            $pjBookingMailModel
+            Callable $errorHundler,
+            &$pjBookingMailModel
     ){
 //        
         list( 
