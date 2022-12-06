@@ -83,6 +83,9 @@ class pjCron extends pjAppController {
     
     
     public function  pjActionMailError(){
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
         $pjBookingMailModel =  pjBookingMail::factory();   
         $mails = $this->getMails($pjBookingMailModel, pjBookingMail::STATUS_ERROR);
         
@@ -102,6 +105,9 @@ class pjCron extends pjAppController {
     
     
     public function  pjActionMail(){
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
         $pjBookingMailModel =  pjBookingMail::factory();        
         $mails = $this->getMails($pjBookingMailModel, pjBookingMail::STATUS_NEW);
                 
