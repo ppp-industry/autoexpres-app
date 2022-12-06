@@ -170,7 +170,17 @@ class pjCron extends pjAppController {
             $res = $fields = null;
             
             try{
-                $res = $this->hundlerMailItem($mail);
+                $res = $this->hundlerMailItem(
+                    $mail,
+                    $mailer,
+                    $lang_message_confirm,
+                    $lang_subject_confirm,
+                    $lang_message_cancel,
+                    $lang_subject_cancel,
+                    $lang_message_payment,
+                    $lang_subject_payment
+                );
+                
                 if($res){
                     $fields = ['status' => pjBookingMail::STATUS_CLOSE];
                 }
