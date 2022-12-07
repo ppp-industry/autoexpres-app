@@ -28,7 +28,7 @@ class pjBusModel extends pjAppModel {
 
     public function getBusIds($date, $pickup_id, $return_id, $isReturn, &$transferIds = null) {        
         
-        error_reporting(E_ALL ^ E_DEPRECATED);
+        
         $day_of_week = strtolower(date('l', strtotime($date)));
         $currentTime = new \DateTime();
         $departure_time = date('Y-m-d H:i', strtotime($currentTime->format('Y-m-d H:i') . '+2hours'));

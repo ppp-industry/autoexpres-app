@@ -137,13 +137,11 @@ class pjCron extends pjAppController {
 
         switch($mail['type']){
             case pjBookingMail::TYPE_CONFIRM:
+            case pjBookingMail::TYPE_PAYMENT:
                 $res = $this->hundleConfirmMail($mailer, $arr,$tokens,$langMessageConfirm,$langSubjectConfirm);
                 break;
             case pjBookingMail::TYPE_CANCEL:
                 $res = $this->hundleCanselMail($mailer, $arr,$tokens,$langMessageCancel,$langSubjectCancel);
-                break;
-            case pjBookingMail::TYPE_PAYMENT:
-                $res = $this->hundlePaymentMail($mailer, $arr,$tokens,$langMessagePayment,$langSubjectPayment);
                 break;
         }
         
@@ -222,15 +220,15 @@ class pjCron extends pjAppController {
     }
     
     private function hundlePaymentMail($mailer,$booking_arr,$tokens,$lang_message,$lang_subject){
-        $messageText = str_replace($tokens['search'], $tokens['replace'], $lang_message[0]['content']);
-        $message = Swift_Message::newInstance()
-                                    ->setFrom($this->option_arr['o_smtp_user'])
-                                    ->setCharset('UTF-8')
-                                    ->setSubject($lang_subject[0]['content'])
-                                    ->setBody($messageText)
-                                    ->setTo($booking_arr['c_email']);
-            
-        return $mailer->send($message, $failures);
+//        $messageText = str_replace($tokens['search'], $tokens['replace'], $lang_message[0]['content']);
+//        $message = Swift_Message::newInstance()
+//                                    ->setFrom($this->option_arr['o_smtp_user'])
+//                                    ->setCharset('UTF-8')
+//                                    ->setSubject($lang_subject[0]['content'])
+//                                    ->setBody($messageText)
+//                                    ->setTo($booking_arr['c_email']);
+//            
+//        return $mailer->send($message, $failures);
     }
     
     

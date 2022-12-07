@@ -8,8 +8,8 @@ if (!defined("ROOT_PATH")) {
 class pjAdminRoutes extends pjAdmin {
 
     public function pjActionCreate() {
-        ini_set("display_errors", "On");
-       error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//       error_reporting(E_ALL ^ E_DEPRECATED);
 
         $this->checkLogin();
 

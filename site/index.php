@@ -18,12 +18,12 @@ if (isset($_GET["reporting"]) && $_GET["reporting"] == '0') {
     $_SESSION["error_reporting"] = '1';
 }
 
-if (isset($_SESSION["error_reporting"]) && $_SESSION["error_reporting"] == '1') {
-    ini_set("display_errors", "On");
-    error_reporting(E_ALL ^ E_DEPRECATED);
-} else {
+//if (isset($_SESSION["error_reporting"]) && $_SESSION["error_reporting"] == '1') {
+//    ini_set("display_errors", "On");
+//    error_reporting(E_ALL ^ E_DEPRECATED);
+//} else {
     error_reporting(0);
-}
+//}
 
 //if(isset($_GET['action']) == 'pjActionConfirmLiqPay' || preg_match('/api\/payment\/confirmLiqPay/', $_SERVER['REQUEST_URI'])){
 //    file_put_contents('post.data', var_export($_POST, true));
