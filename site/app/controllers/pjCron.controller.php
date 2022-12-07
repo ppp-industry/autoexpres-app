@@ -125,9 +125,7 @@ class pjCron extends pjAppController {
         $langMessageConfirm,
         $langSubjectConfirm,
         $langMessageCancel,
-        $langSubjectCancel,
-        $langMessagePayment,
-        $langSubjectPayment
+        $langSubjectCancel
     ){
         $localeId = $this->getLocaleId();
         

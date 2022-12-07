@@ -412,7 +412,7 @@ class pjApiBooking extends pjApi {
                 $data ['booking_route'] .= __('front_from', true, false) . ' ' . $from_location . ' ' . __('front_to', true, false) . ' ' . $to_location;
 
                 $id = $pjBookingModel->setAttributes(array_merge($FORM, $data))->insert()->getInsertId();
-                pjBookingMail::makeModel($id, pjBookingMail::TYPE_CONFIRM);
+                
                 makePayment($FORM,$id,$payment);
                 
                 if ($id !== false && (int) $id > 0) {
