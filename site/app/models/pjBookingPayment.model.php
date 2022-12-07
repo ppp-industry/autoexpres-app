@@ -7,6 +7,17 @@ if (!defined("ROOT_PATH")) {
 
 class pjBookingPaymentModel extends pjAppModel {
 
+    const STATUS_PAID = 'paid';
+    const STATUS_NOTPAID = 'notpaid';
+    
+    const METHOD_CARD = 'creditcard';
+    const METHOD_CASH = 'cash';
+    const METHOD_LIQPAY = 'liqpay';
+    const METHOD_GPAY = 'gpay';
+    const METHOD_APAY = 'apay';
+    
+    
+    
     /**
      * The name of table's primary key. If PK is over 2 or more columns set this to boolean null
      *

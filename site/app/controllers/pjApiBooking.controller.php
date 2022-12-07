@@ -30,13 +30,13 @@ class pjApiBooking extends pjApi {
         $localeId = $this->getLocaleId();
         
         
-        function makePayment($form,$id,$payment){
+        function makePayment($form,$id,$payment,$status){
             $payment_data = array();
             $payment_data['booking_id'] = $id;
             $payment_data['payment_method'] = $payment;
             $payment_data['payment_type'] = 'online';
             $payment_data['amount'] = $form['deposit'];
-            $payment_data['status'] = 'notpaid';
+            $payment_data['status'] = $status;
 
             pjBookingPaymentModel::factory()->setAttributes($payment_data)->insert();
 
@@ -171,7 +171,7 @@ class pjApiBooking extends pjApi {
         $payment = 'none';
             
         if (isset($FORM ['payment_method'])) {
-            if ($FORM ['payment_method'] && $FORM ['payment_method'] == 'creditcard') {
+            if ($FORM ['payment_method'] && $FORM ['payment_method'] == pjBookingPaymentModel::METHOD_CARD) {
                 $data ['cc_exp'] = $FORM ['cc_exp_year'] . '-' . $FORM ['cc_exp_month'];
             }
 
@@ -255,8 +255,14 @@ class pjApiBooking extends pjApi {
                 $data ['booking_route'] .= ', ' . $bus_arr_end ['route'] . ', ' . $depart_arrive_end. ' з ' . $trans_location . ' до' .$to_location ;;
 
                 $id = $pjBookingModel->setAttributes(array_merge($FORM, $data))->insert()->getInsertId();
-                pjBookingMail::makeModel($id, pjBookingMail::TYPE_CONFIRM);
-                makePayment($FORM,$id,$payment);
+                
+                
+                
+                if($payment === pjBookingPaymentModel::METHOD_CASH){
+                    pjBookingMail::makeModel($id, pjBookingMail::TYPE_CONFIRM);
+                }
+                
+                makePayment($FORM,$id,$payment, pjBookingPaymentModel::STATUS_PAID);
                 
                 
                 if ($id !== false && (int) $id > 0) {
@@ -412,8 +418,11 @@ class pjApiBooking extends pjApi {
                 $data ['booking_route'] .= __('front_from', true, false) . ' ' . $from_location . ' ' . __('front_to', true, false) . ' ' . $to_location;
 
                 $id = $pjBookingModel->setAttributes(array_merge($FORM, $data))->insert()->getInsertId();
+                if($payment === pjBookingPaymentModel::METHOD_CASH){
+                    pjBookingMail::makeModel($id, pjBookingMail::TYPE_CONFIRM);
+                }
                 
-                makePayment($FORM,$id,$payment);
+                makePayment($FORM,$id,$payment, pjBookingPaymentModel::STATUS_PAID);
                 
                 if ($id !== false && (int) $id > 0) {
                     

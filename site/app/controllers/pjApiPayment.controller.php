@@ -71,8 +71,9 @@ class pjApiPayment extends pjApi {
         
         $returnUrl = 'http://' . $host. '/api/payment/checkPayment?key=' . $key . '&id=' . $arr['id'];
         
-        if($arr['payment_method'] == 'cash'){
+        if($arr['payment_method'] == pjBookingPaymentModel::METHOD_CASH){
             
+            pjBookingMail::makeModel($_GET['booking_id'], pjBookingMail::TYPE_CONFIRM);
             $this->setPaidStatus($_GET['booking_id']);
             pjUtil::redirect($returnUrl);
         } 
@@ -107,22 +108,22 @@ class pjApiPayment extends pjApi {
 
         switch ($arr['payment_method']) {
 
-            case 'liqpay':
+            case pjBookingPaymentModel::METHOD_LIQPAY:
                 $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$returnUrl);
 
                 $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
 
                 break;
-            case 'gpay':
+            case pjBookingPaymentModel::METHOD_GPAY:
                 $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$returnUrl);
-                $params['paytypes'] = 'gpay';
+                $params['paytypes'] = pjBookingPaymentModel::METHOD_GPAY;
                 $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
 
 
                 break;
-            case 'apay':
+            case pjBookingPaymentModel::METHOD_APAY:
                 $params = $getLiqPayParams($arr,$this->option_arr['o_currency'],$returnUrl);
-                $params['paytypes'] = 'apay';
+                $params['paytypes'] = pjBookingPaymentModel::METHOD_APAY;
                 $response = $this->requestAction(array('controller' => 'pjLiqPay', 'action' => 'pjActionForm', 'params' => $params));
 
 
