@@ -156,7 +156,7 @@ class pjApiBuses extends pjApi {
             if (isset($params['is_return']) && $params['is_return'] == 'T') {
 
                 $returnDate = pjUtil::formatDate($params['return_date'], $this->option_arr['o_date_format']);
-                
+             
                 $busIdArr = $pjBusModel->getBusIds($date,$pickupId,$returnId, true,$transferIds);
                 $returnBusIdArr = $pjBusModel->getBusIds($returnDate,$returnId,$pickupId, true,$transferIds);
                 
@@ -179,7 +179,7 @@ class pjApiBuses extends pjApi {
                 
                 $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
                 
-//                vd($busIdArr);
+                vd($busIdArr);
                 
                 $filter($busIdArr,$pickupId, $returnId, $localeId);
                 

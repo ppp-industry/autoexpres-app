@@ -58,66 +58,125 @@ class pjBusModel extends pjAppModel {
             
             foreach($transferIds as $transferCity => &$cities){
                 if(in_array($pickup_id, $cities) || in_array($return_id, $cities)){
+//                    $reccurringCondition = "(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')";
                     
                     $queryToTransferCity = $this
                         ->reset()
                         ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')")
                         ->where("t1.route_id IN(SELECT TRD.route_id FROM `" . pjRouteDetailModel::factory()->getTable() . "` AS TRD WHERE TRD.from_location_id = $pickup_id AND TRD.to_location_id = $transferCity)");
-                    
+                   
                     if ($dateCondition) {
                         $queryToTransferCity->where($dateCondition);
                     }
-                 
-                    $tmp = $queryToTransferCity->findAll()->getDataPair(null, 'id');
                     
-                    $diff = null;
+                    $resTo = $queryToTransferCity->findAll()->getData();
+                    
+                    $queryFromTransferCity = $this
+                        ->reset()
+                        ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')")
+                        ->where("t1.route_id IN(SELECT TRD.route_id FROM `" . pjRouteDetailModel::factory()->getTable() . "` AS TRD WHERE TRD.from_location_id = $transferCity AND TRD.to_location_id = $return_id)");
+                    
+                    if ($dateCondition) {
+                        $queryFromTransferCity->where($dateCondition);
+                    }
+                    
+                    $resFrom = $queryFromTransferCity->findAll()->getData();
+                    
+                    
+                    $keysFrom = $keysTo = $availableBuses =  [];
+                    
+//                    vd($resFrom);
+//                    vd($resTo);
+                   
+                    foreach($resTo as $toItem){
+                       
+                        $dateTmp = $date;
+                        $departureTime = $dateTmp . ' ' . $toItem['departure_time'];
+                        $arrivalTime = $dateTmp . ' ' . $toItem['arrival_time'];
+                        $departureTimeTimestamp = strtotime($departureTime);
+                        $arrivalTimeTimestamp = strtotime($arrivalTime);
+                        
+                        if($arrivalTimeTimestamp < $departureTimeTimestamp){
+                            $arrivalTimeTimestamp += 86400;
+                            $dateTmp = date('Y-m-d',strtotime($dateTmp . '+24hours'));
+                        }
+                        
+                        $availableBuses[$toItem['id']] = [
+//                            'departureTime' => date('Y-m-d H:i',$departureTimeTimestamp),  
+                            'arrivalTime' => date('Y-m-d H:i', $arrivalTimeTimestamp)
+                            
+                        ];
+                        
+                        foreach($resFrom as $fromItem){
+                            
+                            $departureTime = $dateTmp . ' ' . $fromItem['departure_time'];
+                            $departureTimeTimestamp = strtotime($departureTime);
+                            
+                            if($arrivalTimeTimestamp > $departureTimeTimestamp){
+                                $departureTimeTimestamp += 86400;
+                            }
+                            
+                            $difference = $departureTimeTimestamp - $arrivalTimeTimestamp;
+                            
+                            if($difference < 7200){
+                                $availableBuses[$toItem['id']][] = [
+                                    'id' => $fromItem['id'],
+                                    'departureTime' => date('Y-m-d H:i',$departureTimeTimestamp),
+//                                    'arrivalTime' => date('Y-m-d H:i', $arrivalTimeTimestamp)
+                                    
+                                ];
+                                
+                                $keysFrom[] = $fromItem['id'];
+                            }
+                        }   
+                        
+                        if(count($availableBuses[$toItem['id']]) > 1){
+                            $keysTo[] = $toItem['id'];
+                        }
+                       
+                    }
+
+                    
+                    $diff = $keysTo;
                     if(empty($totalTo)){
-                        $diff = $tmp;
+                        $diff = $resTo;
                     }
                     else{
-                        $diff = array_diff($totalTo, $tmp);;
+                        $diff = array_diff($totalTo, $resTo);;
                     }
                   
                     $totalTo = array_merge($diff,$totalTo);
                     $tmpTo = $diff;
             
-                    $queryFromTransferCity = $this
-                            ->reset()
-                            ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')")
-                            ->where("t1.route_id IN(SELECT TRD.route_id FROM `" . pjRouteDetailModel::factory()->getTable() . "` AS TRD WHERE TRD.from_location_id = $transferCity AND TRD.to_location_id = $return_id)");
-
-                    if ($dateCondition) {
-                        $queryFromTransferCity->where($dateCondition);
-                    }
                     
-                    $tmp = $queryFromTransferCity->findAll()->getDataPair(null, 'id');
-                    
-                    $diff = null;
+                    $diff = $keysFrom;
                     if(empty($totalFrom)){
-                        $diff = $tmp;
+                        $diff = $resFrom;
                     }
                     else{
-                        $diff = array_diff($totalFrom, $tmp);;
+                        $diff = array_diff($totalFrom, $resFrom);;
                     }
-                  
+                    
                     $totalFrom = array_merge($diff,$totalFrom);
                     $tmpFrom = $diff;
                     
                     if(!empty($tmpFrom) && !empty($tmpTo)){
-                        $tIds[$transferCity] = [];
                         
+                        $tIds[$transferCity] = [];
                         $tIds[$transferCity]['to'] = $tmpTo;
                         $tIds[$transferCity]['from'] = $tmpFrom;
-                    }
+                    }        
                 }
             }
-             
+            
             if(!empty($tIds)){
+//                echo __LINE__;exit();
                 return [
                     'transferIds' => $tIds
                 ];
             }
             else {
+//                echo __LINE__;exit();
                 return null;
             }
             
