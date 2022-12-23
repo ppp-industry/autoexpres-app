@@ -179,7 +179,7 @@ class pjApiBuses extends pjApi {
                 
                 $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
                 
-                vd($busIdArr);
+//                vd($busIdArr);
                 
                 $filter($busIdArr,$pickupId, $returnId, $localeId);
                 

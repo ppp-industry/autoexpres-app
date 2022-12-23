@@ -80,13 +80,8 @@ class pjBusModel extends pjAppModel {
                         $queryFromTransferCity->where($dateCondition);
                     }
                     
-                    $resFrom = $queryFromTransferCity->findAll()->getData();
-                    
-                    
+                    $resFrom = $queryFromTransferCity->findAll()->getData(); 
                     $keysFrom = $keysTo = $availableBuses =  [];
-                    
-//                    vd($resFrom);
-//                    vd($resTo);
                    
                     foreach($resTo as $toItem){
                        
@@ -102,9 +97,7 @@ class pjBusModel extends pjAppModel {
                         }
                         
                         $availableBuses[$toItem['id']] = [
-//                            'departureTime' => date('Y-m-d H:i',$departureTimeTimestamp),  
                             'arrivalTime' => date('Y-m-d H:i', $arrivalTimeTimestamp)
-                            
                         ];
                         
                         foreach($resFrom as $fromItem){
@@ -122,8 +115,6 @@ class pjBusModel extends pjAppModel {
                                 $availableBuses[$toItem['id']][] = [
                                     'id' => $fromItem['id'],
                                     'departureTime' => date('Y-m-d H:i',$departureTimeTimestamp),
-//                                    'arrivalTime' => date('Y-m-d H:i', $arrivalTimeTimestamp)
-                                    
                                 ];
                                 
                                 $keysFrom[] = $fromItem['id'];
@@ -132,29 +123,28 @@ class pjBusModel extends pjAppModel {
                         
                         if(count($availableBuses[$toItem['id']]) > 1){
                             $keysTo[] = $toItem['id'];
-                        }
-                       
+                        }  
                     }
-
                     
                     $diff = $keysTo;
+                    
                     if(empty($totalTo)){
-                        $diff = $resTo;
+                        $diff = $keysTo;
                     }
                     else{
-                        $diff = array_diff($totalTo, $resTo);;
+                        $diff = array_diff($totalTo, $keysTo);;
                     }
                   
                     $totalTo = array_merge($diff,$totalTo);
                     $tmpTo = $diff;
-            
+                    
                     
                     $diff = $keysFrom;
                     if(empty($totalFrom)){
-                        $diff = $resFrom;
+                        $diff = $keysFrom;
                     }
                     else{
-                        $diff = array_diff($totalFrom, $resFrom);;
+                        $diff = array_diff($totalFrom, $keysFrom);;
                     }
                     
                     $totalFrom = array_merge($diff,$totalFrom);
@@ -170,13 +160,11 @@ class pjBusModel extends pjAppModel {
             }
             
             if(!empty($tIds)){
-//                echo __LINE__;exit();
                 return [
                     'transferIds' => $tIds
                 ];
             }
             else {
-//                echo __LINE__;exit();
                 return null;
             }
             
