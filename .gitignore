@@ -68,3 +68,9 @@ Thumbs.db
 !.nvmrc
 !.phpcs.xml.dist
 /nbproject
+/site/app/controllers/world_cities_array.php
+/site/app/controllers/world_cities_array_2.php
+/site/app/controllers/world_cities_array_3.php
+/site/app/controllers/world_cities_array_4.php
+/site/app/controllers/world_cities_array_5.php
+/site/app/controllers/world_cities_array_6.php
