@@ -33,6 +33,12 @@ class pjApi extends pjFront {
             )
             && 
             (
+                $controller !== 'pjApiRoutes' 
+                && 
+                $action !== 'pjActionInternational'
+            )
+            && 
+            (
                 $controller !== 'pjApiPayment' 
                 && 
                 (

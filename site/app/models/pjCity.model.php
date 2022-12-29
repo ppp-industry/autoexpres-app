@@ -12,7 +12,9 @@ class pjCityModel extends pjAppModel {
     protected $schema = array(
         array('name' => 'id', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'status', 'type' => 'enum', 'default' => 'T'),
-        array('name' => 'is_ukraine', 'type' => 'smallint', 'default' => 0)
+        array('name' => 'is_ukraine', 'type' => 'smallint', 'default' => 0),
+        array('name' => 'order_by_country', 'type' => 'smallint', 'default' => ':NULL'),
+        array('name' => 'country_alpha', 'type' => 'varchar', 'default' => ':NULL')
     );
     public $i18n = array('name');
 

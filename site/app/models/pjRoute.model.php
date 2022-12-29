@@ -12,7 +12,8 @@ class pjRouteModel extends pjAppModel {
     protected $schema = array(
         array('name' => 'id', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'back_id', 'type' => 'int', 'default' => ':NULL'),
-        array('name' => 'status', 'type' => 'enum', 'default' => 'T')
+        array('name' => 'status', 'type' => 'enum', 'default' => 'T'),
+        array('name' => 'order_by_country', 'type' => 'smallint', 'default' => ':NULL'),
     );
     public $i18n = array('title');
 
