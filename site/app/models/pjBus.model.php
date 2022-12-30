@@ -26,7 +26,7 @@ class pjBusModel extends pjAppModel {
         return new pjBusModel($attr);
     }
 
-    public function getBusIdsByRoutes($date,$routes,$isReturn = false){
+    public function getBusIdsByRoutes($date,$routes,$returnObjects = false){
         $res = null;
         $day_of_week = strtolower(date('l', strtotime($date)));
         $currentTime = new \DateTime();
@@ -36,14 +36,26 @@ class pjBusModel extends pjAppModel {
                 ->reset()
                 ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')");
                 
-        if($routes){
-            
+        if(is_array($routes) && count($routes)){
+            $query->whereIn('route_id',$routes);
+        }
+        else{
+            $query->where('route_id',$routes);
         }
         
-        
-        if (!$isReturn && $date == $currentTime->format('Y-m-d')) {
+        if ($date == $currentTime->format('Y-m-d')) {
            $query->where("STR_TO_DATE(CONCAT('{$currentTime->format('Y-m-d')}', ' ', t1.departure_time), '%Y-%m-%d %H:%i:%s') >= '$departure_time'");
         }
+        
+        if($returnObjects){
+            $res = $query->findAll()->getData(); 
+        }
+        else{
+            $res = $query->findAll()->getDataPair(null, 'id');
+        }
+        
+        
+        return $res;
         
         
         

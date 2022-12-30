@@ -86,9 +86,6 @@ class pjApiCities extends pjApi {
                     ->getData();
             
             
-//            vd($locationArrPickup);
-            
-            
             $inserted = array_column($locationArrPickup, 'id');
             $inserted[] = $params['pickup_id'];
             
