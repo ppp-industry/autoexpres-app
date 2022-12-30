@@ -20,11 +20,11 @@ class pjApiTickets extends pjApi {
         
         $params = Router::getParams();
         
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
        
         if(isset($params['from'],$params['to'])){
-            $availableTickets = [];
+            $busList = [];
             
             $date = date('Y-m-d');
             $routeModel = pjRouteModel::factory();
@@ -43,37 +43,33 @@ class pjApiTickets extends pjApi {
                     ->findAll()
                     ->getData();
             
+
 //            vd($routes);
+            //                $busModel->where('route_id',$route['id']); 
             
             foreach ($routes as &$route){
+                $bookedData = $bookingPeriod = array();
                 
-                $busModel->where('route_id',$route['id']); 
+                $cities = $routeCityModel->where('route_id',$route['id'])
+                                        ->orderBy('`order`')
+                                        ->findAll()
+                                        ->getData();
+//                
+                $fromCityId = array_shift($cities);
+                $toCityId = array_pop($cities);
+                
+                
+                $busIdsArr = $busModel->getBusIds($date,$fromCityId['city_id'],$toCityId['city_id']);
+//                echo __LINE__;exit();
+                if(!empty($busIdsArr)){
+                    $busList = $this->getBusList($fromCityId['city_id'],$toCityId['city_id'], $busIdsArr, $bookingPeriod, $bookedData, $date, 'F');
+                }
                 
             }   
                 
-//                $bookedData = $bookingPeriod = array();
                 
-                
-//                $cities = $routeCityModel->where('route_id',$route['id'])
-//                                        ->orderBy('`order`')
-//                                        ->findAll()
-//                                        ->getData();
-//                    
-//                
-//                
-//                $fromCityId = array_shift($cities);
-//                $toCityId = array_pop($cities);
-                
-                
-                
-//                $busIdsArr = $busModel->getBusIds($date,$fromCityId['city_id'],$toCityId['city_id']);
-//                
-//                vd($busIdsArr);
-//                
-//                $busList = $this->getBusList($fromCityId['city_id'],$toCityId['city_id'], $busIdsArr, $bookingPeriod, $bookedData, $date, 'F');
-//                
-//                pjAppController::jsonResponse($busList);
-//                exit();
+            pjAppController::jsonResponse($busList);
+            exit();    
                  
         }        
 
