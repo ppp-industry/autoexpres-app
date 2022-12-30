@@ -26,9 +26,32 @@ class pjBusModel extends pjAppModel {
         return new pjBusModel($attr);
     }
 
-    public function getBusIds($date, $pickup_id, $return_id, $isReturn, &$transferIds = null) {        
+    public function getBusIdsByRoutes($date,$routes,$isReturn = false){
+        $res = null;
+        $day_of_week = strtolower(date('l', strtotime($date)));
+        $currentTime = new \DateTime();
+        $departure_time = date('Y-m-d H:i', strtotime($currentTime->format('Y-m-d H:i') . '+2hours'));
+
+        $query = $this
+                ->reset()
+                ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')");
+                
+        if($routes){
+            
+        }
         
         
+        if (!$isReturn && $date == $currentTime->format('Y-m-d')) {
+           $query->where("STR_TO_DATE(CONCAT('{$currentTime->format('Y-m-d')}', ' ', t1.departure_time), '%Y-%m-%d %H:%i:%s') >= '$departure_time'");
+        }
+        
+        
+        
+    }
+    
+    public function getBusIds($date, $pickup_id, $return_id, $isReturn = false, &$transferIds = null,$returnObjects = false) {        
+        
+        $res = null;
         $day_of_week = strtolower(date('l', strtotime($date)));
         $currentTime = new \DateTime();
         $departure_time = date('Y-m-d H:i', strtotime($currentTime->format('Y-m-d H:i') . '+2hours'));
@@ -37,14 +60,19 @@ class pjBusModel extends pjAppModel {
                 ->reset()
                 ->where("(t1.start_date <= '$date' AND '$date' <= t1.end_date) AND (t1.recurring LIKE '%$day_of_week%') AND t1.id NOT IN (SELECT TSD.bus_id FROM `" . pjBusDateModel::factory()->getTable() . "` AS TSD WHERE TSD.`date` = '$date')")
                 ->where("t1.route_id IN(SELECT TRD.route_id FROM `" . pjRouteDetailModel::factory()->getTable() . "` AS TRD WHERE TRD.from_location_id = $pickup_id AND TRD.to_location_id = $return_id)");
+        
         if (!$isReturn && $date == $currentTime->format('Y-m-d')) {
-            $query->where("STR_TO_DATE(CONCAT('{$currentTime->format('Y-m-d')}', ' ', t1.departure_time), '%Y-%m-%d %H:%i:%s') >= '$departure_time'");
+           $query->where("STR_TO_DATE(CONCAT('{$currentTime->format('Y-m-d')}', ' ', t1.departure_time), '%Y-%m-%d %H:%i:%s') >= '$departure_time'");
         }
 
-        $res = $query->findAll()->getDataPair(null, 'id');
+        if($returnObjects){
+            $res = $query->findAll()->getData(); 
+        }
+        else{
+            $res = $query->findAll()->getDataPair(null, 'id');
+        }
         
 //        Вычесляем transferID 
-        
         if (empty($res) && $transferIds) {
 
             $dateCondition = null;
