@@ -110,12 +110,68 @@ class pjApiTickets extends pjApi {
             if(empty($busList)){
                 
                 
+                $needTransfer = function($cityId,$cities){
+                    return !in_array($cityId, $cities);
+                };
+
+                $params = Router::getParams();
+                $this->setAjax(true);
+
+                $pjCityModel = pjCityModel::factory();
+                $pjRouteDetailModel = pjRouteDetailModel::factory();
+                $withTransferSeparated = $withTransfer = [];
+                $localeId = $this->getLocaleId();
+
+                $joinCondition = "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $localeId . "'";
+
+                $where = "t1.id IN(SELECT TRD.to_location_id FROM `{$pjRouteDetailModel->getTable()}` AS TRD WHERE TRD.from_location_id={pickupId})";
                 
-                
-                
+
+                $locationArrPickup = $pjCityModel
+                        ->reset()
+                        ->select('t1.*, t2.content as name')
+                        ->join('pjMultiLang', $joinCondition, 'left outer')
+                        ->where(str_replace('{pickupId}', $fromId, $where))
+                        ->orderBy("t2.content ASC")
+                        ->findAll()
+                        ->getData();
+
+
+                $inserted = array_column($locationArrPickup, 'id');
+                $inserted[] = $params['pickup_id'];
+
+                foreach ($locationArrPickup as &$location){
+                    $withTransfer[$location['id']] = $pjCityModel
+                        ->reset()
+                        ->select('t1.*, t2.content as name')
+                        ->join('pjMultiLang', $joinCondition, 'left outer')
+                        ->where(str_replace('{pickupId}', $location['id'], $where))
+                        ->orderBy("t2.content ASC")
+                        ->findAll()
+                        ->getData();
+                }
+
+                $withTransferIds = [];
+
+                foreach($withTransfer as $transferCity => $locations ){
+                    $withTransferSeparated[$transferCity] = array_values(
+                        array_filter($locations, function($item) use (&$inserted){
+                            if(!in_array($item['id'], $inserted)){
+                                return true;
+                            }
+                            else{
+                                return false;
+                            }
+                        })
+                    );
+
+                    $withTransferIds[$transferCity] = array_column($withTransferSeparated[$transferCity], 'id');
+
+                    if(empty($withTransferSeparated[$transferCity])){
+                        unset($withTransferSeparated[$transferCity],$withTransferIds[$transferCity]);
+                    }
+                }   
             }
-            
-                
                 
             pjAppController::jsonResponse($busList);
             exit();    
