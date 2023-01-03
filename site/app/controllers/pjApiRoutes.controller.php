@@ -191,40 +191,40 @@ class pjApiRoutes extends pjApi {
         ini_set("display_errors", "On");
         error_reporting(E_ALL ^ E_DEPRECATED);
 
-        $routeModel = pjRouteModel::factory();
-        
-        $data = pjCityModel::factory()->where('is_ukraine = 0')->findALl()->getDataPair('id','country_alpha');
+//        $routeModel = pjRouteModel::factory();
 //        
-        $routes = $routeModel->where('is_international = 1 and country_alpha is null')->findAll()->getData();;
-        
-        $routeCity = pjRouteCityModel::factory();
-        $counter = 0;
+//        $data = pjCityModel::factory()->where('is_ukraine = 0')->findALl()->getDataPair('id','country_alpha');
+////        
+//        $routes = $routeModel->where('is_international = 1 and country_alpha is null')->findAll()->getData();;
 //        
-        foreach($routes as $route){
-            
-            $country_alpha = null;
-
-            if ($route['order_by_country'] > 4) {
-                $city = $routeCity->reset()->where('route_id', $route['id'])->orderBy('`order` ASC')->limit(1)->findAll()->getData();
-                $country_alpha = $data[$city[0]['city_id']]; // array_shift($cities)['country_alpha'];
-                
-                
-                $routeModel->reset()->where('id', $route['id'])->limit(1)->modifyAll([
-                    'country_alpha' => $country_alpha
-                ]);
-               echo $route['id'],'  ',$country_alpha,'  ',$city[0]['city_id'],'<br>';
-                
-            } else {
-                $city = $routeCity->reset()->where('route_id', $route['id'])->orderBy('`order` DESC')->limit(1)->findAll()->getData();
-                $country_alpha = $data[$city[0]['city_id']];
-
-                $routeModel->reset()->where('id', $route['id'])->limit(1)->modifyAll([
-                    'country_alpha' => $country_alpha
-                ]);
-            }
-        }
-        echo $counter;
-        exit();
+//        $routeCity = pjRouteCityModel::factory();
+//        $counter = 0;
+////        
+//        foreach($routes as $route){
+//            
+//            $country_alpha = null;
+//
+//            if ($route['order_by_country'] > 4) {
+//                $city = $routeCity->reset()->where('route_id', $route['id'])->orderBy('`order` ASC')->limit(1)->findAll()->getData();
+//                $country_alpha = $data[$city[0]['city_id']]; // array_shift($cities)['country_alpha'];
+//                
+//                
+//                $routeModel->reset()->where('id', $route['id'])->limit(1)->modifyAll([
+//                    'country_alpha' => $country_alpha
+//                ]);
+//               echo $route['id'],'  ',$country_alpha,'  ',$city[0]['city_id'],'<br>';
+//                
+//            } else {
+//                $city = $routeCity->reset()->where('route_id', $route['id'])->orderBy('`order` DESC')->limit(1)->findAll()->getData();
+//                $country_alpha = $data[$city[0]['city_id']];
+//
+//                $routeModel->reset()->where('id', $route['id'])->limit(1)->modifyAll([
+//                    'country_alpha' => $country_alpha
+//                ]);
+//            }
+//        }
+//        echo $counter;
+//        exit();
         
 //        vd($routes);
         
@@ -313,50 +313,50 @@ class pjApiRoutes extends pjApi {
 //        exit();
         
         
-//        function groupByCountry(&$cities){
-//            $res = [];
-//            
-//            foreach($cities as &$city){
-//                
-//                if(!isset($res[$city['country_alpha']])){
-//                    $res[$city['country_alpha']] = [];
-//                }
-//                
-//                $res[$city['country_alpha']][] = $city;
-//                
-//            }
-//            
-//            return $res;
-//        };
-//        
-//        $data = [];
-//        $cities = pjRouteModel::factory()
-//                    ->select(" t1.*, t2.content as title, t3.content as `from`, t4.content as `to`")
-//                    ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
-//                    ->join('pjMultiLang', "t3.model='pjRoute' AND t3.foreign_id=t1.id AND t3.field='from' AND t3.locale='" . $this->getLocaleId() . "'", 'left outer')
-//                    ->join('pjMultiLang', "t4.model='pjRoute' AND t4.foreign_id=t1.id AND t4.field='to' AND t4.locale='" . $this->getLocaleId() . "'", 'left outer')
-//                    ->where('is_international = 1 and order_by_country < 5')
-//                    ->orderBy('order_by_country ASC')
-//                    ->findAll()
-//                    ->getData();
-//        
-//        
-//        $data['from'] = groupByCountry($cities); 
-//        
-//        $cities = pjRouteModel::factory()
-//                    ->select(" t1.*, t2.content as title, t3.content as `from`, t4.content as `to`")
-//                    ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
-//                    ->join('pjMultiLang', "t3.model='pjRoute' AND t3.foreign_id=t1.id AND t3.field='from' AND t3.locale='" . $this->getLocaleId() . "'", 'left outer')
-//                    ->join('pjMultiLang', "t4.model='pjRoute' AND t4.foreign_id=t1.id AND t4.field='to' AND t4.locale='" . $this->getLocaleId() . "'", 'left outer')
-//                    ->where('is_international = 1 and order_by_country > 4')
-//                    ->orderBy('order_by_country ASC')
-//                    ->findAll()
-//                    ->getData();
-//        
-//        $data['to'] = groupByCountry($cities);
-//        
-//        pjAppController::jsonResponse($data);
-//        exit();
+        function groupByCountry(&$cities){
+            $res = [];
+            
+            foreach($cities as &$city){
+                
+                if(!isset($res[$city['country_alpha']])){
+                    $res[$city['country_alpha']] = [];
+                }
+                
+                $res[$city['country_alpha']][] = $city;
+                
+            }
+            
+            return $res;
+        };
+        
+        $data = [];
+        $cities = pjRouteModel::factory()
+                    ->select(" t1.*, t2.content as title, t3.content as `from`, t4.content as `to`")
+                    ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
+                    ->join('pjMultiLang', "t3.model='pjRoute' AND t3.foreign_id=t1.id AND t3.field='from' AND t3.locale='" . $this->getLocaleId() . "'", 'left outer')
+                    ->join('pjMultiLang', "t4.model='pjRoute' AND t4.foreign_id=t1.id AND t4.field='to' AND t4.locale='" . $this->getLocaleId() . "'", 'left outer')
+                    ->where('is_international = 1 and order_by_country < 5')
+                    ->orderBy('order_by_country ASC')
+                    ->findAll()
+                    ->getData();
+        
+        
+        $data['from'] = groupByCountry($cities); 
+        
+        $cities = pjRouteModel::factory()
+                    ->select(" t1.*, t2.content as title, t3.content as `from`, t4.content as `to`")
+                    ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
+                    ->join('pjMultiLang', "t3.model='pjRoute' AND t3.foreign_id=t1.id AND t3.field='from' AND t3.locale='" . $this->getLocaleId() . "'", 'left outer')
+                    ->join('pjMultiLang', "t4.model='pjRoute' AND t4.foreign_id=t1.id AND t4.field='to' AND t4.locale='" . $this->getLocaleId() . "'", 'left outer')
+                    ->where('is_international = 1 and order_by_country > 4')
+                    ->orderBy('order_by_country ASC')
+                    ->findAll()
+                    ->getData();
+        
+        $data['to'] = groupByCountry($cities);
+        
+        pjAppController::jsonResponse($data);
+        exit();
 //        
     }
     
