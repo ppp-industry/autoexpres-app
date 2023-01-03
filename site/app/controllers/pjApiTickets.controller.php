@@ -19,14 +19,11 @@ class pjApiTickets extends pjApi {
     public function pjActionToday() {
         
         $params = Router::getParams();
-        
         $date = strtotime('tomorrow');
         $fromId = $toId = null;
         
-//        vd($date);
-        
-//        ini_set("display_errors", "On");
-//        error_reporting(E_ALL ^ E_DEPRECATED);
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
        
         if(isset($params['from'],$params['to'])){
             $busList = [];
@@ -88,7 +85,7 @@ class pjApiTickets extends pjApi {
                                         ->limit(1,0)
                                         ->findAll()
                                         ->getData();;
-                                        
+//                                        
                 $to = pjMultiLangModel::factory()
                                         ->where('`model` = \'pjCity\'')
                                         ->where('`field` = \'name\'')
@@ -96,23 +93,16 @@ class pjApiTickets extends pjApi {
                                         ->limit(1,0)
                                         ->findAll()
                                         ->getData();;
-                
+//                
                 $fromId = $from[0]['foreign_id'];
-                $toId = $to[0]['foreign_id'];                      
-                                        
-                                        
+                $toId = $to[0]['foreign_id'];
+                
                 $busIds = $busModel->getBusIds($date,$fromId,$toId);
                 $busList = $this->getBusList($fromId,$toId, $busIds, $bookingPeriod, $bookedData, $date, 'F');
             }
             
-           
-            
-            if(empty($busList)){
-                
-                
-                $needTransfer = function($cityId,$cities){
-                    return !in_array($cityId, $cities);
-                };
+//           через трансферы 
+            if(empty($busList) && $fromId && $toId){
 
                 $params = Router::getParams();
                 $this->setAjax(true);
@@ -135,10 +125,13 @@ class pjApiTickets extends pjApi {
                         ->orderBy("t2.content ASC")
                         ->findAll()
                         ->getData();
+                
+                
+//                vd($locationArrPickup);
 
 
                 $inserted = array_column($locationArrPickup, 'id');
-                $inserted[] = $params['pickup_id'];
+                $inserted[] = $fromId;
 
                 foreach ($locationArrPickup as &$location){
                     $withTransfer[$location['id']] = $pjCityModel
@@ -149,8 +142,9 @@ class pjApiTickets extends pjApi {
                         ->orderBy("t2.content ASC")
                         ->findAll()
                         ->getData();
-                }
 
+                }
+                
                 $withTransferIds = [];
 
                 foreach($withTransfer as $transferCity => $locations ){
@@ -169,8 +163,16 @@ class pjApiTickets extends pjApi {
 
                     if(empty($withTransferSeparated[$transferCity])){
                         unset($withTransferSeparated[$transferCity],$withTransferIds[$transferCity]);
-                    }
-                }   
+                    }       
+                    
+                }
+                
+                
+                $busIdArr = $busModel->getBusIds($date,$fromId,$toId, false,$withTransferIds);
+                $bookedData = $bookingPeriod = array();
+                $busList = $this->getBusList($fromId,$toId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F');
+
+                
             }
                 
             pjAppController::jsonResponse($busList);
