@@ -923,6 +923,11 @@ class pjAppController extends pjController {
                 $seconds = 0;
                 $startCount = false;
                 
+//                if($bus['route_id'] == 5){
+//                    
+//                    vd($busStops);
+//                }
+                
                 foreach ($locations as $key => &$location) {
                     
                     $cityId = $location['city_id'];
@@ -960,6 +965,21 @@ class pjAppController extends pjController {
                     }
                     
                     if ($nextLocation ['city_id'] == $returnId) {
+                        
+                        if(isset($busStops[$returnId])){
+                            $tmpBusStopData = $pjBusStopModel->reset()
+                                ->join('pjMultiLang', "t2.model='pjBusStopModel' AND t2.foreign_id=t1.bus_stop_id AND t2.field='name' AND t2.locale='" . $localeId . "'", 'left outer')
+                                ->join('pjMultiLang', "t3.model='pjBusStopModel' AND t3.foreign_id=t1.bus_stop_id AND t3.field='address' AND t3.locale='" . $localeId . "'", 'left outer')
+                                ->select("t1.bus_stop_id,CONCAT(t2.content,', ',t3.content) as address")
+                                ->where('route_id', $bus['route_id'])
+                                ->whereIn('bus_stop_id', $busStops[$returnId])
+                                ->findAll()
+                                ->getData();
+                        
+                            $location['bus_stops'][$returnId] = $tmpBusStopData;   
+                        }
+                        
+                        
                         if($transferId && ($transferId == $returnId) && $transferLocation){
                             $busArr[$k]['transferId'] = $transferId;
                             $busArr[$k]['transfer_location'] = $transferLocation;

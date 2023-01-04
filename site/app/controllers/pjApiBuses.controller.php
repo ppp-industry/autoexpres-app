@@ -112,7 +112,6 @@ class pjApiBuses extends pjApi {
                             unset($busIdArr['transferIds'][$city]['from'][$key]);
                         }
                     }
-
                 }
             }
             else{
@@ -125,8 +124,6 @@ class pjApiBuses extends pjApi {
                         }
                     }    
                 }
-                
-                
             }  
         };
         
@@ -183,8 +180,6 @@ class pjApiBuses extends pjApi {
             else {
                 
                 $busIdArr = $pjBusModel->getBusIds($date, $pickupId, $returnId, false,$transferIds);
-                
-//                vd($busIdArr);
                 
                 $filter($busIdArr,$pickupId, $returnId, $localeId);
                 
@@ -280,25 +275,19 @@ class pjApiBuses extends pjApi {
                 
                 $busIdArr = $this->_get('bus_id_arr');
                 $date = $this->_get('date');
-               
                 $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F');
-                
             }
             if ($this->_is('return_bus_id_arr')) {
-                
                 $busIdArr = $this->_get('return_bus_id_arr');
                 $date = $this->_get('return_date');
-                
                 $returnBusList = $this->getBusList($returnId,$pickupId, $busIdArr, $bookingPeriod, $bookedData, $date, 'T');
-                
                 $keys = array_keys($returnBusList);
                 
                 array_walk($keys, function(&$item){
                     $item .= '_return';
                 });
                 
-                $busList += array_combine($keys, array_values($returnBusList));
-               
+                $busList += array_combine($keys, array_values($returnBusList));  
             }
         }
         
