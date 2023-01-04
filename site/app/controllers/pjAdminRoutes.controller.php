@@ -25,6 +25,9 @@ class pjAdminRoutes extends pjAdmin {
                         $index_arr = explode("|", $_POST['index_arr']);
 
                         $pjRouteCityModel = pjRouteCityModel::factory();
+                        
+                        $from = $to = null;
+                        
                         foreach ($index_arr as $k => $index) {
                             if (isset($_POST['city_id_' . $index]) && (int) $_POST['city_id_' . $index] > 0) {
                                 $city_id = $_POST['city_id_' . $index];
@@ -35,16 +38,23 @@ class pjAdminRoutes extends pjAdmin {
                                 $pjRouteCityModel->reset()->setAttributes($data)->insert();
 
                                 if ($k == 0) {
+                                    $from = $city_id;
                                     $i18n_arr = $pjMultiLangModel->reset()->getMultiLang($city_id, 'pjCity');
                                     $i18n_arr = pjUtil::changeLangField($i18n_arr, 'from', 'name');
                                     $pjMultiLangModel->reset()->saveMultiLang($i18n_arr, $id, 'pjRoute', 'data');
                                 }
                                 if ($k == count($index_arr) - 1) {
+                                    
+                                    $to = $city_id;
                                     $i18n_arr = $pjMultiLangModel->reset()->getMultiLang($city_id, 'pjCity');
                                     $i18n_arr = pjUtil::changeLangField($i18n_arr, 'to', 'name');
                                     $pjMultiLangModel->reset()->saveMultiLang($i18n_arr, $id, 'pjRoute', 'data');
                                 }
                             }
+                        }
+                        
+                        if($from || $to){
+                            $this->checkIsInternational($from, $to, $id);
                         }
                     }
                     pjRouteModel::factory()->updateRouteDetail($id);
@@ -276,9 +286,8 @@ class pjAdminRoutes extends pjAdmin {
                 }
 
                 $pjRouteModel->reset()->where('id', $_POST['id'])->limit(1)->modifyAll($_POST);
-                
-                if(isset($_POST['back_id'])){
-                    
+//                echo __LINE__;exit();
+                if(isset($_POST['back_id']) && !empty($_POST['back_id'])){
                     
                     $cities = array_unique(array_column($busStops, 'city_id'));
                     $backBusStops = $pjRouteCityBusStopModel->reset()->whereIn('city_id',$cities)->where('route_id',$_POST['back_id'])->findAll()->getData();
@@ -297,13 +306,14 @@ class pjAdminRoutes extends pjAdmin {
                 if (isset($_POST['i18n'])) {
                     $pjMultiLangModel->updateMultiLang($_POST['i18n'], $_POST['id'], 'pjRoute', 'data');
                 }
-
+                
                 if (!isset($_POST['has_bookings'])) {
                     
                     $pjRouteCityModel = pjRouteCityModel::factory();
                     $pjRouteCityModel->where('route_id', $_POST['id'])->eraseAll();
                     if (isset($_POST['index_arr']) && $_POST['index_arr'] != '') {
                         $index_arr = explode("|", $_POST['index_arr']);
+                        $from = $to = null;
 
                         foreach ($index_arr as $k => $index) {
                             if (isset($_POST['city_id_' . $index]) && (int) $_POST['city_id_' . $index] > 0) {
@@ -314,16 +324,22 @@ class pjAdminRoutes extends pjAdmin {
                                 $data['order'] = $k + 1;
                                 $pjRouteCityModel->reset()->setAttributes($data)->insert();
                                 if ($k == 0) {
+                                    $from = $city_id;
                                     $i18n_arr = $pjMultiLangModel->reset()->getMultiLang($city_id, 'pjCity');
                                     $i18n_arr = pjUtil::changeLangField($i18n_arr, 'from', 'name');
                                     $pjMultiLangModel->reset()->updateMultiLang($i18n_arr, $_POST['id'], 'pjRoute', 'data');
                                 }
                                 if ($k == (count($index_arr) - 1)) {
+                                    $to = $city_id;
                                     $i18n_arr = $pjMultiLangModel->reset()->getMultiLang($city_id, 'pjCity');
                                     $i18n_arr = pjUtil::changeLangField($i18n_arr, 'to', 'name');
                                     $pjMultiLangModel->reset()->updateMultiLang($i18n_arr, $_POST['id'], 'pjRoute', 'data');
                                 }
                             }
+                        }            
+                        
+                        if($from || $to){   
+                            $this->checkIsInternational($from, $to, $_POST['id']);
                         }
                     }
                     $pjRouteModel->updateRouteDetail($_POST['id']);
@@ -393,7 +409,8 @@ class pjAdminRoutes extends pjAdmin {
                 $this->appendJs('pjAdminRoutes.js');
                 $this->appendJs('index.php?controller=pjAdmin&action=pjActionMessages', PJ_INSTALL_URL, true);
             }
-        } else {
+        } 
+        else {
             $this->set('status', 2);
         }
     }
@@ -456,6 +473,55 @@ class pjAdminRoutes extends pjAdmin {
             }
         }
     }
+    
+    
+    private function checkIsInternational($from,$to,$id) {
+
+        $fromModel = pjCityModel::factory()->find($from)->getData();
+        $toModel = pjCityModel::factory()->find($to)->getData();
+
+        if ($fromModel['is_ukraine'] == 0 || $toModel['is_ukraine'] == 0) {
+            $update = [
+                'is_international' => 1,  
+            ];
+            
+            if ($fromModel['is_ukraine'] == 0) {
+                $update['country_alpha'] = $fromModel['country_alpha'];
+                switch ($fromModel['country_alpha']) {
+                    case 'DE':
+                        $update['order_by_country'] = 5;
+                        break;
+                    case 'FR':
+                        $update['order_by_country'] = 6;
+                        break;
+                    case 'BE':
+                        $update['order_by_country'] = 7;
+                        break;
+                    default:
+                        $update['order_by_country'] = 8;
+                }
+            } 
+            else {
+                $update['country_alpha'] = $toModel['country_alpha'];
+                switch ($toModel['country_alpha']) {
+                    case 'DE':
+                        $update['order_by_country'] = 1;
+                        break;
+                    case 'FR':
+                        $update['order_by_country'] = 2;
+                        break;
+                    case 'BE':
+                        $update['order_by_country'] = 3;
+                        break;
+                    default:
+                        $update['order_by_country'] = 4;
+                }
+            }
+
+            pjRouteModel::factory()->where('id', $id)->modifyAll($update);
+        }
+    }
+
 }
 
 ?>
