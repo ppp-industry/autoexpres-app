@@ -30,7 +30,12 @@ class pjApiBuses extends pjApi {
                     ->join('pjRoute', "t3.id = t1.route_id", 'inner')
                     ->where('is_international',$isUkr ? 0 : 1)
                     ->groupBy('t1.id')
-                    ->select('t1.*,t2.content');
+                    ->select('t1.*,t2.content,t3.country_alpha');
+                    
+        if(!$isUkr){
+            $pjBusModel->orderBy('order_by_country');
+        }
+                    
         
         $total = $pjBusModel->findCount()->getData();
         
@@ -42,7 +47,7 @@ class pjApiBuses extends pjApi {
             $page = $pages;
         }
         
-        $data = $pjBusModel->select(" t1.*, t2.content AS route")->limit($rowCount, $offset)->findAll()->getData();
+        $data = $pjBusModel->select(" t1.*, t2.content AS route,t3.country_alpha")->limit($rowCount, $offset)->findAll()->getData();
 
         
          foreach($data as &$busItem){
