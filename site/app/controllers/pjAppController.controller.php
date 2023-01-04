@@ -626,6 +626,7 @@ class pjAppController extends pjController {
                 
                 $arrivalTimeTransferTimestamp = strtotime($arrivalTimeTransfer);
                 $departureTimeTransferTimestamp = strtotime($departureTimeTransfer);
+                
                 $arrivalTimeEndTimestamp = strtotime($arrivalTimeEnd);
                 $departureTimeStartTimestamp = strtotime($departureTimeStart);
                 
@@ -640,7 +641,7 @@ class pjAppController extends pjController {
                 }
                 
                 $busArrKey = $id . '_' . $itemFrom['id'];
-                if(isset($busArr[$busArrKey])){
+                if(isset($busArr[$busArrKey]) || ($departureTimeTransferTimestamp - $arrivalTimeTransferTimestamp) > 7200){
                     continue;;
                 }
                 
@@ -675,9 +676,12 @@ class pjAppController extends pjController {
                 $busArr[$busArrKey] = [
                     
                     'departure_time_start' => $departureTimeStart,
+                    
                     'arrival_time_transfer' => $arrivalTimeTransfer,
                     
                     'departure_time_transfer' => $departureTimeTransfer,
+                    
+                    
                     'arrival_time_end' => $arrivalTimeEnd,
                     
                     'route_id_to_transfer' => $busArrTo[$id]['route_id'],
@@ -946,7 +950,7 @@ class pjAppController extends pjController {
                         $location['bus_stops'][$cityId] = $tmpBusStopData;
                     }
 
-                    $nextLocation = $locations [$key + 1];
+                    $nextLocation = &$locations [$key + 1];
 
                     if ($location ['city_id'] == $pickupId) {
                         
@@ -976,7 +980,7 @@ class pjAppController extends pjController {
                                 ->findAll()
                                 ->getData();
                         
-                            $location['bus_stops'][$returnId] = $tmpBusStopData;   
+                            $nextLocation['bus_stops'][$returnId] = $tmpBusStopData;   
                         }
                         
                         
