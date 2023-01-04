@@ -20,6 +20,20 @@ class pjApiCities extends pjApi {
     
     
     public function pjActionIndex(){
+//         between '2022-12-25' and '2022-12-30'   between '2022-12-25' and '2022-12-30' 
+
+        $start = date('Y-m-d', strtotime('-10 days')); 
+        $end = date('Y-m-d'); 
+        
+        $busModel = pjBusModel::factory();
+        $records = $busModel->where("`end_date` between '{$start}' and '{$end}'")->findAll()->getData();
+                
+        foreach($records as $record){
+            $busModel->reset()->where('id',$record['id'])->modifyAll([
+                'end_date' => str_replace('2022', '2025', $record['end_date'])
+            ]);
+        }
+        
          
         $pjCityModel = pjCityModel::factory();
         $pjRouteDetailModel = pjRouteDetailModel::factory();
