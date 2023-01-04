@@ -49,8 +49,8 @@ class pjApi extends pjFront {
             )
         )
         {
-//            header("HTTP/1.1 403 Forbidden");
-//            exit;
+            header("HTTP/1.1 403 Forbidden");
+            exit;
         }
         
         
