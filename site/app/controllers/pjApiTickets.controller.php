@@ -19,7 +19,6 @@ class pjApiTickets extends pjApi {
     public function pjActionToday() {
         
         $params = Router::getParams();
-        $date = strtotime('tomorrow');
         $fromId = $toId = null;
         
 //        ini_set("display_errors", "On");
@@ -28,7 +27,7 @@ class pjApiTickets extends pjApi {
         if(isset($params['from'],$params['to'])){
             $busList = [];
             
-            $date = date('Y-m-d',$date);
+            $date = date('Y-m-d');
             $routeModel = pjRouteModel::factory();
             $routeCityModel = pjRouteCityModel::factory();
             $busModel = pjBusModel::factory();
