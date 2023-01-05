@@ -38,18 +38,28 @@ if (isset($tpl['status']))
 				<?php
 			}
 			?>	
-			<p>
-				<label class="title">&nbsp;</label>
-				<input type="submit" value="<?php __('btnSave'); ?>" class="pj-button" />
-				<input type="button" value="<?php __('btnCancel'); ?>" class="pj-button" onclick="window.location.href='<?php echo PJ_INSTALL_URL; ?>index.php?controller=pjAdminCities&action=pjActionIndex';" />
-			</p>
-                        
+			
                         <p>
 				<label class="title">Код країни(Alpha code):</label>
                                 <span class="inline_block">
-                                        <input type="text" id="" name="i18n[<?php echo $v['id']; ?>][name]" class="pj-form-field w300 required" />
+                                    <input type="text" id="" required="" name="country_alpha" class="pj-form-field w300 required" />
                                        
                                 </span>
+			</p>  
+                            
+                        <p>
+				<label class="title">Україна:</label>
+                                <span class="inline_block">
+                                    <input type="checkbox" id="" name="is_ukraine" class="pj-form-field w30" />
+                                       
+                                </span>
+			</p>        
+                       
+                                
+                        <p>
+				<label class="title">&nbsp;</label>
+				<input type="submit" value="<?php __('btnSave'); ?>" class="pj-button" />
+				<input type="button" value="<?php __('btnCancel'); ?>" class="pj-button" onclick="window.location.href='<?php echo PJ_INSTALL_URL; ?>index.php?controller=pjAdminCities&action=pjActionIndex';" />
 			</p>
 		</div>
 	</form>

@@ -31,7 +31,19 @@ class pjAdminCities extends pjAdmin {
 
         if ($this->isAdmin() || $this->isEditor()) {
             if (isset($_POST['city_create'])) {
-                $id = pjCityModel::factory($_POST)->insert()->getInsertId();
+                $data = $_POST;
+                
+                if(isset($data['is_ukraine'])){
+                    $data['is_ukraine'] = 1;
+                }
+                else{
+                    $data['is_ukraine'] = 0;
+                }
+                
+                
+                $id = pjCityModel::factory($data)->insert()->getInsertId();
+                
+                
                 if ($id !== false && (int) $id > 0) {
                     if (isset($_POST['i18n'])) {
                         pjMultiLangModel::factory()->saveMultiLang($_POST['i18n'], $id, 'pjCity', 'data');
@@ -42,18 +54,9 @@ class pjAdminCities extends pjAdmin {
                 }
                 pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminCities&action=pjActionIndex&err=$err");
             } else {
-                $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                                ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                                ->where('t2.file IS NOT NULL')
-                                ->orderBy('t1.sort ASC')->findAll()->getData();
-
-                $lp_arr = array();
-                foreach ($locale_arr as $item) {
-                    $lp_arr[$item['id'] . "_"] = $item['file'];
-                }
-                $this->set('lp_arr', $locale_arr);
-                $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
-
+                $this->setLocales();
+                
+                
                 $this->appendJs('jquery.validate.min.js', PJ_THIRD_PARTY_PATH . 'validate/');
                 $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
                 $this->appendJs('jquery.tipsy.js', PJ_THIRD_PARTY_PATH . 'tipsy/');
@@ -164,7 +167,18 @@ class pjAdminCities extends pjAdmin {
 
         if ($this->isAdmin() || $this->isEditor()) {
             if (isset($_POST['city_update'])) {
-                pjCityModel::factory()->where('id', $_POST['id'])->limit(1)->modifyAll($_POST);
+                
+                $data = $_POST;
+                if(isset($data['is_ukraine'])){
+                    $data['is_ukraine'] = 1;
+                }
+                else{
+                    $data['is_ukraine'] = 0;
+                }
+                
+                
+                
+                pjCityModel::factory()->where('id', $_POST['id'])->limit(1)->modifyAll($data);
                 if (isset($_POST['i18n'])) {
                     pjMultiLangModel::factory()->updateMultiLang($_POST['i18n'], $_POST['id'], 'pjCity', 'data');
                 }
@@ -177,19 +191,9 @@ class pjAdminCities extends pjAdmin {
                 }
                 $arr['i18n'] = $pjMultiLangModel->getMultiLang($arr['id'], 'pjCity');
 
-                $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                                ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                                ->where('t2.file IS NOT NULL')
-                                ->orderBy('t1.sort ASC')->findAll()->getData();
-
-                $lp_arr = array();
-                foreach ($locale_arr as $item) {
-                    $lp_arr[$item['id'] . "_"] = $item['file'];
-                }
-                $this->set('seat_arr', pjSeatModel::factory()->where('bus_type_id', $_GET['id'])->findAll()->getData());
-
-                $this->set('lp_arr', $locale_arr);
-                $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+                $this->setLocales();
+                
+                
                 $this->set('arr', $arr);
 
                 $this->appendJs('jquery.validate.min.js', PJ_THIRD_PARTY_PATH . 'validate/');
