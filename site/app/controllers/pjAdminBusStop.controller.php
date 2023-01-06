@@ -8,8 +8,6 @@ if (!defined("ROOT_PATH")) {
 class pjAdminBusStop extends pjAdmin {
 
     public function pjActionIndex() {
-        
-        
         $this->checkLogin();
 
         if ($this->isAdmin() || $this->isEditor()) {
@@ -57,8 +55,17 @@ class pjAdminBusStop extends pjAdmin {
                 }
             }
             
-            $arr['i18n'] = $pjMultiLangModel->getMultiLang($arr['id'], 'pjBusStopModel');
+            $i18n = $pjMultiLangModel->getMultiLang($arr['id'], 'pjBusStopModel');
             
+            if(empty($i18n) || isset($i18n[3])){
+                $i18n[3] = [
+                    'name' => $arr['name'],
+                    'address' => $arr['address'],
+                ];
+            }
+            
+            $arr['i18n'] = $i18n;
+                       
             $this->set('arr', $arr);
             
             $city_arr = pjCityModel::factory()
@@ -80,9 +87,6 @@ class pjAdminBusStop extends pjAdmin {
 //                $this->appendJs('pjAdminBusTypes.js');
             $this->appendJs('index.php?controller=pjAdmin&action=pjActionMessages', PJ_INSTALL_URL, true);
         }
-        
-        
-        
     }
     
     public function pjActionCreate(){
@@ -91,8 +95,6 @@ class pjAdminBusStop extends pjAdmin {
         if ($this->isAdmin() || $this->isEditor()) {
             
             if (isset($_POST['bus_stop_create'])) {
-                
-//                vd($_POST);
                 $pjBusTypeModel = pjBusStopModel::factory();
                 $localeId = $this->getLocaleId();
                 
@@ -175,11 +177,8 @@ class pjAdminBusStop extends pjAdmin {
 
             pjAppController::jsonResponse(compact('data', 'total', 'pages', 'page', 'rowCount', 'column', 'direction'));
         }
-        exit;
-        
+        exit;   
     }
-    
-
 }
 
 ?>
