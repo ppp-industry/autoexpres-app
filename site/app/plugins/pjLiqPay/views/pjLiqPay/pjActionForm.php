@@ -6,8 +6,14 @@ require_once dirname(__FILE__) . '/pjLiqPaySDK.php';
 //$private_key = 'b8S75OT5Ot6yw5rkuWzwHg8pqJSoBlkx2DGOTdhn';																																																																																																					
 //$public_key = 'i13881580010';
 
-$public_key = 'sandbox_i42968995129';
-$private_key = 'sandbox_UXFowv7bgWRt3gbLR30XmLhO5s3YV3kacoqrWaFH';
+//$public_key = 'sandbox_i42968995129';
+//$private_key = 'sandbox_UXFowv7bgWRt3gbLR30XmLhO5s3YV3kacoqrWaFH';
+
+$public_key = 'i57278017171';
+$private_key = 'VoeBHdI4YdGEUxpksUt4gNeOsSKD6nZAMoJuZabU';
+
+
+
 $liqpay = new LiqPay($public_key, $private_key);
 
 $pjLiqPayFormParams = array(

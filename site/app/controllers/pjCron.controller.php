@@ -8,6 +8,23 @@ if (!defined("ROOT_PATH")) {
 class pjCron extends pjAppController {
 
     public function pjActionIndex() {
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
+        $mailer = $this->getMailer();
+        $message = Swift_Message::newInstance()
+                                    ->setFrom('alexmaoczedun@gmail.com')
+                                    ->setCharset('UTF-8')
+                                    ->setSubject('Test')
+                                    ->setBody('<p>test</p>')
+                                    ->setTo('Abings1971@jourrapide.com');
+        
+        if(!$mailer->send($message, $failures)){
+            vd($failures);
+        };
+        echo __LINE__;exit();
+        
+        
         $this->setLayout('pjActionEmpty');
 
         $option_arr = pjOptionModel::factory()->getPairs($this->getForeignId());
@@ -332,10 +349,15 @@ class pjCron extends pjAppController {
     private function getMailer(){
         require_once ROOT_PATH . 'core/libs/swift_mailer/lib/swift_required.php';
         
-        $port = $this->option_arr['o_smtp_port'];
-        $host = $this->option_arr['o_smtp_host']; 
-        $user = $this->option_arr['o_smtp_user'];
-        $pass = $this->option_arr['o_smtp_pass'];
+//        $port = $this->option_arr['o_smtp_port'];
+//        $host = $this->option_arr['o_smtp_host']; 
+//        $user = $this->option_arr['o_smtp_user'];
+//        $pass = $this->option_arr['o_smtp_pass'];
+        $port = 587;
+        $host = 'smtp.gmail.com';
+        $user = 'alexmaoczedun@gmail.com';
+        $pass = 'Ap23029514';
+        
         $security = $port == 587 ? 'tls' : null;
         
         $transport = Swift_SmtpTransport::newInstance($host, $port,$security);
