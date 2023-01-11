@@ -9,6 +9,8 @@ require_once dirname(__FILE__) . '/pjLiqPaySDK.php';
 //$public_key = 'sandbox_i42968995129';
 //$private_key = 'sandbox_UXFowv7bgWRt3gbLR30XmLhO5s3YV3kacoqrWaFH';
 
+
+
 $public_key = 'i57278017171';
 $private_key = 'VoeBHdI4YdGEUxpksUt4gNeOsSKD6nZAMoJuZabU';
 

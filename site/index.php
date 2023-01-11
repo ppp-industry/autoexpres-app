@@ -1,4 +1,5 @@
 <?php
+phpinfo();exit();
 function vd($var){
     
     
