@@ -8,23 +8,6 @@ if (!defined("ROOT_PATH")) {
 class pjCron extends pjAppController {
 
     public function pjActionIndex() {
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
-        
-        $mailer = $this->getMailer();
-        $message = Swift_Message::newInstance()
-                                    ->setFrom('alexmaoczedun@gmail.com')
-                                    ->setCharset('UTF-8')
-                                    ->setSubject('Test')
-                                    ->setBody('<p>test</p>')
-                                    ->setTo('Abings1971@jourrapide.com');
-        
-        if(!$mailer->send($message, $failures)){
-            vd($failures);
-        };
-        echo __LINE__;exit();
-        
-        
         $this->setLayout('pjActionEmpty');
 
         $option_arr = pjOptionModel::factory()->getPairs($this->getForeignId());
@@ -219,7 +202,7 @@ class pjCron extends pjAppController {
                                 
         $messageText = str_replace($tokens['search'], $tokens['replace'], $lang_message[0]['content']);
         $message = Swift_Message::newInstance()
-                                    ->setFrom($this->option_arr['o_smtp_user'])
+                                    ->setFrom('pavluk@pavluks-trans.com')
                                     ->setCharset('UTF-8')
                                     ->setSubject($lang_subject[0]['content'])
                                     ->setBody($messageText)
@@ -353,10 +336,10 @@ class pjCron extends pjAppController {
 //        $host = $this->option_arr['o_smtp_host']; 
 //        $user = $this->option_arr['o_smtp_user'];
 //        $pass = $this->option_arr['o_smtp_pass'];
-        $port = 587;
-        $host = 'smtp.gmail.com';
-        $user = 'alexmaoczedun@gmail.com';
-        $pass = 'Ap23029514';
+        $port = 25;
+        $host = 'mail.adm.tools';
+        $user = 'pavluk@pavluks-trans.com';
+        $pass = 'Dev12345!';
         
         $security = $port == 587 ? 'tls' : null;
         

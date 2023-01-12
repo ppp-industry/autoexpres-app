@@ -241,7 +241,16 @@ class pjAppController extends pjController {
         $total = pjUtil::formatCurrencySign($booking_arr['total'], $option_arr['o_currency']);
 
         $booking_date = NULL;
-        if (isset($booking_arr['booking_date']) && !empty($booking_arr['booking_date'])) {
+        if 
+            (
+                isset(
+                $booking_arr['booking_date']) 
+                && 
+                !empty($booking_arr['booking_date']) 
+                &&
+                $booking_arr['booking_date'] != '0000-00-00' 
+               
+            ) {
             $tm = strtotime(@$booking_arr['booking_date']);
             $booking_date = date($option_arr['o_date_format'], $tm);
         }
@@ -260,13 +269,34 @@ class pjAppController extends pjController {
             '{PrintTickets}',
             '{CancelURL}');
         $replace = array(
-            (!empty($booking_arr['c_title']) ? $personal_titles[$booking_arr['c_title']] : null), $booking_arr['c_fname'], $booking_arr['c_lname'], $booking_arr['c_email'], $booking_arr['c_phone'], $country,
-            $booking_arr['c_city'], $booking_arr['c_state'], $booking_arr['c_zip'], $booking_arr['c_address'],
-            $booking_arr['c_company'], @$booking_arr['cc_type'], @$booking_arr['cc_num'], (@$booking_arr['payment_method'] == 'creditcard' ? @$booking_arr['cc_exp'] : NULL), @$booking_arr['cc_code'], @$booking_arr['payment_method'],
-            @$booking_arr['uuid'], $booking_date, $bus, $route, $seats, $time, $tickets,
-            @$total, @$booking_arr['c_notes'],
+            (!empty($booking_arr['c_title']) ? $personal_titles[$booking_arr['c_title']] : null), 
+            $booking_arr['c_fname'],
+            $booking_arr['c_lname'], 
+            $booking_arr['c_email'],
+            $booking_arr['c_phone'],
+            $country,
+            $booking_arr['c_city'], 
+            $booking_arr['c_state'],
+            $booking_arr['c_zip'],
+            $booking_arr['c_address'],
+            $booking_arr['c_company'],
+            @$booking_arr['cc_type'],
+            @$booking_arr['cc_num'], 
+            (@$booking_arr['payment_method'] == 'creditcard' ? @$booking_arr['cc_exp'] : NULL), 
+            @$booking_arr['cc_code'],
+            @$booking_arr['payment_method'],
+            @$booking_arr['uuid'],
+            $booking_date,
+            $bus,
+            $route, 
+            $seats, 
+            $time,
+            $tickets,
+            @$total,
+            @$booking_arr['c_notes'],
             $printURL,
-            $cancelURL);
+            $cancelURL
+        );
 
         return compact('search', 'replace');
     }
@@ -626,7 +656,6 @@ class pjAppController extends pjController {
                 
                 $arrivalTimeTransferTimestamp = strtotime($arrivalTimeTransfer);
                 $departureTimeTransferTimestamp = strtotime($departureTimeTransfer);
-                
                 $arrivalTimeEndTimestamp = strtotime($arrivalTimeEnd);
                 $departureTimeStartTimestamp = strtotime($departureTimeStart);
                 
@@ -676,12 +705,9 @@ class pjAppController extends pjController {
                 $busArr[$busArrKey] = [
                     
                     'departure_time_start' => $departureTimeStart,
-                    
                     'arrival_time_transfer' => $arrivalTimeTransfer,
                     
                     'departure_time_transfer' => $departureTimeTransfer,
-                    
-                    
                     'arrival_time_end' => $arrivalTimeEnd,
                     
                     'route_id_to_transfer' => $busArrTo[$id]['route_id'],
@@ -926,11 +952,6 @@ class pjAppController extends pjController {
             if (!empty($pickupArr) && !empty($returnArr)) {
                 $seconds = 0;
                 $startCount = false;
-                
-//                if($bus['route_id'] == 5){
-//                    
-//                    vd($busStops);
-//                }
                 
                 foreach ($locations as $key => &$location) {
                     

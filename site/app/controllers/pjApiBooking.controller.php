@@ -162,7 +162,7 @@ class pjApiBooking extends pjApi {
         $data ['return_id'] = $return_id;
         $data ['is_return'] = $is_return;
         $data ['status'] = $this->option_arr ['o_booking_status'];
-
+        
         $data ['booking_date'] = pjUtil::formatDate($this->_get('date'), $this->option_arr ['o_date_format']);
         if ($is_return == 'T') {
             $data ['return_date'] = pjUtil::formatDate($this->_get('return_date'), $this->option_arr ['o_date_format']);

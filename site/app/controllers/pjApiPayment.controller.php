@@ -68,13 +68,15 @@ class pjApiPayment extends pjApi {
         $response = '';
         
 
-        
-        $returnUrl = 'http://' . $host. '/api/payment/checkPayment?key=' . $key . '&id=' . $arr['id'];
+        $protocol = (!empty($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == '1')) ? 'https://' : 'http://';
+        $returnUrl = $protocol . $host. '/api/payment/checkPayment?key=' . $key . '&id=' . $arr['id'];
         
         if($arr['payment_method'] == pjBookingPaymentModel::METHOD_CASH){
             
-            pjBookingMail::makeModel($_GET['booking_id'], pjBookingMail::TYPE_CONFIRM);
             $this->setPaidStatus($_GET['booking_id']);
+            echo '<meta http-equiv="refresh" content="0;url='.$returnUrl.'">';
+            exit();
+            
             pjUtil::redirect($returnUrl);
         } 
         
