@@ -163,13 +163,13 @@ class pjApiBooking extends pjApi {
         $data ['is_return'] = $is_return;
         $data ['status'] = $this->option_arr ['o_booking_status'];
         
-        $data ['booking_date'] = pjUtil::formatDate($FORM['date'], $this->option_arr['o_date_format']);
+        $data ['booking_date'] = pjUtil::formatDate(str_replace(['/','.',',','\\','_'], '-', $FORM['date']), $this->option_arr['o_date_format']);
 //        vd($data['booking_date']);
         
         if ($is_return == 'T') {
             
             
-            $data['return_date'] = pjUtil::formatDate($FORM['return_date'], $this->option_arr['o_date_format']);
+            $data['return_date'] = pjUtil::formatDate(str_replace(['/','.',',','\\','_'], '-', $FORM['return_date']), $this->option_arr['o_date_format']);
 //            vd($data['return_date']);/
         }
         $data ['booking_datetime'] = $data ['booking_date'];
@@ -311,7 +311,7 @@ class pjApiBooking extends pjApi {
 
                         $data ['booking_route'] = $child_bus_arr ['route'] . ', ' . $depart_arrive_start . '<br/>';
                         $data ['booking_route'] .= __('front_from', true, false) . ' ' . $to_location . ' ' . __('front_to', true, false) . ' ' . $from_location;
-                        $data ['booking_date'] = pjUtil::formatDate($FORM['return_date'], $this->option_arr ['o_date_format']);
+                        $data ['booking_date'] = pjUtil::formatDate(str_replace(['/','.',',','\\','_'], '-', $FORM['return_date']), $this->option_arr ['o_date_format']);
                        
                         
                         if (isset($bookingPeriod[$return_bus_id_start],$bookingPeriod[$return_bus_id_end])) {
@@ -461,7 +461,7 @@ class pjApiBooking extends pjApi {
 
                         $data ['booking_route'] = $child_bus_arr ['route'] . ', ' . $depart_arrive . '<br/>';
                         $data ['booking_route'] .= __('front_from', true, false) . ' ' . $to_location . ' ' . __('front_to', true, false) . ' ' . $from_location;
-                        $data ['booking_date'] = pjUtil::formatDate($FORM['return_date'], $this->option_arr ['o_date_format']);
+                        $data ['booking_date'] = pjUtil::formatDate(str_replace(['/','.',',','\\','_'], '-', $FORM['return_date']), $this->option_arr ['o_date_format']);
                        
                         
                         if (isset($bookingPeriod[$return_bus_id])) {
