@@ -873,7 +873,7 @@ class pjFrontEnd extends pjFront {
                         ->getData();
 
                 pjFrontEnd::pjActionConfirmSend($this->option_arr, $booking_arr, PJ_SALT, 'cancel');
-
+                
                 pjUtil::redirect($_SERVER['PHP_SELF'] . '?controller=pjFrontEnd&action=pjActionCancel&err=200');
             }
         } else {
@@ -913,7 +913,8 @@ class pjFrontEnd extends pjFront {
                         }
                     }
                 }
-            } elseif (!isset($_GET['err'])) {
+            } 
+            elseif (!isset($_GET['err'])) {
                 $this->set('status', 1);
             }
         }

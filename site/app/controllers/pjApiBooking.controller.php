@@ -151,9 +151,9 @@ class pjApiBooking extends pjApi {
         $return_bus_id_start = isset($booked_data ['return_bus_id_start']) ? $booked_data ['return_bus_id_start'] : 0;
         $return_bus_id_end = isset($booked_data ['return_bus_id_end']) ? $booked_data ['return_bus_id_end'] : 0;
 
-        $pickup_id = $this->_get('pickup_id');
-        $return_id = $this->_get('return_id');
-        $is_return = $this->_get('is_return');
+        $pickup_id = $FORM['pickup_id'];
+        $return_id = $FORM['return_id'];
+        $is_return = isset($FORM['is_return']) && $FORM['is_return'] == '1' ? 'T' : 'F';
 
         $data = array();
         $data ['uuid'] = time();
@@ -163,9 +163,14 @@ class pjApiBooking extends pjApi {
         $data ['is_return'] = $is_return;
         $data ['status'] = $this->option_arr ['o_booking_status'];
         
-        $data ['booking_date'] = pjUtil::formatDate($this->_get('date'), $this->option_arr ['o_date_format']);
+        $data ['booking_date'] = pjUtil::formatDate($FORM['date'], $this->option_arr['o_date_format']);
+//        vd($data['booking_date']);
+        
         if ($is_return == 'T') {
-            $data ['return_date'] = pjUtil::formatDate($this->_get('return_date'), $this->option_arr ['o_date_format']);
+            
+            
+            $data['return_date'] = pjUtil::formatDate($FORM['return_date'], $this->option_arr['o_date_format']);
+//            vd($data['return_date']);/
         }
         $data ['booking_datetime'] = $data ['booking_date'];
         $payment = 'none';
@@ -191,7 +196,7 @@ class pjApiBooking extends pjApi {
         $to_location = $return_location ['name'];
 
             
-            if($transferId){
+        if($transferId){
                 
                 $transfer_location = $pjCityModel->reset()->select('t1.*, t2.content as name')->join('pjMultiLang', "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')->find($transferId)->getData();
                 $trans_location = $transfer_location ['name'];
@@ -306,7 +311,7 @@ class pjApiBooking extends pjApi {
 
                         $data ['booking_route'] = $child_bus_arr ['route'] . ', ' . $depart_arrive_start . '<br/>';
                         $data ['booking_route'] .= __('front_from', true, false) . ' ' . $to_location . ' ' . __('front_to', true, false) . ' ' . $from_location;
-                        $data ['booking_date'] = pjUtil::formatDate($this->_get('return_date'), $this->option_arr ['o_date_format']);
+                        $data ['booking_date'] = pjUtil::formatDate($FORM['return_date'], $this->option_arr ['o_date_format']);
                        
                         
                         if (isset($bookingPeriod[$return_bus_id_start],$bookingPeriod[$return_bus_id_end])) {
@@ -414,7 +419,7 @@ class pjApiBooking extends pjApi {
                 
                 
                 $data ['booking_time'] = join(" - ", $bus_time_arr);
-                $data ['booking_route'] = $bus_arr ['route'] . ', ' . $depart_arrive;
+                $data ['booking_route'] = $bus_arr['route'] . ', ' . $depart_arrive;
                 $data ['booking_route'] .= __('front_from', true, false) . ' ' . $from_location . ' ' . __('front_to', true, false) . ' ' . $to_location;
 
                 $id = $pjBookingModel->setAttributes(array_merge($FORM, $data))->insert()->getInsertId();
@@ -456,7 +461,7 @@ class pjApiBooking extends pjApi {
 
                         $data ['booking_route'] = $child_bus_arr ['route'] . ', ' . $depart_arrive . '<br/>';
                         $data ['booking_route'] .= __('front_from', true, false) . ' ' . $to_location . ' ' . __('front_to', true, false) . ' ' . $from_location;
-                        $data ['booking_date'] = pjUtil::formatDate($this->_get('return_date'), $this->option_arr ['o_date_format']);
+                        $data ['booking_date'] = pjUtil::formatDate($FORM['return_date'], $this->option_arr ['o_date_format']);
                        
                         
                         if (isset($bookingPeriod[$return_bus_id])) {
