@@ -53,6 +53,7 @@ if (isset($tpl['status'])) {
 	myLabel.active = "<?php __('lblActive', false, true); ?>";
 	myLabel.inactive = "<?php __('lblInactive', false, true); ?>";
 	myLabel.status = "<?php __('lblStatus', false, true); ?>";
+	myLabel.order = "сортування";
 	</script>
 	<?php
 }

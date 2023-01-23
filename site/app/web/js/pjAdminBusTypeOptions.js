@@ -241,14 +241,12 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
                     {type: "delete", url: "index.php?controller=pjAdminBusTypeOptions&action=pjActionDeleteBusTypeOption&id={:id}"}
                 ],
                 columns: [
-                    {text: myLabel.id, type: "text", sortable: false, editable: false,  width: 50},
-                    {text: myLabel.name, type: "text", sortable: true, editable: true, width: 280}
-                    
-                    
+                    {text: myLabel.name, type: "text", sortable: true, editable: true, width: 280},
+                    {text: myLabel.order, type: "text", sortable: true, editable: true, width: 280}
                 ],
                 dataUrl: "index.php?controller=pjAdminBusTypeOptions&action=pjActionGetBusTypeOptions",
                 dataType: "json",
-                fields: ['id','name'],
+                fields: ['name','order'],
                 paginator: {
                     actions: [
                         {text: myLabel.delete_selected, url: "index.php?controller=pjAdminBusTypeOptions&action=pjActionDeleteBusTypeBulk", render: true, confirmation: myLabel.delete_confirmation},

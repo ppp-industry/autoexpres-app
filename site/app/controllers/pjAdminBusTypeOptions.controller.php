@@ -4,6 +4,10 @@ if (!defined("ROOT_PATH")) {
     header("HTTP/1.1 403 Forbidden");
     exit;
 }
+
+ini_set("display_errors", "On");
+error_reporting(E_ALL ^ E_DEPRECATED);
+
 class pjAdminBusTypeOptions extends pjAdmin {
     
     
@@ -98,7 +102,7 @@ class pjAdminBusTypeOptions extends pjAdmin {
                 $pjBusTypeOptionModel->where('name LIKE', "%$q%");
             }
             
-            $column = 'name';
+            $column = '`order`';
             $direction = 'ASC';
             if (isset($_GET['direction']) && isset($_GET['column']) && in_array(strtoupper($_GET['direction']), array('ASC', 'DESC'))) {
                 $column = $_GET['column'];
@@ -153,8 +157,7 @@ class pjAdminBusTypeOptions extends pjAdmin {
 
     
     public function pjActionUpdateBusTypeOption(){
-//        ini_set("display_errors", "On");
-//        error_reporting(E_ALL ^ E_DEPRECATED);
+        
         
          $this->checkLogin();
 
@@ -206,6 +209,11 @@ class pjAdminBusTypeOptions extends pjAdmin {
                     $data['name'] = $_POST['i18n'][$localeId]['name'];    
                     
                 }
+                
+                if(isset($params['order'])){
+                    $data['order'] = $params['order'];
+                }
+                
                 
                 if($pjBusTypeOptionItemModel->reset()->find($params['id'])->modify($data)->getAffectedRows() > 0){
                     pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypeOptions&action=pjActionIndex");

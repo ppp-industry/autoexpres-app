@@ -50,6 +50,14 @@
                     
             <?php endif;?>
                     
+            
+            <p>
+                <label class="title">Сортування</label>
+                <span class="inline_block">
+                    <input type="text" name="order" id="order" class="pj-form-field required" required />
+                </span>
+            </p>
+            
                     
             <p>
                 <label class="title"><?php if(!$tpl['arr']['svg_source']): ?> Фото  <?php endif;?></label>

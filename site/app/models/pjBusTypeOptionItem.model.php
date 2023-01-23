@@ -13,6 +13,7 @@ class pjBusTypeOptionItemModel extends pjAppModel {
         array('name' => 'id', 'type' => 'int', 'default' => ':NULL'),
         array('name' => 'name', 'type' => 'varchar', 'default' => ':NULL'),
         array('name' => 'svg_source', 'type' => 'varchar', 'default' => ':NULL'),
+        array('name' => 'order', 'type' => 'int', 'default' => ':NULL')
     );
 
     public static function factory($attr = array()) {

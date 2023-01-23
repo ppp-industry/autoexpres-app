@@ -35,6 +35,12 @@
         
                     
             <p>
+                <label class="title">Сортування</label>
+                <span class="inline_block">
+                    <input type="text" name="order" id="order" class="pj-form-field required" required />
+                </span>
+            </p>
+            <p>
                 <label class="title">Фото</label>
                 <span class="inline_block">
                     <input type="file" name="photo" id="photo" class="pj-form-field" accept=".svg" />

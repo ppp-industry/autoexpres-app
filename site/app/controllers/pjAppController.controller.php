@@ -1073,6 +1073,7 @@ class pjAppController extends pjController {
                                     ->join('pjBusTypeOptionItem', "t3.id=t1.option_id ", 'inner')
                                     ->select("t1.*,t2.content as name,t3.svg_source as file")
                                     ->where('bus_type_id',$bus['bus_type_id'])
+                                    ->orderBy('t3.`order`')
                                     ->findAll()
                                     ->getData();
                         
