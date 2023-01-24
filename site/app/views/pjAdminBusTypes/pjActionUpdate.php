@@ -60,7 +60,7 @@ if (isset($tpl['status'])) {
 				$size = getimagesize($map);
 				?>
 				<div id="boxMap">
-					<p>
+					<p >
 						<label class="title"><?php __('lblSeatsMap'); ?></label>
 						<span class="inline_block">
 							<input type="button" value="<?php __('btnDeleteMap'); ?>" class="pj-button pj-delete-map" lang="<?php echo $tpl['arr']['id']?>"/>
@@ -103,17 +103,13 @@ if (isset($tpl['status'])) {
 			} 
 			?>
                                 
-                                
-                                
-                                
-                                
 			<?php
 			$photo = $tpl['arr']['photo']; 
 			if (is_file($photo))
 			{
 				$size = getimagesize($photo);
 				?>
-                                <p>
+                                <p class="dltImgBtnWrp">
 						<label class="title">Фото</label>
 						<span class="inline_block">
 							<input type="button" value="Видалити фото" class="pj-button pj-delete-photo" lang="<?php echo $tpl['arr']['id']?>"/>

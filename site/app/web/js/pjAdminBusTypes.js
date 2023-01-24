@@ -8,6 +8,7 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 			$dialogDel = $("#dialogDelete"),
 			$dialogPhotoDel = $("#dialogDeletePhoto"),
 			$boxMap = $("#boxMap"),
+			$boxPhoto = $(".dltImgBtnWrp,#photoHolder"),
 			datagrid = ($.fn.datagrid !== undefined),
 			validate = ($.fn.validate !== undefined),
 			vOpts = {
@@ -370,6 +371,7 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
                                                 success: function (data) {
                                                     if(data != '100')
                                                     {
+                                                        $boxPhoto.hide();
 //                                                        $boxMap.html(data);
 //                                                        $('#seats_count').parent().parent().css('display', 'block');
                                                     }
