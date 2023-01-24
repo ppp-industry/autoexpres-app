@@ -320,11 +320,13 @@ class pjAdminBusTypes extends pjAdmin {
                                         $data['photo'] = $image_path;
                                         
                                         
+                                        
+                                        if($arr['photo']){
+                                            $this->delelteItemPhoto($params['id']);
+                                        }
+                                        
+                                        
                                    }
-                                }
-                                else{
-                                    
-                                    
                                 }
 
                         } else {
@@ -436,6 +438,27 @@ class pjAdminBusTypes extends pjAdmin {
         } else {
             $this->set('status', 2);
         }
+    }
+    
+    public function pjActionDeletePhoto(){
+        $params = $_POST;
+        $this->delelteItemPhoto($params['id']);
+        
+    }
+    
+    
+    private function delelteItemPhoto($id){
+        $pjBusTypeModel = pjBusTypeModel::factory();
+        $arr = $pjBusTypeModel->find($id)->getData();
+        $image_path = $arr['photo'];
+        
+        if (is_file($image_path) && unlink($image_path)) {
+            
+               $sql = "UPDATE `{$pjBusTypeModel->getTable()}` SET photo = NULL where id = {$id}";
+
+               $res = $pjBusTypeModel->reset()->execute($sql);
+               
+        } 
     }
 
     public function pjActionDeleteMap() {

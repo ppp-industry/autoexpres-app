@@ -6,6 +6,7 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 			$frmUpdateBusType = $("#frmUpdateBusType"),
 			$dialogUpdate = $("#dialogUpdate"),
 			$dialogDel = $("#dialogDelete"),
+			$dialogPhotoDel = $("#dialogDeletePhoto"),
 			$boxMap = $("#boxMap"),
 			datagrid = ($.fn.datagrid !== undefined),
 			validate = ($.fn.validate !== undefined),
@@ -196,39 +197,7 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 				}
 			});
 			
-			if ($dialogDel.length > 0) {
-				$dialogDel.dialog({
-					autoOpen: false,
-					resizable: false,
-					draggable: false,
-					modal: true,
-					buttons: (function () {
-						var buttons = {};
-						buttons[bsApp.locale.button.delete] = function () {
-							$.ajax({
-								type: "POST",
-								data: {
-									id: $(this).data('lang')
-								},
-								url: "index.php?controller=pjAdminBusTypes&action=pjActionDeleteMap",
-								success: function (data) {
-									if(data != '100')
-									{
-										$boxMap.html(data);
-										$('#seats_count').parent().parent().css('display', 'block');
-									}
-								}
-							});
-							$dialogDel.dialog('close');
-						};
-						buttons[bsApp.locale.button.cancel] = function () {
-							$dialogDel.dialog('close');
-						};
-						
-						return buttons;
-					})()
-				});
-			}
+			initDialogs();
 		}
 		
 		function formatMap(val, obj) {
@@ -336,12 +305,91 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 			}
 			return false;
 		}).on("click", ".pj-delete-map", function (e) {
-			$dialogDel.data('lang', $(this).attr('lang')).dialog('open');
+                    $dialogDel.data('lang', $(this).attr('lang')).dialog('open');    
+		}).on("click", ".pj-delete-photo", function (e) {
+                    $dialogPhotoDel.data('lang', $(this).attr('lang')).dialog('open');    
 		}).on("click", "#pj_delete_seat", function (e) {
 			var rel = $(this).attr('data-rel');
 			$("#" + rel, $("#hiddenHolder")).remove();				
 			$(".rect-selected[rel='"+ rel +"']", $("#mapHolder")).remove();
 			$(this).css('display', 'none');
 		});
+                
+            
+                function initDialogs(){
+
+                    if ($dialogDel.length > 0) {
+                        $dialogDel.dialog({
+                            autoOpen: false,
+                            resizable: false,
+                            draggable: false,
+                            modal: true,
+                            buttons: (function () {
+                                    var buttons = {};
+                                    buttons[bsApp.locale.button.delete] = function () {
+                                            $.ajax({
+                                                type: "POST",
+                                                data: {
+                                                    id: $(this).data('lang')
+                                                },
+                                                url: "index.php?controller=pjAdminBusTypes&action=pjActionDeleteMap",
+                                                success: function (data) {
+                                                    if(data != '100')
+                                                    {
+                                                        $boxMap.html(data);
+                                                        $('#seats_count').parent().parent().css('display', 'block');
+                                                    }
+                                                }
+                                            });
+                                            $dialogDel.dialog('close');
+                                    };
+                                    buttons[bsApp.locale.button.cancel] = function () {
+                                            $dialogDel.dialog('close');
+                                    };
+
+                                    return buttons;
+                            })()
+                        });
+                    }
+                    
+                    if ($dialogPhotoDel.length > 0) {
+                        $dialogPhotoDel.dialog({
+                            autoOpen: false,
+                            resizable: false,
+                            draggable: false,
+                            modal: true,
+                            buttons: (function () {
+                                    var buttons = {};
+                                    buttons[bsApp.locale.button.delete] = function () {
+                                            $.ajax({
+                                                type: "POST",
+                                                data: {
+                                                    id: $(this).data('lang')
+                                                },
+                                                url: "index.php?controller=pjAdminBusTypes&action=pjActionDeletePhoto",
+                                                success: function (data) {
+                                                    if(data != '100')
+                                                    {
+//                                                        $boxMap.html(data);
+//                                                        $('#seats_count').parent().parent().css('display', 'block');
+                                                    }
+                                                }
+                                            });
+                                            $dialogPhotoDel.dialog('close');
+                                    };
+                                    buttons[bsApp.locale.button.cancel] = function () {
+                                            $dialogPhotoDel.dialog('close');
+                                    };
+
+                                    return buttons;
+                            })()
+                        });
+                    }
+                    
+                }    
+                
 	});
+        
+        
+        
 })(jQuery_1_8_2);

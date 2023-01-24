@@ -113,22 +113,35 @@ if (isset($tpl['status'])) {
 			{
 				$size = getimagesize($photo);
 				?>
-				<div id="boxMap">
-					<p>
+                                <p>
 						<label class="title">Фото</label>
 						<span class="inline_block">
-							<input type="button" value="<?php __('btnDeleteMap'); ?>" class="pj-button pj-delete-map" lang="<?php echo $tpl['arr']['id']?>"/>
+							<input type="button" value="Видалити фото" class="pj-button pj-delete-photo" lang="<?php echo $tpl['arr']['id']?>"/>
 						</span>
 					</p>
+                                        
+					
+					<div id="dialogDeletePhoto" title="Видалити фото" style="display:none">
+						<p>Ви впевненні ?</p>
+					</div>
+                                        
+                                        <p>
+						<label class="title">Завантажити нове</label>
+						<span class="inline_block">
+                                                    <input type="file" name="photo" id="photo" class="pj-form-field" />
+                                                </span>
+					</p>
+                                        
+					
+					
+				<div id="boxMapPhoto">
+					
 					<div class="bsMapHolder">
-						<div id="mapHolder" style="position: relative; overflow: hidden; width: <?php echo $size[0]; ?>px; height: <?php echo $size[1]; ?>px; margin: 0 auto;">
-							<img id="photo" src="<?php echo $photo; ?>" alt="" style="margin: 0; border: none; position: absolute; top: 0; left: 0; z-index: 500" />
+						<div id="photoHolder" style="position: relative; overflow: hidden; width: <?php echo $size[0]; ?>px; height: <?php echo $size[1]; ?>px; margin: 0 auto;">
+							<img id="photo" src="<?php echo $photo; ?>" alt="" style="margin: 0; border: none; position: absolute; top: 0; left: 0;" />
 						</div>
 					</div>
-					
-					<div id="dialogDelete" title="<?php __('btnDeleteMap'); ?>" style="display:none">
-						<p><?php __('lblDeleteMapConfirm'); ?></p>
-					</div>
+                                      
 				</div>
 				<?php
 			}else{

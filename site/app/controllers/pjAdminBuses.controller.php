@@ -913,8 +913,23 @@ class pjAdminBuses extends pjAdmin {
 
             $pjPriceModel = pjPriceModel::factory();
             $price_arr = $pjPriceModel->where('bus_id', $source_bus_id)->where('ticket_id', $source_ticket_id)->findAll()->getData();
+            
+            
+//            vd($price_arr);
+            
+            $data = [];
+            
             foreach ($price_arr as $v) {
-                $cnt = $pjPriceModel->reset()->where('bus_id', $dst_bus_id)->where('ticket_id', $dst_ticket_id)->where('from_location_id', $v['from_location_id'])->where('to_location_id', $v['to_location_id'])->findCount()->getData();
+                
+                
+                $cnt = $pjPriceModel->reset()
+                                    ->where('bus_id', $dst_bus_id)
+                                    ->where('ticket_id', $dst_ticket_id)
+                                    ->where('from_location_id', $v['from_location_id'])
+                                    ->where('to_location_id', $v['to_location_id'])
+                                    ->findCount()
+                                    ->getData();
+                
                 $price = $v['price'];
                 if ($cnt == 0) {
                     $data = array();
@@ -924,6 +939,7 @@ class pjAdminBuses extends pjAdmin {
                     $data['to_location_id'] = $v['to_location_id'];
                     $data['price'] = $price;
                     $pjPriceModel->reset()->setAttributes($data)->insert();
+                    $data[] = $pjPriceModel->getAffectedRows();
                 } else {
                     $pjPriceModel->reset()
                             ->where('bus_id', $dst_bus_id)
@@ -932,11 +948,18 @@ class pjAdminBuses extends pjAdmin {
                             ->where('to_location_id', $v['to_location_id'])
                             ->limit(1)
                             ->modifyAll(array('price' => $price));
+                    
+                    $data[] = $pjPriceModel->getAffectedRows();
                 }
             }
+            
+            
+            
             $response['code'] = 200;
+            $response['data'] = $data;
             pjAppController::jsonResponse($response);
-        }
+//        }
+    }
     }
 
 }
