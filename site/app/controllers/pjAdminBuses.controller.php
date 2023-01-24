@@ -5,6 +5,11 @@ if (!defined("ROOT_PATH")) {
     exit;
 }
 
+
+//        ini_set("display_errors", "On");
+//        error_reporting(E_ALL ^ E_DEPRECATED);
+        
+        
 class pjAdminBuses extends pjAdmin {
 
     public function pjActionCreate() {
@@ -110,7 +115,7 @@ class pjAdminBuses extends pjAdmin {
     public function pjActionDeleteBus() {
         $this->setAjax(true);
 
-        if ($this->isXHR()) {
+//        if ($this->isXHR()) {
             $response = array();
 
             if (pjBusModel::factory()->setAttributes(array('id' => $_GET['id']))->erase()->getAffectedRows() == 1) {
@@ -130,7 +135,7 @@ class pjAdminBuses extends pjAdmin {
             }
 
             pjAppController::jsonResponse($response);
-        }
+//        }
         exit;
     }
 
@@ -912,53 +917,29 @@ class pjAdminBuses extends pjAdmin {
             $dst_ticket_id = $_GET['ticket_id'];
 
             $pjPriceModel = pjPriceModel::factory();
-            $price_arr = $pjPriceModel->where('bus_id', $source_bus_id)->where('ticket_id', $source_ticket_id)->findAll()->getData();
-            
-            
-//            vd($price_arr);
+            $price_arr = $pjPriceModel->where('bus_id', $source_bus_id)->where('ticket_id', $source_ticket_id)->where('price is not null')->findAll()->getData();
             
             $data = [];
+            $pjPriceModel->reset()
+                        ->where('bus_id', $dst_bus_id)
+                        ->where('ticket_id', $dst_ticket_id)
+                        ->eraseAll();
             
-            foreach ($price_arr as $v) {
+            foreach ($price_arr as $sourcePriceItem) {
+                $data = array();
+                $data['bus_id'] = $dst_bus_id;
+                $data['ticket_id'] = $dst_ticket_id;
+                $data['from_location_id'] = $sourcePriceItem['from_location_id'];
+                $data['to_location_id'] = $sourcePriceItem['to_location_id'];
+                $data['price'] = $sourcePriceItem['price'];
                 
-                
-                $cnt = $pjPriceModel->reset()
-                                    ->where('bus_id', $dst_bus_id)
-                                    ->where('ticket_id', $dst_ticket_id)
-                                    ->where('from_location_id', $v['from_location_id'])
-                                    ->where('to_location_id', $v['to_location_id'])
-                                    ->findCount()
-                                    ->getData();
-                
-                $price = $v['price'];
-                if ($cnt == 0) {
-                    $data = array();
-                    $data['bus_id'] = $dst_bus_id;
-                    $data['ticket_id'] = $dst_ticket_id;
-                    $data['from_location_id'] = $v['from_location_id'];
-                    $data['to_location_id'] = $v['to_location_id'];
-                    $data['price'] = $price;
-                    $pjPriceModel->reset()->setAttributes($data)->insert();
-                    $data[] = $pjPriceModel->getAffectedRows();
-                } else {
-                    $pjPriceModel->reset()
-                            ->where('bus_id', $dst_bus_id)
-                            ->where('ticket_id', $dst_ticket_id)
-                            ->where('from_location_id', $v['from_location_id'])
-                            ->where('to_location_id', $v['to_location_id'])
-                            ->limit(1)
-                            ->modifyAll(array('price' => $price));
-                    
-                    $data[] = $pjPriceModel->getAffectedRows();
-                }
+                $pjPriceModel->reset()->setAttributes($data)->insert();
+
             }
-            
-            
             
             $response['code'] = 200;
             $response['data'] = $data;
             pjAppController::jsonResponse($response);
-//        }
     }
     }
 
