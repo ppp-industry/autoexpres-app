@@ -115,7 +115,7 @@ class pjAdminBuses extends pjAdmin {
     public function pjActionDeleteBus() {
         $this->setAjax(true);
 
-//        if ($this->isXHR()) {
+        if ($this->isXHR()) {
             $response = array();
 
             if (pjBusModel::factory()->setAttributes(array('id' => $_GET['id']))->erase()->getAffectedRows() == 1) {
@@ -135,7 +135,7 @@ class pjAdminBuses extends pjAdmin {
             }
 
             pjAppController::jsonResponse($response);
-//        }
+        }
         exit;
     }
 
@@ -938,7 +938,6 @@ class pjAdminBuses extends pjAdmin {
             }
             
             $response['code'] = 200;
-            $response['data'] = $data;
             pjAppController::jsonResponse($response);
     }
     }
