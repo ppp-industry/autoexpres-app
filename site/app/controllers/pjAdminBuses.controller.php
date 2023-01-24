@@ -932,6 +932,7 @@ class pjAdminBuses extends pjAdmin {
                 $data['from_location_id'] = $sourcePriceItem['from_location_id'];
                 $data['to_location_id'] = $sourcePriceItem['to_location_id'];
                 $data['price'] = $sourcePriceItem['price'];
+                $data['is_return'] = $sourcePriceItem['is_return'];
                 
                 $pjPriceModel->reset()->setAttributes($data)->insert();
 
