@@ -263,11 +263,13 @@ class pjApiBooking extends pjApi {
                 
                 
                 
-                if($payment === pjBookingPaymentModel::METHOD_CASH){
+//                if($payment === pjBookingPaymentModel::METHOD_CASH){
                     pjBookingMail::makeModel($id, pjBookingMail::TYPE_CONFIRM);
-                }
+//                }
                 
-                makePayment($FORM,$id,$payment, pjBookingPaymentModel::STATUS_PAID);
+                    
+                
+                makePayment($FORM,$id,$payment,$payment === pjBookingPaymentModel::METHOD_CASH ? pjBookingPaymentModel::STATUS_PAID : pjBookingPaymentModel::STATUS_NOTPAID);
                 
                 
                 if ($id !== false && (int) $id > 0) {
@@ -423,11 +425,14 @@ class pjApiBooking extends pjApi {
                 $data ['booking_route'] .= __('front_from', true, false) . ' ' . $from_location . ' ' . __('front_to', true, false) . ' ' . $to_location;
 
                 $id = $pjBookingModel->setAttributes(array_merge($FORM, $data))->insert()->getInsertId();
-                if($payment === pjBookingPaymentModel::METHOD_CASH){
+//                if(){
                     pjBookingMail::makeModel($id, pjBookingMail::TYPE_CONFIRM);
-                }
+//                }
+//                else{
+//                    
+//                }
                 
-                makePayment($FORM,$id,$payment, pjBookingPaymentModel::STATUS_PAID);
+                makePayment($FORM,$id,$payment,$payment === pjBookingPaymentModel::METHOD_CASH ? pjBookingPaymentModel::STATUS_PAID : pjBookingPaymentModel::STATUS_NOTPAID);
                 
                 if ($id !== false && (int) $id > 0) {
                     
