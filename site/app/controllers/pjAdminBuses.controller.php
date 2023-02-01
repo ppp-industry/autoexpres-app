@@ -6,8 +6,8 @@ if (!defined("ROOT_PATH")) {
 }
 
 
-//        ini_set("display_errors", "On");
-//        error_reporting(E_ALL ^ E_DEPRECATED);
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
         
         
 class pjAdminBuses extends pjAdmin {
@@ -61,9 +61,36 @@ class pjAdminBuses extends pjAdmin {
                     }
                     $pjBusModel->reset()->where('id', $id)->limit(1)->modifyAll($b_data);
 
+                    
+                    if(isset($_POST['transfer']) && count($_POST['transfer']) > 0){
+                        
+                        $busTransferModel = pjBusTransferModel::factory();
+                        
+//                        vd($_POST['select_transfer']);
+                        
+                        foreach($_POST['select_transfer'] as $city => $transferBusId){
+//                            select_transfer
+                            
+//                            vd($city);
+//                            exit();
+                            
+                            $busTransferModel->reset()->setAttributes([
+                                'bus_id' => $id,
+                                'city_id' => $city,
+                                'transfer_bus_id' => $transferBusId,
+                            ])->insert();
+                        }
+                        
+                    }
+                        
+                    
+                    
+                    
+                    
                     $err = 'ABS03';
                     pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBuses&action=pjActionTime&id=$id&err=$err");
-                } else {
+                } 
+                else {
                     $err = 'ABS04';
                     pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBuses&action=pjActionIndex&err=$err");
                 }
@@ -86,17 +113,9 @@ class pjAdminBuses extends pjAdmin {
 
                 $this->set('bus_type_arr', $bus_type_arr);
 
-                $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                                ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                                ->where('t2.file IS NOT NULL')
-                                ->orderBy('t1.sort ASC')->findAll()->getData();
-
-                $lp_arr = array();
-                foreach ($locale_arr as $item) {
-                    $lp_arr[$item['id'] . "_"] = $item['file'];
-                }
-                $this->set('lp_arr', $locale_arr);
-                $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+                
+                $this->setLocales();  
+                
 
                 $this->appendJs('jquery.validate.min.js', PJ_THIRD_PARTY_PATH . 'validate/');
                 $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
@@ -529,18 +548,9 @@ class pjAdminBuses extends pjAdmin {
                         ->find($arr['route_id'])
                         ->getData();
 
-
-                $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                                ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                                ->where('t2.file IS NOT NULL')
-                                ->orderBy('t1.sort ASC')->findAll()->getData();
-
-                $lp_arr = array();
-                foreach ($locale_arr as $item) {
-                    $lp_arr[$item['id'] . "_"] = $item['file'];
-                }
-                $this->set('lp_arr', $locale_arr);
-                $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+                $this->setLocales();
+                
+                
                 $this->set('arr', $arr);
                 $this->set('ticket_arr', $ticket_arr);
                 $this->set('seats_available', $seats_available);
@@ -943,6 +953,39 @@ class pjAdminBuses extends pjAdmin {
     }
     }
 
+    
+    
+    public function pjActionGetTransfersRoutes(){
+        $city = $_GET['city'];
+        
+        $pjBusModel = pjBusModel::factory()
+                    ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
+                    ->join('pjRouteCity', "t3.city_id={$city} AND t3.route_id=t1.route_id AND `order` = 1", 'inner');
+
+        
+        $data =  $pjBusModel->select(" t1.*,concat(t2.content,' ',t1.departure_time)  AS route")
+                            ->orderBy("route ASC")
+                            ->findAll()
+                            ->getData();
+
+        if(count($data) > 0){
+
+            pjAppController::jsonResponse([
+                'status' => 200,
+                'buses' => $data,
+            ]);
+        } 
+        else{
+            pjAppController::jsonResponse([
+                'status' => 100,
+            ]);
+        }
+
+        
+        
+        exit();
+                        
+    }
 }
 
 ?>

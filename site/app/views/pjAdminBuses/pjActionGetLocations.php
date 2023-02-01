@@ -57,6 +57,33 @@ if(count($tpl['location_arr']) > 0)
 					} 
 					?>
 				</span>
+                                
+                                
+                                <span class="inline_block">
+                                    <span class="block b3">
+                                        <label class="block float_left t5 w100">Пересадка: </label>
+                                        
+                                    </span>
+                                    <span class="block b3">
+                                        <input type="checkbox" data-city="<?=$v['city_id']?>" name="transfer[<?=$v['city_id']?>]" class="pj-form-field w80" />
+                                    </span>
+                                </span>
+                                
+                                
+                                <span style="display:  none" class="inline_block" id="transfer_container_<?=$v['city_id']?>">
+                                     <span class="block b3">
+                                        <label class="block float_left t5 w100">Оберіть маршрут: </label>
+                                        
+                                    </span>
+                                    <span class="block b3">
+                                        <select class="pj-form-field w250" name="select_transfer[<?=$v['city_id']?>]">
+                                            
+                                        </select> 
+                                    </span>
+                                    
+                                    
+                                </span>
+                                
 			</p>
 		<?php
 	}

@@ -660,7 +660,7 @@ class pjLocale extends pjLocaleAppController
 		}
 		$this->set('lp_arr', $locale_arr);
 		$this->set('locale_str', pjAppController::jsonEncode($lp_arr));
-
+                
 		$pjFieldModel = pjFieldModel::factory()
 			->join('pjMultiLang', "t2.model='pjField' AND t2.foreign_id=t1.id AND t2.locale='".$this->getLocaleId()."'", 'left');
 		if (isset($_GET['q']) && !empty($_GET['q']))

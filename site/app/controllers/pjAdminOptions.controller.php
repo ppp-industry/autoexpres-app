@@ -200,17 +200,8 @@ class pjAdminOptions extends pjAdmin {
 
             $this->set('arr', $arr);
 
-            $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                            ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                            ->where('t2.file IS NOT NULL')
-                            ->orderBy('t1.sort ASC')->findAll()->getData();
-
-            $lp_arr = array();
-            foreach ($locale_arr as $item) {
-                $lp_arr[$item['id'] . "_"] = $item['file'];
-            }
-            $this->set('lp_arr', $locale_arr);
-            $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+            $this->setLocales();
+            
 
             $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
             $this->appendJs('jquery.tipsy.js', PJ_THIRD_PARTY_PATH . 'tipsy/');
@@ -234,17 +225,7 @@ class pjAdminOptions extends pjAdmin {
 
             $this->set('arr', $arr);
 
-            $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                            ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                            ->where('t2.file IS NOT NULL')
-                            ->orderBy('t1.sort ASC')->findAll()->getData();
-
-            $lp_arr = array();
-            foreach ($locale_arr as $item) {
-                $lp_arr[$item['id'] . "_"] = $item['file'];
-            }
-            $this->set('lp_arr', $locale_arr);
-            $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+            $this->setLocales();
 
             $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
             $this->appendJs('jquery.tipsy.js', PJ_THIRD_PARTY_PATH . 'tipsy/');
@@ -280,17 +261,8 @@ class pjAdminOptions extends pjAdmin {
             $this->set('arr', $arr);
             $this->set('image_arr', $image_arr);
 
-            $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                            ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                            ->where('t2.file IS NOT NULL')
-                            ->orderBy('t1.sort ASC')->findAll()->getData();
-
-            $lp_arr = array();
-            foreach ($locale_arr as $item) {
-                $lp_arr[$item['id'] . "_"] = $item['file'];
-            }
-            $this->set('lp_arr', $locale_arr);
-            $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+            $this->setLocales();
+            
 
             $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
             $this->appendJs('jquery.tipsy.js', PJ_THIRD_PARTY_PATH . 'tipsy/');
@@ -315,17 +287,8 @@ class pjAdminOptions extends pjAdmin {
 
             $this->set('arr', $arr);
 
-            $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                            ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                            ->where('t2.file IS NOT NULL')
-                            ->orderBy('t1.sort ASC')->findAll()->getData();
-
-            $lp_arr = array();
-            foreach ($locale_arr as $item) {
-                $lp_arr[$item['id'] . "_"] = $item['file'];
-            }
-            $this->set('lp_arr', $locale_arr);
-            $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+            $this->setLocales();
+            
 
             $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
             $this->appendJs('jquery.tipsy.js', PJ_THIRD_PARTY_PATH . 'tipsy/');

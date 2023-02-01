@@ -309,8 +309,45 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 				$('.bs-loader').css('display', 'block');
 				$.get("index.php?controller=pjAdminBuses&action=pjActionGetLocations&route_id=" + route_id + qs).done(function (data) {
 					$('#bs_bus_locations').html(data);
+                                        
 					$('.bs-loader').css('display', 'none');
 					initializeTimePicker();
+                                        
+                                             
+                                $('input[name^="transfer"]').on('click',function(){
+
+                                    var $this = $(this),
+                                        city = $this.data('city'),
+                                        selectSelector = `select[name="select_transfer[${city}]"]`,
+                                        containerSelector = `#transfer_container_${city}`;
+
+
+                                    if($this.is(':checked')){
+                                        $.get("index.php?controller=pjAdminBuses&action=pjActionGetTransfersRoutes",{
+                                            city:city,
+
+                                        },function(data){
+                                            var htmlSelect = '';
+
+                                            if(data.status == 200){
+                                                data.buses.forEach((element) => { 
+                                                    
+
+                                                    htmlSelect += `<option value="${element.route_id}">${element.route}</option>`;
+                                                });
+
+                                                $(selectSelector).attr('required','required').html(htmlSelect);
+                                                $(containerSelector).show();
+
+                                            }
+
+
+                                        });
+                                    }
+
+                                });    
+                
+                                        
 				});
 			}
 		}).on("focusin", ".timepick", function (e) {
@@ -466,5 +503,9 @@ var jQuery_1_8_2 = jQuery_1_8_2 || $.noConflict();
 				$('#ticketTypeBox').html(data);
 			});
 		});
+                
+                
+           
+                
 	});
 })(jQuery_1_8_2);

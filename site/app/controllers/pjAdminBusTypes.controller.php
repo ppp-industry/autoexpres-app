@@ -69,17 +69,9 @@ class pjAdminBusTypes extends pjAdmin {
                     pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBusTypes&action=pjActionIndex&err=$err");
                 }
             } else {
-                $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                                ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                                ->where('t2.file IS NOT NULL')
-                                ->orderBy('t1.sort ASC')->findAll()->getData();
-
-                $lp_arr = array();
-                foreach ($locale_arr as $item) {
-                    $lp_arr[$item['id'] . "_"] = $item['file'];
-                }
-                $this->set('lp_arr', $locale_arr);
-                $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+                
+                
+                $this->setLocales();
 
                 $this->appendJs('jquery.validate.min.js', PJ_THIRD_PARTY_PATH . 'validate/');
                 $this->appendJs('jquery.multilang.js', PJ_FRAMEWORK_LIBS_PATH . 'pj/js/');
@@ -413,19 +405,12 @@ class pjAdminBusTypes extends pjAdmin {
                 }
                 $arr['i18n'] = $pjMultiLangModel->getMultiLang($arr['id'], 'pjBusType');
 
-                $locale_arr = pjLocaleModel::factory()->select('t1.*, t2.file')
-                                ->join('pjLocaleLanguage', 't2.iso=t1.language_iso', 'left')
-                                ->where('t2.file IS NOT NULL')
-                                ->orderBy('t1.sort ASC')->findAll()->getData();
-
-                $lp_arr = array();
-                foreach ($locale_arr as $item) {
-                    $lp_arr[$item['id'] . "_"] = $item['file'];
-                }
+                
+                $this->setLocales();
+                
+                
                 $this->set('seat_arr', pjSeatModel::factory()->where('bus_type_id', $_GET['id'])->findAll()->getData());
-
-                $this->set('lp_arr', $locale_arr);
-                $this->set('locale_str', pjAppController::jsonEncode($lp_arr));
+                
                 $this->set('arr', $arr);
 
                 $this->appendJs('jquery.validate.min.js', PJ_THIRD_PARTY_PATH . 'validate/');
