@@ -66,13 +66,8 @@ class pjAdminBuses extends pjAdmin {
                         
                         $busTransferModel = pjBusTransferModel::factory();
                         
-//                        vd($_POST['select_transfer']);
-                        
                         foreach($_POST['select_transfer'] as $city => $transferBusId){
-//                            select_transfer
-                            
-//                            vd($city);
-//                            exit();
+
                             
                             $busTransferModel->reset()->setAttributes([
                                 'bus_id' => $id,
@@ -296,6 +291,8 @@ class pjAdminBuses extends pjAdmin {
                 $number_of_locations = count($location_arr);
 
                 $today = date('Y-m-d');
+                
+                
                 foreach ($location_arr as $k => $v) {
                     $data = array();
                     if ($k == 0) {
@@ -318,6 +315,8 @@ class pjAdminBuses extends pjAdmin {
                         $pjBusLocationModel->reset()->setAttributes($data)->insert();
                     }
                 }
+                
+                
                 $pjBusModel->reset()->where('id', $_POST['id'])->limit(1)->modifyAll(array_merge($_POST, $b_data));
 
                 $pjBusDateModel = pjBusDateModel::factory();
@@ -332,10 +331,77 @@ class pjAdminBuses extends pjAdmin {
                         }
                     }
                 }
+                
+                
+                if(isset($_POST['transfer']) && count($_POST['transfer']) > 0){
+
+                     $busTransferModel = pjBusTransferModel::factory();
+
+                     foreach($_POST['select_transfer'] as $city => $transferBusId){
+                         
+                        $cnt =  $busTransferModel->reset()->where('bus_id',$_POST['id'])->where('city_id',$city)->findCount()->getData();
+                        if($cnt){
+//                            echo __LINE__;exit();
+                            
+                            $busTransferModel->reset()->where('bus_id',$_POST['id'])->where('city_id',$city)->limit(1)->modifyAll([
+                                'transfer_bus_id' => $transferBusId,
+                            ]);
+
+                            
+                        }
+                        else{
+                            $busTransferModel->reset()->setAttributes([
+                                'bus_id' => $_POST['id'],
+                                'city_id' => $city,
+                                'transfer_bus_id' => $transferBusId,
+                            ])->insert();
+                        }
+                        
+                         
+                         
+                         
+                     }
+
+                 }
+                        
+                
+                
 
                 pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBuses&action=pjActionTime&id=" . $_POST['id'] . "&err=ABS01");
+                
+                
             } else {
                 $arr = pjBusModel::factory()->find($_GET['id'])->getData();
+                
+                $transfers = pjBusTransferModel::factory()->where('bus_id',$_GET['id'])->findAll()->getData();
+                
+                if(count($transfers) > 0){
+                    $dataTransfers = [];
+                    $pjBusModel = pjBusModel::factory();
+                   
+                    foreach($transfers as &$transfer){
+                        
+                        
+                        $transfer['routes'] = $pjBusModel->reset()
+                            ->join('pjMultiLang', "t2.model='pjRoute' AND t2.foreign_id=t1.route_id AND t2.field='title' AND t2.locale='" . $this->getLocaleId() . "'", 'left outer')
+                            ->join('pjRouteCity', "t3.city_id={$transfer['city_id']} AND t3.route_id=t1.route_id AND `order` = 1", 'inner')
+                            ->select(" t1.*,concat(t2.content,' ',t1.departure_time)  AS route")
+                            ->orderBy("route ASC")
+                            ->findAll()
+                            ->getData();
+                            
+                            
+                        $dataTransfers[$transfer['city_id']] = &$transfer;
+                    }   
+                    
+                    
+                    
+                    
+                }
+                
+                $this->set('transfers', $dataTransfers);
+                
+                
                 if (count($arr) === 0) {
                     pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminBuses&action=pjActionIndex&err=ABS08");
                 }
@@ -756,6 +822,9 @@ class pjAdminBuses extends pjAdmin {
     }
 
     public function pjActionGetLocations() {
+        ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+        
         $this->setAjax(true);
 
         if ($this->isXHR()) {
@@ -766,6 +835,10 @@ class pjAdminBuses extends pjAdmin {
                                 ->where('route_id', $_GET['route_id'])
                                 ->orderBy("t1.order ASC")
                                 ->findAll()->getData();
+                
+//                vd($location_arr);
+                
+                
                 $this->set('location_arr', $location_arr);
 
                 if (isset($_GET['bus_id'])) {

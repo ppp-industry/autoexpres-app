@@ -110,7 +110,7 @@ if (isset($tpl['status']))
 									?>
 								</select>
 							</span>
-							<span id="bsArrivalTime" class="bs-time float_left l5"><?php echo !empty($time_arr) ? __('lblArrivalTime', true, false) . ': ' . $time_arr[1] : null;?></span>
+							<span id="bsArrivalTime" class="bs-time float_left l5"><?php echo !empty($time_arr) ? __('lblArrivalTime', true, false) . ': ' . (isset($time_arr[1]) ? $time_arr[1] : '') : null;?></span>
 						</span>
 					</p>
 				</div>
@@ -243,7 +243,7 @@ if (isset($tpl['status']))
 						<select name="payment_method" id="payment_method" class="pj-form-field w150">
 							<option value="">-- <?php __('lblChoose'); ?>--</option>
 							<?php
-							foreach (__('payment_methods', true, false) as $k => $v)
+							foreach ($tpl['payments'] as $k => $v)
 							{
 								?><option value="<?php echo $k; ?>"<?php echo $k == $tpl['arr']['payment_method'] ? ' selected="selected"' : NULL; ?>><?php echo $v; ?></option><?php
 							}
@@ -309,6 +309,7 @@ if (isset($tpl['status']))
 						<input type="text" name="cc_code" id="cc_code" value="<?php echo pjSanitize::clean($tpl['arr']['cc_code']); ?>" class="pj-form-field w100" />
 					</span>
 				</p>
+                                
 				<div class="p">
 					<label class="title"><?php __('lblStatus'); ?></label>
 					<span class="inline-block">
@@ -323,6 +324,24 @@ if (isset($tpl['status']))
 						</select>
 					</span>
 				</div>
+                                
+				<div class="p">
+					<label class="title">Статус оплати</label>
+					<span class="inline-block">
+						<select name="status" id="status" class="pj-form-field w150 required">
+							<option value="">-- <?php __('lblChoose'); ?>--</option>
+							<?php
+							foreach ($tpl['paymentsStatuses'] as $k => $v)
+							{
+								?><option value="<?php echo $k; ?>"<?php echo $k == $tpl['arr']['payment_status'] ? ' selected="selected"' : NULL; ?>><?php echo $v; ?></option><?php
+							}
+							?>
+						</select>
+					</span>
+				</div>
+                                
+                                
+                                
 				<p>
 					<label class="title">&nbsp;</label>
 					<input type="submit" value="<?php __('btnSave', false, true); ?>" class="pj-button" />

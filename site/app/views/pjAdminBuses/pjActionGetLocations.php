@@ -1,4 +1,9 @@
 <?php
+ini_set("display_errors", "On");
+        error_reporting(E_ALL ^ E_DEPRECATED);
+$transfers = isset($tpl['transfers']) ? $tpl['transfers'] : null;
+
+
 if(count($tpl['location_arr']) > 0)
 {
 	$time_format = $tpl['option_arr']['o_time_format'];
@@ -31,7 +36,6 @@ if(count($tpl['location_arr']) > 0)
 				}
 			}
 		}
-		
 		?>
 			<p>
 				<label class="title"><?php echo pjSanitize::clean($v['name']); ?>:</label>
@@ -65,19 +69,27 @@ if(count($tpl['location_arr']) > 0)
                                         
                                     </span>
                                     <span class="block b3">
-                                        <input type="checkbox" data-city="<?=$v['city_id']?>" name="transfer[<?=$v['city_id']?>]" class="pj-form-field w80" />
+                                        <input <?php if($transfers && isset($transfers[$v['city_id']])): ?>checked=""<?php endif ?>  type="checkbox" data-city="<?=$v['city_id']?>" name="transfer[<?=$v['city_id']?>]" class="pj-form-field w80" />
                                     </span>
                                 </span>
                                 
                                 
-                                <span style="display:  none" class="inline_block" id="transfer_container_<?=$v['city_id']?>">
+                                <span <?php if(!$transfers || !isset($transfers[$v['city_id']])):?>style="display:  none"<?php endif?>   class="inline_block" id="transfer_container_<?=$v['city_id']?>">
                                      <span class="block b3">
                                         <label class="block float_left t5 w100">Оберіть маршрут: </label>
                                         
                                     </span>
                                     <span class="block b3">
                                         <select class="pj-form-field w250" name="select_transfer[<?=$v['city_id']?>]">
+                                            <?php if($transfers && isset($transfers[$v['city_id']])): 
+                                                foreach($transfers[$v['city_id']]['routes'] as $routeItem):
+                                                ?>
                                             
+                                            <option <?php if($routeItem['id'] == $transfers[$v['city_id']]['transfer_bus_id']):  ?>selected=""<?php endif ?>  value="<?=$routeItem['id']?>"><?=$routeItem['route']?></option>
+                                            
+                                            <?php
+                                                endforeach;
+                                            endif ?> 
                                         </select> 
                                     </span>
                                     
@@ -88,4 +100,6 @@ if(count($tpl['location_arr']) > 0)
 		<?php
 	}
 }
+
+
 ?>

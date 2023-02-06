@@ -673,10 +673,25 @@ class pjAdminBookings extends pjAdmin {
 
                 $err = 'ABB01';
                 pjUtil::redirect(PJ_INSTALL_URL . "index.php?controller=pjAdminBookings&action=pjActionIndex&err=$err");
-            } else {
+            }
+            
+            else {
 
-                $arr = pjBookingModel::factory()->find($_GET['id'])->getData();
+                $arr = pjBookingModel::factory()->join('pjBookingPayment', "t1.id = t2.booking_id", 'left outer')->select('t1.*,t2.payment_method,t2.amount as payment_amount,t2.status as payment_status')->find($_GET['id'])->getData();
 
+                $payments = [
+                    pjBookingPaymentModel::METHOD_APAY => 'Apple pay',
+                    pjBookingPaymentModel::METHOD_CARD => 'Картка',
+                    pjBookingPaymentModel::METHOD_CASH => 'Готівка',
+                    pjBookingPaymentModel::METHOD_GPAY => 'Google pay',
+                    pjBookingPaymentModel::METHOD_LIQPAY  => 'Liqpay',
+                ];
+                
+                $paymentsStatuses = [
+                    pjBookingPaymentModel::STATUS_PAID => 'Оплачено',
+                    pjBookingPaymentModel::STATUS_NOTPAID => 'Не оплачено',
+                ];
+                
                 if (count($arr) <= 0) {
                     pjUtil::redirect(PJ_INSTALL_URL . "index.php?controller=pjAdminBookings&action=pjActionIndex&err=ABB08");
                 }
@@ -687,6 +702,8 @@ class pjAdminBookings extends pjAdmin {
                                 ->orderBy('`country_title` ASC')->findAll()->getData();
 
                 $this->set('country_arr', $country_arr);
+                $this->set('payments', $payments);
+                $this->set('paymentsStatuses', $paymentsStatuses);
 
                 $pjCityModel = pjCityModel::factory();
                 $pjRouteDetailModel = pjRouteDetailModel::factory();
@@ -766,7 +783,7 @@ class pjAdminBookings extends pjAdmin {
 
                 $bus_type_arr = pjBusTypeModel::factory()->find($bus_arr['bus_type_id'])->getData();
                 if ($bus_arr['set_seats_count'] == 'F') {
-                    $seats_available = $bus_type_arr['seats_count'];
+                    $seats_available = isset($bus_type_arr['seats_count']) ? $bus_type_arr['seats_count'] : 0;
                     $cnt_arr = $pjBookingSeatModel->reset()
                             ->select("COUNT(DISTINCT t1.seat_id) as cnt_booked")
                             ->where("t1.start_location_id IN(" . join(",", $location_id_arr) . ") 
