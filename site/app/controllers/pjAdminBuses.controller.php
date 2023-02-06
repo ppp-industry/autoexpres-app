@@ -822,8 +822,6 @@ class pjAdminBuses extends pjAdmin {
     }
 
     public function pjActionGetLocations() {
-        ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
         
         $this->setAjax(true);
 

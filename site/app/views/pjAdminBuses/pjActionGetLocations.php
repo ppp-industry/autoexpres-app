@@ -1,6 +1,5 @@
 <?php
-ini_set("display_errors", "On");
-        error_reporting(E_ALL ^ E_DEPRECATED);
+
 $transfers = isset($tpl['transfers']) ? $tpl['transfers'] : null;
 
 
