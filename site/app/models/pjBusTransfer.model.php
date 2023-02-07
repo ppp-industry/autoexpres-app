@@ -44,7 +44,21 @@ class pjBusTransferModel extends pjAppModel {
                 ->findAll()
                 ->getData();
                 
-        return  count($res) > 0 ? array_column($res, 'bus_id') : null;
+        if( count($res) > 0){
+            
+            $toBusIds = array_column($res, 'bus_id');
+            $fromBusIds = array_column($res, 'transfer_bus_id');
+
+            return [
+                'transferIds' =>[
+                    $transferIds => [
+                        'to' => $toBusIds,
+                        'from' => $fromBusIds,
+                    ]
+                ]
+            ];
+        }
+        return null;
     }
     
     
