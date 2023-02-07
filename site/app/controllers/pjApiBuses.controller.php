@@ -174,7 +174,6 @@ class pjApiBuses extends pjApi {
                             $this->_remove('return_bus_id_arr');
                         }
                     }
-                    echo __LINE__;exit();
                     pjAppController::jsonResponse($resp);
                 }
             } 
@@ -245,7 +244,7 @@ class pjApiBuses extends pjApi {
                 $seatIdArr = explode("|", $store['booked_data']['selected_seats']);
                 $intersect = array_intersect($bookedSeatArr, $seatIdArr);
                 if (!empty($intersect)) {
-                    echo __LINE__;exit();
+                    
                     $resp['code'] = 100;
                 } else {
                     $resp['code'] = 200;
@@ -283,6 +282,10 @@ class pjApiBuses extends pjApi {
             if ($this->_is('bus_id_arr')) {
                 
                 $busIdArr = $this->_get('bus_id_arr');
+                
+//                vd($busIdArr);
+                
+                
                 $date = $this->_get('date');
                 $busList = $this->getBusList($pickupId, $returnId, $busIdArr, $bookingPeriod, $bookedData, $date, 'F');
             }
