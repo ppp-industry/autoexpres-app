@@ -174,6 +174,7 @@ class pjApiBuses extends pjApi {
                             $this->_remove('return_bus_id_arr');
                         }
                     }
+                    echo __LINE__;exit();
                     pjAppController::jsonResponse($resp);
                 }
             } 
@@ -184,12 +185,20 @@ class pjApiBuses extends pjApi {
                 $filter($busIdArr,$pickupId, $returnId, $localeId);
                 
                 if (empty($busIdArr)) {
+                    
+                    $busIdArr = pjBusTransferModel::factory()->getBusIdsThroughManualTransfer($pickupId, $returnId,$params['transfer_id']);
+                }
+                
+                if (empty($busIdArr) || is_null($busIdArr) ) {
+                    
                     $resp['code'] = 100;
                     if (!isset($params['final_check'])) {
                         if ($this->_is('bus_id_arr')) {
                             $this->_remove('bus_id_arr');
                         }
                     }
+                    
+                    
                     pjAppController::jsonResponse($resp);
                 }
                 
@@ -236,7 +245,7 @@ class pjApiBuses extends pjApi {
                 $seatIdArr = explode("|", $store['booked_data']['selected_seats']);
                 $intersect = array_intersect($bookedSeatArr, $seatIdArr);
                 if (!empty($intersect)) {
-                    
+                    echo __LINE__;exit();
                     $resp['code'] = 100;
                 } else {
                     $resp['code'] = 200;
