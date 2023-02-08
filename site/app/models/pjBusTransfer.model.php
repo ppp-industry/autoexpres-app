@@ -55,7 +55,8 @@ class pjBusTransferModel extends pjAppModel {
                         'to' => $toBusIds,
                         'from' => $fromBusIds,
                     ]
-                ]
+                ],
+                'isTransfer' => 1
             ];
         }
         return null;

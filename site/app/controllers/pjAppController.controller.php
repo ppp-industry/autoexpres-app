@@ -509,6 +509,7 @@ class pjAppController extends pjController {
         $pjBusStopModel = pjRouteCityBusStopModel::factory();
         
         $transferIds = isset($busIdArr['transferIds']) ? $busIdArr['transferIds'] : null;
+        $isManualTransfer = isset($busIdArr['isTransfer']);
         
         $cityPreparedQuery = "t2.model='pjCity' AND t2.foreign_id=t1.id AND t2.field='name' AND t2.locale='" . $this->getLocaleId() . "'";
 
@@ -613,9 +614,11 @@ class pjAppController extends pjController {
                 
             }
             
-            $busArrTo = array_filter($busArrTo,$filterFunction);
-            $busArrFrom = array_filter($busArrFrom,$filterFunction);
-
+            if(!$isManualTransfer){
+                $busArrTo = array_filter($busArrTo,$filterFunction);
+                $busArrFrom = array_filter($busArrFrom,$filterFunction);
+            }
+            
             $keysFrom = array_keys($busArrFrom);
             $lastFromBusIndex = array_pop($keysFrom);
             $lastFromBus = $busArrFrom[$lastFromBusIndex];
@@ -670,7 +673,10 @@ class pjAppController extends pjController {
                 }
                 
                 $busArrKey = $id . '_' . $itemFrom['id'];
-                if(isset($busArr[$busArrKey]) || ($departureTimeTransferTimestamp - $arrivalTimeTransferTimestamp) > 7200){
+                
+                
+//                
+                if(!$isManualTransfer && (isset($busArr[$busArrKey]) || ($departureTimeTransferTimestamp - $arrivalTimeTransferTimestamp) > 7200)){
                     continue;;
                 }
                 
