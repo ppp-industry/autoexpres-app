@@ -396,10 +396,10 @@ class pjAdminBuses extends pjAdmin {
                     
                     
                     
-                    
+                    $this->set('transfers', $dataTransfers);
                 }
                 
-                $this->set('transfers', $dataTransfers);
+                
                 
                 
                 if (count($arr) === 0) {
@@ -639,6 +639,8 @@ class pjAdminBuses extends pjAdmin {
 
         if ($this->isAdmin() || $this->isEditor()) {
             if (isset($_POST['bus_update'])) {
+               
+                
                 $pjBusModel = pjBusModel::factory();
                 $arr = $pjBusModel->find($_POST['id'])->getData();
 
@@ -676,8 +678,11 @@ class pjAdminBuses extends pjAdmin {
                                         ->findCount()
                                         ->getData();
 
-                                $price = $_POST['price_' . $row['city_id'] . '_' . $col['city_id']];
-                                if ($price != '') {
+                                $tmpKey = 'price_' . $row['city_id'] . '_' . $col['city_id'];
+                                $price = isset($_POST[$tmpKey]) ? $_POST[$tmpKey] : null;
+                                
+                                
+                                if ($price && $price != '') {
                                     if (!is_numeric($price)) {
                                         $price = ':NULL';
                                     } else {
@@ -688,6 +693,7 @@ class pjAdminBuses extends pjAdmin {
                                 } else {
                                     $price = ':NULL';
                                 }
+                                
                                 if ($cnt == 0) {
                                     $data = array();
                                     $data['bus_id'] = $_POST['id'];
