@@ -184,8 +184,8 @@ class pjApiBuses extends pjApi {
                 $filter($busIdArr,$pickupId, $returnId, $localeId);
                 
                 if (empty($busIdArr)) {
-                    
-                    $busIdArr = pjBusTransferModel::factory()->getBusIdsThroughManualTransfer($pickupId, $returnId,$params['transfer_id']);
+                    $localeId = $this->getLocaleId();
+                    $busIdArr = pjBusTransferModel::factory()->getBusIdsThroughManualTransfer($pickupId, $returnId,$params['transfer_id'],$date,$localeId);
                 }
                 
                 if (empty($busIdArr) || is_null($busIdArr) ) {

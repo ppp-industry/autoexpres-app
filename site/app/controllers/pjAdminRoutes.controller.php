@@ -273,10 +273,11 @@ class pjAdminRoutes extends pjAdmin {
         if ($this->isAdmin() || $this->isEditor()) {
 
             $pjRouteCityBusStopModel = pjRouteCityBusStopModel::factory();
-            $busStops = $pjRouteCityBusStopModel->where('route_id',$_POST['id'])->findAll()->getData();;
             
             
             if (isset($_POST['route_update'])) {
+                
+                $busStops = $pjRouteCityBusStopModel->where('route_id',$_POST['id'])->findAll()->getData();;
                 $pjMultiLangModel = pjMultiLangModel::factory();
                 $pjRouteModel = pjRouteModel::factory();
                 
@@ -350,6 +351,7 @@ class pjAdminRoutes extends pjAdmin {
                 pjUtil::redirect($_SERVER['PHP_SELF'] . "?controller=pjAdminRoutes&action=pjActionUpdate&id=" . $_POST['id'] . "&err=AR01");
             } 
             else {
+                $busStops = $pjRouteCityBusStopModel->where('route_id',$_GET['id'])->findAll()->getData();;
                 $pjRouteModel = pjRouteModel::factory();
                 $routes = $pjRouteModel->where('t1.id != ' . $_GET['id'])
                         ->select("t1.*, t2.content as title")
