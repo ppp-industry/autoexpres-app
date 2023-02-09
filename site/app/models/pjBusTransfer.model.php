@@ -26,6 +26,8 @@ class pjBusTransferModel extends pjAppModel {
     public function getBusIdsThroughManualTransfer($pickup_id, $return_id,&$transferIds,$date,$localeId) {      
 
         $bookingDate = pjUtil::formatDate($date,'Y-m-d');
+        $dayOfWeek = date('l', strtotime($date));
+//        vd($dayOfWeek);
 
         $res = $this
                 ->reset()
@@ -42,7 +44,7 @@ class pjBusTransferModel extends pjAppModel {
                 ->join('pjBusLocation', "t1.transfer_bus_id = t3.bus_id", 'LEFT')
                 ->join('pjBus', "t4.id = t1.bus_id", 'INNER')
                 ->join('pjBus', "t5.id = t1.transfer_bus_id", 'INNER')
-                ->where("(t1.city_id = {$transferIds} and t2.location_id = {$pickup_id} and t3.location_id = {$return_id}) and (t5.`end_date` > '{$bookingDate}' and t4.`end_date` > '{$bookingDate}' )")
+                ->where("(t1.city_id = {$transferIds} and t2.location_id = {$pickup_id} and t3.location_id = {$return_id}) and (t5.`end_date` > '{$bookingDate}' and t4.`end_date` > '{$bookingDate}' ) and t4.recurring like '%{$dayOfWeek}%'")
                 ->findAll()
                 ->getData();
                 
